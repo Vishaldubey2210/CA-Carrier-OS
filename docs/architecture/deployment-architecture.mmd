@@ -1,0 +1,70 @@
+flowchart TB
+  classDef edge fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef alb fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe
+  classDef compute fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  classDef db fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef ext fill:#1c1917,stroke:#a8a29e,stroke-width:1px,color:#f5f5f4
+
+  subgraph INTERNET_CLIENTS["1. Internet & Edge Perimeter"]
+    CLIENTS["Web & Mobile Browsers\n(Candidates · Recruiters · Mentors)"]:::edge
+    CLOUDFLARE["Cloudflare Edge Network\n• Anycast DNS & Edge WAF\n• DDoS Mitigation & IP Reputation\n• TLS 1.3 Termination & Static CDN"]:::edge
+  end
+
+  subgraph AWS_VPC["2. AWS Cloud Virtual Private Cloud (VPC) — ap-south-1 (Mumbai)"]
+    direction TB
+
+    subgraph PUBLIC_SUBNETS["Public Subnet Tier (Multi-AZ)"]
+      ALB["Application Load Balancer (ALB)\n• Path-Based Routing: /api/* -> Backend, /* -> Frontend\n• AWS Certificate Manager (ACM) SSL"]:::alb
+      NAT_GW["NAT Gateway (Multi-AZ)\nOutbound Egress for Private Subnets"]:::alb
+    end
+
+    subgraph PRIVATE_APP_SUBNETS["Private Application Subnet Tier (Compute)"]
+      direction TB
+      subgraph ECS_FRONTEND["Next.js Presentation Service"]
+        NEXT_CONTAINERS["Next.js SSR Containers (Fargate)\n• React 19 App Router\n• Auto-Scaling: CPU > 70%"]:::compute
+      end
+
+      subgraph ECS_BACKEND["NestJS Core API Service"]
+        NEST_CONTAINERS["NestJS Modular Monolith (Fargate)\n• REST API Controllers & Domain Services\n• JWT Guards & Zod Validation\n• Auto-Scaling: Min 2, Max 10"]:::compute
+      end
+
+      subgraph ECS_WORKERS["Async Processing Workers"]
+        WORKER_CONTAINERS["BullMQ Worker Containers (Fargate)\n• Ingestion, Freshness, Embeddings, Reminders\n• Isolated Memory Sandbox"]:::compute
+      end
+    end
+
+    subgraph PRIVATE_DATA_SUBNETS["Private Isolated Persistence Subnet Tier"]
+      direction LR
+      AURORA_PG[("Amazon Aurora PostgreSQL 16+\n• Multi-AZ Primary + Read Replica\n• pgvector Extension Enabled\n• AES-256 KMS At-Rest Encryption")]:::db
+      ELASTICACHE[("Amazon ElastiCache Redis 7+\n• Multi-AZ Cluster (Primary + Replica)\n• In-Memory Sessions & BullMQ Queues\n• Auth Token & In-Transit TLS")]:::db
+      S3_BUCKET[("Amazon S3 / Cloudflare R2\n• Private Resume & Document Bucket\n• SSE-KMS Encryption\n• Pre-Signed URLs (15m TTL)")]:::db
+      SECRETS_MGR[("AWS Secrets Manager\n• Automated Credential Rotation\n• Zero Secrets in Code or Docker")]:::db
+    end
+  end
+
+  subgraph EXTERNAL_SAAS["3. External SaaS Egress (via NAT Gateway)"]
+    direction LR
+    AI_MODELS["AI Model Providers\n(Gemini · Claude · OpenAI)"]:::ext
+    JOB_PARTNERS["Partner ATS Feeds\n(Greenhouse · Lever · Darwinbox)"]:::ext
+    COMM_GATEWAYS["Resend (Email)\nTwilio (SMS/WhatsApp)"]:::ext
+    PAYMENT_GATEWAY["Razorpay Payment Gateway\n(PCI-DSS Invoicing)"]:::ext
+  end
+
+  CLIENTS -->|"HTTPS"| CLOUDFLARE
+  CLOUDFLARE -->|"Encrypted Ingress"| ALB
+  ALB -->|"/*"| NEXT_CONTAINERS
+  ALB -->|"/api/*"| NEST_CONTAINERS
+
+  NEXT_CONTAINERS -->|"Internal API Calls"| NEST_CONTAINERS
+  NEST_CONTAINERS -->|"Read / Write"| AURORA_PG
+  NEST_CONTAINERS -->|"Cache / Locks / Enqueue"| ELASTICACHE
+  NEST_CONTAINERS -->|"Pre-Signed URLs"| S3_BUCKET
+  NEST_CONTAINERS -->|"Fetch Config"| SECRETS_MGR
+
+  WORKER_CONTAINERS -->|"Consume Jobs"| ELASTICACHE
+  WORKER_CONTAINERS -->|"Batch Updates"| AURORA_PG
+  WORKER_CONTAINERS -->|"Upload Rendered PDFs"| S3_BUCKET
+
+  NEST_CONTAINERS -->|"Egress via NAT"| NAT_GW
+  WORKER_CONTAINERS -->|"Egress via NAT"| NAT_GW
+  NAT_GW --> EXTERNAL_SAAS

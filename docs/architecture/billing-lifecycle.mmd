@@ -1,0 +1,43 @@
+stateDiagram-v2
+  [*] --> FreeTier : User Registration
+
+  state FreeTier {
+    [*] --> ActiveFree
+    ActiveFree --> UpgradeInitiated : User selects Pro/Team Plan
+  }
+
+  UpgradeInitiated --> CheckoutPending : Razorpay Order Created
+
+  state CheckoutPending {
+    [*] --> AwaitingPayment
+    AwaitingPayment --> PaymentSuccess : Webhook payment.captured
+    AwaitingPayment --> PaymentFailed : Webhook payment.failed / Abandoned
+    PaymentFailed --> [*] : Order Expired (30m)
+  }
+
+  PaymentSuccess --> ActivePaid : Entitlement Granted (PRO / TEAM)
+
+  state ActivePaid {
+    [*] --> InGoodStanding
+    InGoodStanding --> RenewalApproaching : 3 Days Prior to Billing Cycle
+    RenewalApproaching --> AutoDebitAttempted : Recurring Mandate Triggered
+    AutoDebitAttempted --> InGoodStanding : Charge Success
+    AutoDebitAttempted --> PastDue : Charge Failed (RBI AFA / Funds)
+    InGoodStanding --> CancellationRequested : User requests cancel
+  }
+
+  PastDue --> GracePeriod : 7-Day Grace Window Active
+  state GracePeriod {
+    [*] --> RetryAttempt1 : Day 2 Retry
+    RetryAttempt1 --> InGoodStanding : Succeeded
+    RetryAttempt1 --> RetryAttempt2 : Day 5 Retry
+    RetryAttempt2 --> InGoodStanding : Succeeded
+    RetryAttempt2 --> GraceExpired : Day 7 Final Notice
+  }
+
+  GraceExpired --> DowngradedToFree : Revoke Pro Entitlements
+  CancellationRequested --> ActiveUntilPeriodEnd : Preserves Paid Days
+  ActiveUntilPeriodEnd --> DowngradedToFree : Billing Period Elapsed
+
+  DowngradedToFree --> FreeTier : Data Preserved in Read-Only
+  DowngradedToFree --> UpgradeInitiated : User Reactivates Plan

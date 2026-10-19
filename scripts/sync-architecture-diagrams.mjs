@@ -25,7 +25,7 @@ const ARCH_DIR = path.join(REPO_ROOT, 'docs', 'architecture');
 const isCheckOnly = process.argv.includes('--check');
 
 // Map of diagram identifiers to their source .mmd files in docs/architecture/
-// Exactly 14 canonical architecture diagrams defined across the system
+// Exactly 18 canonical architecture diagrams defined across the system
 const DIAGRAM_MAP = {
   'system-context': 'system-context.mmd',
   'system-architecture': 'system-architecture.mmd',
@@ -41,6 +41,10 @@ const DIAGRAM_MAP = {
   'security-boundaries': 'security-boundaries.mmd',
   'background-processing': 'background-processing.mmd',
   'independent-practice-workflow': 'independent-practice-workflow.mmd',
+  'deployment-architecture': 'deployment-architecture.mmd',
+  'identity-and-access': 'identity-and-access.mmd',
+  'billing-lifecycle': 'billing-lifecycle.mmd',
+  'observability-architecture': 'observability-architecture.mmd',
 };
 
 // Target markdown files containing embedded diagram markers

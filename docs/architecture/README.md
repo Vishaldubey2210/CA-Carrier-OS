@@ -8,7 +8,7 @@
 [![Architecture Status](https://img.shields.io/badge/Status-Blueprint%20%7C%20Implementation%20Pending-yellow.svg)](#11-architecture-status-implementation-phases--roadmap)
 [![Design Pattern](https://img.shields.io/badge/Pattern-Modular%20Monolith%20(NestJS)-blue.svg)(decisions.md#adr-001-modular-monolith-architecture-over-microservices)
 [![Security Standard](https://img.shields.io/badge/Security-Zero--Trust%20Gateway%20%7C%20Human--in--the--Loop-green.svg)](#7-security-architecture--threat-model)
-[![Mermaid Diagrams](https://img.shields.io/badge/Diagrams-14%20Validated%20Views-brightgreen.svg)](#2-visual-architecture-diagrams-handbook)
+[![Mermaid Diagrams](https://img.shields.io/badge/Diagrams-18%20Validated%20Views-brightgreen.svg)](#2-visual-architecture-diagrams-handbook)
 [![ICAI Ethics Alignment](https://img.shields.io/badge/Domain-ICAI%20Ethics%20Alignment%20(Under%20Review)-orange.svg)](#13-legal-professional-ethics--regulatory-disclaimers)
 
 ---
@@ -16,7 +16,10 @@
 ## Table of Contents
 
 1. [Executive Summary & Architectural Vision](#1-executive-summary--architectural-vision)
-2. [Visual Architecture Diagrams Handbook (14 Core Views)](#2-visual-architecture-diagrams-handbook)
+   - [1.1 The Core Product Promise](#11-the-core-product-promise)
+   - [1.2 Core Architectural Principles](#12-core-architectural-principles)
+   - [1.3 Master Documentation Suite & Blueprint Directory](#13-master-documentation-suite--blueprint-directory)
+2. [Visual Architecture Diagrams Handbook (18 Core Views)](#2-visual-architecture-diagrams-handbook)
    - [2.1 System Context Diagram](#21-system-context-diagram)
    - [2.2 Detailed Container Architecture](#22-detailed-container-architecture)
    - [2.3 Backend Component Architecture](#23-backend-component-architecture)
@@ -31,6 +34,10 @@
    - [2.12 Security Boundaries & Trust Zones](#212-security-boundaries--trust-zones)
    - [2.13 Background Jobs & Asynchronous Queues](#213-background-jobs--asynchronous-queues)
    - [2.14 Independent Practice Workflow](#214-independent-practice-workflow)
+   - [2.15 Deployment Architecture & Cloud Topology](#215-deployment-architecture--cloud-topology)
+   - [2.16 Identity, Multi-Tenancy & Access Control](#216-identity-multi-tenancy--access-control)
+   - [2.17 Billing, Subscriptions & Commercial Lifecycle](#217-billing-subscriptions--commercial-lifecycle)
+   - [2.18 Observability, Telemetry & Health Monitoring](#218-observability-telemetry--health-monitoring)
 3. [Product & Domain Architecture (11 Core Modules)](#3-product--domain-architecture-11-core-modules)
 4. [AI Agent Request & Execution Lifecycle](#4-ai-agent-request--execution-lifecycle)
 5. [Database Architecture & Schema Specification](#5-database-architecture--schema-specification)
@@ -70,15 +77,62 @@ Unlike generic, fragmented job boards, CA Career OS provides an active, personal
 - **Modular Monolith Baseline (ADR-001):** Single deployable NestJS service with clean domain boundaries, avoiding microservices network latency while preserving clean future extraction boundaries.
 - **Standard REST API Standard (ADR-002):** Unified RESTful API with strict Zod schema validation, predictable error envelopes, and idempotency headers.
 
+### 1.3 Master Documentation Suite & Blueprint Directory
+
+The CA Career OS engineering specification is organized across four specialized directories to provide complete, end-to-end traceability from product vision to operational recovery:
+
+```
+CA-Carrier-OS/
+├── README.md                                    # Master Repository Overview & GitHub Presentation
+├── api/
+│   └── openapi.yaml                             # Formal OpenAPI 3.0.3 REST API Contract
+├── docs/
+│   ├── product/                                 # Product Management & UX Specifications
+│   │   ├── vision-and-scope.md                  # Product Promise, Scope Bounds & Hypotheses
+│   │   ├── personas-and-jobs-to-be-done.md      # 10 Detailed Personas, JTBD & Permissions
+│   │   ├── product-requirements.md              # Functional PRD with Stable Requirement IDs
+│   │   ├── monetization-hypotheses.md           # 5-Tier SaaS Business Model & Unit Economics
+│   │   ├── user-experience-specification.md     # Information Architecture, Routes & 12 UX States
+│   │   ├── user-journeys.md                     # 15 End-to-End User Journeys (Frontend to DB)
+│   │   └── feature-traceability.md              # Traceability Matrix & Unresolved Gap Register
+│   └── architecture/                            # Architecture Handbooks & Technical Specifications
+│       ├── README.md                            # Canonical Master Architecture Handbook (This File)
+│       ├── system-overview.md                   # Modular Monolith Architecture & Module Boundaries
+│       ├── database-schema.md                   # Relational Schema, Indexes, Constraints & Prisma Models
+│       ├── data-ownership-and-retention.md      # Workspace Scoping, Retention Matrix & DPDP Controls
+│       ├── api-design.md                        # REST Conventions, Headers, Envelopes & Status Codes
+│       ├── async-processing.md                  # BullMQ Queues, Job Schemas, Retries & Outbox
+│       ├── security-threat-model.md             # STRIDE Threat Model & Mitigations
+│       ├── data-protection.md                   # File Ingestion Pipeline, Pre-Signed URLs & PII Sanitization
+│       ├── incident-response.md                 # Severity Levels, Incident Lifecycle & CERT-In Reporting
+│       ├── reliability-and-observability.md     # SLIs/SLOs, Monitoring & Failure Handling Matrix
+│       ├── product-analytics.md                 # Analytics Event Taxonomy & Success Metrics
+│       ├── testing-strategy.md                  # Test Pyramid, Negative Suites & Quality Gates
+│       ├── deployment-and-environments.md       # 4 Environment Tiers, Zero-Downtime Migrations & ECS
+│       ├── integration-register.md              # Third-Party Provider Catalog, Scopes & Fallbacks
+│       ├── implementation-roadmap.md            # 5 Implementation Phases & Work Package Catalog
+│       ├── assumptions-risks-and-open-questions.md # Risk Register & Prioritized Research Spikes
+│       ├── glossary.md                          # Indian CA Domain & Software Terminology
+│       ├── decisions.md                         # Architecture Decision Records (ADRs)
+│       └── *.mmd                                # 18 Canonical Mermaid Architecture Diagrams
+└── runbooks/                                    # SRE & Operational Recovery Procedures
+    ├── deployment.md                            # RB-OPS-001: Production Deployment Checklist
+    ├── rollback.md                              # RB-OPS-002: Production Rollback Procedure
+    ├── database-recovery.md                     # RB-OPS-003: Database PITR & Disaster Recovery
+    ├── worker-failures.md                       # RB-OPS-004: Background Worker Failure & DLQ Triage
+    ├── provider-outages.md                      # RB-OPS-005: Upstream Provider Outage & Fallback
+    └── security-incident.md                     # RB-OPS-006: Security Incident Response & CERT-In Filing
+```
+
 ---
 
 ## 2. Visual Architecture Diagrams Handbook
 
-This section documents all 14 visual architecture diagrams across the system. Every diagram includes its embedded, GitHub-compatible Mermaid source, purpose statement, component breakdown, data flow, trust boundaries, failure paths, and implementation status.
+This section documents all 18 visual architecture diagrams across the system. Every diagram includes its embedded, GitHub-compatible Mermaid source, purpose statement, component breakdown, data flow, trust boundaries, failure paths, and implementation status.
 
 ```
 +───────────────────────────────────────────────────────────────────────────────────────────+
-|                                14 VISUAL ARCHITECTURE VIEWS                               |
+|                                18 VISUAL ARCHITECTURE VIEWS                               |
 +───────────────────────────────────────────────────────────────────────────────────────────+
 | 01. System Context            | Users, platform boundary, persistence, external systems   |
 | 02. Container Architecture    | Presentation tier, API gateway, modules, workers, stores  |
@@ -94,6 +148,10 @@ This section documents all 14 visual architecture diagrams across the system. Ev
 | 12. Security Boundaries       | Edge WAF, API ingress, agent gateway, KMS storage zones   |
 | 13. Background Processing     | BullMQ queues, worker pool, retry backoff, DLQ, reconcile |
 | 14. Independent Practice      | COP checklist, firm constitution, ethics, client CRM      |
+| 15. Deployment Architecture   | Multi-AZ ECS Fargate, Aurora PostgreSQL, Redis, CDN       |
+| 16. Identity & Access Control | Workspaces, Tenant Scoping, Session Lifecycle, RBAC       |
+| 17. Billing & Commercial      | Plans, Webhook Processing, Soft-Entitlement Grace, Pro     |
+| 18. Observability & Telemetry | OpenTelemetry, Structured Logs, Metrics, Alert Triggers    |
 +───────────────────────────────────────────────────────────────────────────────────────────+
 ```
 
@@ -1782,6 +1840,285 @@ flowchart TD
 #### Architectural Breakdown:
 - **Ethics Non-Solicitation Enforcement:** The platform prohibits any public directories, firm advertising, or lead-generation bidding engines, adhering to ICAI Code of Ethics (2020).
 - **Client Vault Isolation:** Practice CRM records are held in private organization workspaces with KMS encryption for client audit files.
+
+---
+
+### 2.15 Deployment Architecture & Cloud Topology
+
+- **Purpose:** Cloud infrastructure topology showing Multi-AZ ECS Fargate deployment, ALB ingress routing, private VPC isolation, Aurora PostgreSQL, ElastiCache Redis, S3 document storage, and Cloudflare perimeter security in AWS `ap-south-1` (Mumbai).
+- **Canonical Source:** [`deployment-architecture.mmd`](deployment-architecture.mmd)
+- **Implementation Status:** *Blueprint / Infrastructure Specification (Deployment pending)*
+
+<!-- DIAGRAM:deployment-architecture:START -->
+```mermaid
+flowchart TB
+  classDef edge fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef alb fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe
+  classDef compute fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  classDef db fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef ext fill:#1c1917,stroke:#a8a29e,stroke-width:1px,color:#f5f5f4
+
+  subgraph INTERNET_CLIENTS["1. Internet & Edge Perimeter"]
+    CLIENTS["Web & Mobile Browsers\n(Candidates · Recruiters · Mentors)"]:::edge
+    CLOUDFLARE["Cloudflare Edge Network\n• Anycast DNS & Edge WAF\n• DDoS Mitigation & IP Reputation\n• TLS 1.3 Termination & Static CDN"]:::edge
+  end
+
+  subgraph AWS_VPC["2. AWS Cloud Virtual Private Cloud (VPC) — ap-south-1 (Mumbai)"]
+    direction TB
+
+    subgraph PUBLIC_SUBNETS["Public Subnet Tier (Multi-AZ)"]
+      ALB["Application Load Balancer (ALB)\n• Path-Based Routing: /api/* -> Backend, /* -> Frontend\n• AWS Certificate Manager (ACM) SSL"]:::alb
+      NAT_GW["NAT Gateway (Multi-AZ)\nOutbound Egress for Private Subnets"]:::alb
+    end
+
+    subgraph PRIVATE_APP_SUBNETS["Private Application Subnet Tier (Compute)"]
+      direction TB
+      subgraph ECS_FRONTEND["Next.js Presentation Service"]
+        NEXT_CONTAINERS["Next.js SSR Containers (Fargate)\n• React 19 App Router\n• Auto-Scaling: CPU > 70%"]:::compute
+      end
+
+      subgraph ECS_BACKEND["NestJS Core API Service"]
+        NEST_CONTAINERS["NestJS Modular Monolith (Fargate)\n• REST API Controllers & Domain Services\n• JWT Guards & Zod Validation\n• Auto-Scaling: Min 2, Max 10"]:::compute
+      end
+
+      subgraph ECS_WORKERS["Async Processing Workers"]
+        WORKER_CONTAINERS["BullMQ Worker Containers (Fargate)\n• Ingestion, Freshness, Embeddings, Reminders\n• Isolated Memory Sandbox"]:::compute
+      end
+    end
+
+    subgraph PRIVATE_DATA_SUBNETS["Private Isolated Persistence Subnet Tier"]
+      direction LR
+      AURORA_PG[("Amazon Aurora PostgreSQL 16+\n• Multi-AZ Primary + Read Replica\n• pgvector Extension Enabled\n• AES-256 KMS At-Rest Encryption")]:::db
+      ELASTICACHE[("Amazon ElastiCache Redis 7+\n• Multi-AZ Cluster (Primary + Replica)\n• In-Memory Sessions & BullMQ Queues\n• Auth Token & In-Transit TLS")]:::db
+      S3_BUCKET[("Amazon S3 / Cloudflare R2\n• Private Resume & Document Bucket\n• SSE-KMS Encryption\n• Pre-Signed URLs (15m TTL)")]:::db
+      SECRETS_MGR[("AWS Secrets Manager\n• Automated Credential Rotation\n• Zero Secrets in Code or Docker")]:::db
+    end
+  end
+
+  subgraph EXTERNAL_SAAS["3. External SaaS Egress (via NAT Gateway)"]
+    direction LR
+    AI_MODELS["AI Model Providers\n(Gemini · Claude · OpenAI)"]:::ext
+    JOB_PARTNERS["Partner ATS Feeds\n(Greenhouse · Lever · Darwinbox)"]:::ext
+    COMM_GATEWAYS["Resend (Email)\nTwilio (SMS/WhatsApp)"]:::ext
+    PAYMENT_GATEWAY["Razorpay Payment Gateway\n(PCI-DSS Invoicing)"]:::ext
+  end
+
+  CLIENTS -->|"HTTPS"| CLOUDFLARE
+  CLOUDFLARE -->|"Encrypted Ingress"| ALB
+  ALB -->|"/*"| NEXT_CONTAINERS
+  ALB -->|"/api/*"| NEST_CONTAINERS
+
+  NEXT_CONTAINERS -->|"Internal API Calls"| NEST_CONTAINERS
+  NEST_CONTAINERS -->|"Read / Write"| AURORA_PG
+  NEST_CONTAINERS -->|"Cache / Locks / Enqueue"| ELASTICACHE
+  NEST_CONTAINERS -->|"Pre-Signed URLs"| S3_BUCKET
+  NEST_CONTAINERS -->|"Fetch Config"| SECRETS_MGR
+
+  WORKER_CONTAINERS -->|"Consume Jobs"| ELASTICACHE
+  WORKER_CONTAINERS -->|"Batch Updates"| AURORA_PG
+  WORKER_CONTAINERS -->|"Upload Rendered PDFs"| S3_BUCKET
+
+  NEST_CONTAINERS -->|"Egress via NAT"| NAT_GW
+  WORKER_CONTAINERS -->|"Egress via NAT"| NAT_GW
+  NAT_GW --> EXTERNAL_SAAS
+```
+<!-- DIAGRAM:deployment-architecture:END -->
+
+#### Architectural Breakdown:
+- **Zero Public Compute Exposure:** All Next.js frontend, NestJS backend, and BullMQ worker containers operate in private subnets with no public IPs. Inbound traffic enters exclusively via Cloudflare WAF and AWS ALB.
+- **Data Residency:** All candidate records, resume vaults, and database instances reside strictly in the AWS Mumbai region (`ap-south-1`) adhering to Indian data protection guidance.
+
+---
+
+### 2.16 Identity, Multi-Tenancy & Access Control
+
+- **Purpose:** State and relationship model detailing user registration, authentication, workspace tenancy boundaries, RBAC roles, tenant isolation guards, session token lifecycles, and cryptographic user approval.
+- **Canonical Source:** [`identity-and-access.mmd`](identity-and-access.mmd)
+- **Implementation Status:** *Blueprint / Identity Specification*
+
+<!-- DIAGRAM:identity-and-access:START -->
+```mermaid
+flowchart TB
+  classDef auth fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef token fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef rbac fill:#312e81,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+  classDef tenant fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef block fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+
+  subgraph AUTH_FLOW["1. Authentication & Token Lifecycle"]
+    CREDENTIALS["User Credentials\n(Email + Bcrypt Password)"]:::auth
+    AUTH_SERVICE["IdentityService.validateCredentials()\n• 12 Rounds Bcrypt Verification\n• Rate Limit: Max 5 Failed Attempts"]:::auth
+    TOKEN_GEN["TokenService.generateTokenPair()\n• Access Token: JWT (15m TTL in Memory)\n• Refresh Token: Crypto UUID (7d HttpOnly Cookie)"]:::token
+    REFRESH_ROTATION["Refresh Token Rotation\n• Single-Use Invalidation in Redis\n• Token Family Reuse Detection -> Revoke All"]:::token
+  end
+
+  subgraph CONTEXT_RESOLUTION["2. Workspace Context & Tenant Resolution"]
+    REQ_HEADER["Incoming Request Header:\nX-Workspace-Id: <uuid>"]:::tenant
+    WS_GUARD["TenantContextGuard (NestJS)\n• Verifies Workspace Exists\n• Verifies User is Active Member"]:::tenant
+    WS_TYPE{"Workspace Type"}:::tenant
+    
+    PERSONAL_WS["Personal Workspace\n• 1:1 Candidate Privacy Boundary\n• Resumes, Applications, Mock Drills"]:::tenant
+    ORG_WS["Organization Workspace\n• 1:N Firm / Employer Workspace\n• Job Requisitions, Applicant Pipeline"]:::tenant
+  end
+
+  subgraph RBAC_ENGINE["3. Role-Based Access Control (RBAC) Engine"]
+    ROLE_EVAL{"Workspace Member Role"}:::rbac
+    ROLE_OWNER["OWNER\nFull Control · Billing · Workspace Deletion"]:::rbac
+    ROLE_ADMIN["ADMIN\nMember Invites · Job Management · Pipeline"]:::rbac
+    ROLE_REC["RECRUITER\nPost Jobs · Review Applicants · Schedule Interviews"]:::rbac
+    ROLE_VIEW["VIEWER\nRead-Only Access to Requisitions & Analytics"]:::rbac
+  end
+
+  subgraph BLINDFOLD_RULE["4. Current Employer Privacy Blindfold"]
+    BLINDFOLD_CHECK{"Candidate Employed at\nViewing Organization?"}:::block
+    BLIND_APPLY["Mask Candidate Identity\n• Exclude from Recruiter Search\n• Zero Visibility into Personal Workspace"]:::block
+    PERMIT_VIEW["Allow Authorized Pipeline View\n(Only for Explicit Job Applications)"]:::tenant
+  end
+
+  CREDENTIALS --> AUTH_SERVICE
+  AUTH_SERVICE --> TOKEN_GEN
+  TOKEN_GEN --> REFRESH_ROTATION
+
+  TOKEN_GEN --> REQ_HEADER
+  REQ_HEADER --> WS_GUARD
+  WS_GUARD --> WS_TYPE
+
+  WS_TYPE -- "PERSONAL" --> PERSONAL_WS
+  WS_TYPE -- "ORGANIZATION" --> ORG_WS
+
+  ORG_WS --> ROLE_EVAL
+  ROLE_EVAL -- "OWNER" --> ROLE_OWNER
+  ROLE_EVAL -- "ADMIN" --> ROLE_ADMIN
+  ROLE_EVAL -- "RECRUITER" --> ROLE_REC
+  ROLE_EVAL -- "VIEWER" --> ROLE_VIEW
+
+  ORG_WS --> BLINDFOLD_CHECK
+  BLINDFOLD_CHECK -- "Yes (Current Employer)" --> BLIND_APPLY
+  BLINDFOLD_CHECK -- "No (Legitimate Applicant)" --> PERMIT_VIEW
+```
+<!-- DIAGRAM:identity-and-access:END -->
+
+#### Architectural Breakdown:
+- **Strict Tenant Decoupling:** Candidates possess isolated Personal Workspaces. Employer Organization Workspaces are strictly walled; an employer membership grants zero access to a candidate's personal job search, mock interview history, or salary calculations.
+- **Signed Approval Token Lifecycle:** Actions triggering external mutations (`EXPLICITLY_APPROVED_EXTERNAL`) require an HMAC-SHA256 signed approval token that expires after 15 minutes.
+
+---
+
+### 2.17 Billing, Subscriptions & Commercial Lifecycle
+
+- **Purpose:** Commercial lifecycle state machine covering candidate and employer subscription tiers, checkout session creation, Razorpay webhook processing, idempotency locking, soft-entitlement renewal grace, and cancellation.
+- **Canonical Source:** [`billing-lifecycle.mmd`](billing-lifecycle.mmd)
+- **Implementation Status:** *Blueprint / Commercial Specification (Phase 1 Baseline is Free Tier)*
+
+<!-- DIAGRAM:billing-lifecycle:START -->
+```mermaid
+stateDiagram-v2
+  [*] --> FreeTier : User Registration
+
+  state FreeTier {
+    [*] --> ActiveFree
+    ActiveFree --> UpgradeInitiated : User selects Pro/Team Plan
+  }
+
+  UpgradeInitiated --> CheckoutPending : Razorpay Order Created
+
+  state CheckoutPending {
+    [*] --> AwaitingPayment
+    AwaitingPayment --> PaymentSuccess : Webhook payment.captured
+    AwaitingPayment --> PaymentFailed : Webhook payment.failed / Abandoned
+    PaymentFailed --> [*] : Order Expired (30m)
+  }
+
+  PaymentSuccess --> ActivePaid : Entitlement Granted (PRO / TEAM)
+
+  state ActivePaid {
+    [*] --> InGoodStanding
+    InGoodStanding --> RenewalApproaching : 3 Days Prior to Billing Cycle
+    RenewalApproaching --> AutoDebitAttempted : Recurring Mandate Triggered
+    AutoDebitAttempted --> InGoodStanding : Charge Success
+    AutoDebitAttempted --> PastDue : Charge Failed (RBI AFA / Funds)
+    InGoodStanding --> CancellationRequested : User requests cancel
+  }
+
+  PastDue --> GracePeriod : 7-Day Grace Window Active
+  state GracePeriod {
+    [*] --> RetryAttempt1 : Day 2 Retry
+    RetryAttempt1 --> InGoodStanding : Succeeded
+    RetryAttempt1 --> RetryAttempt2 : Day 5 Retry
+    RetryAttempt2 --> InGoodStanding : Succeeded
+    RetryAttempt2 --> GraceExpired : Day 7 Final Notice
+  }
+
+  GraceExpired --> DowngradedToFree : Revoke Pro Entitlements
+  CancellationRequested --> ActiveUntilPeriodEnd : Preserves Paid Days
+  ActiveUntilPeriodEnd --> DowngradedToFree : Billing Period Elapsed
+
+  DowngradedToFree --> FreeTier : Data Preserved in Read-Only
+  DowngradedToFree --> UpgradeInitiated : User Reactivates Plan
+```
+<!-- DIAGRAM:billing-lifecycle:END -->
+
+#### Architectural Breakdown:
+- **Soft-Entitlement Grace Period:** Subscription renewals facing transient payment gateway failures enter a 48-hour `PAST_DUE` grace period with read-only preservation to avoid disrupting active job hunts.
+- **Deterministic Webhook Idempotency:** Payment callbacks are validated against HMAC signatures and recorded with unique `event_id` keys in Redis/PostgreSQL to prevent duplicate billing or entitlement inflation.
+
+---
+
+### 2.18 Observability, Telemetry & Health Monitoring
+
+- **Purpose:** End-to-end telemetry and monitoring pipeline detailing OpenTelemetry instrumentation, structured JSON log formatting, Prometheus metrics collection, Grafana dashboards, PagerDuty alerting thresholds, and zero-PII redaction sinks.
+- **Canonical Source:** [`observability-architecture.mmd`](observability-architecture.mmd)
+- **Implementation Status:** *Blueprint / Platform Specification*
+
+<!-- DIAGRAM:observability-architecture:START -->
+```mermaid
+flowchart TB
+  classDef app fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef filter fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef sink fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef alert fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+
+  subgraph TELEMETRY_SOURCES["1. Telemetry & Event Producers"]
+    API_REQ["NestJS API Layer\n• Request Latency & Status Codes\n• CorrelationID Tracking (x-request-id)"]:::app
+    DB_METRICS["Prisma & PostgreSQL\n• Connection Pool Saturation\n• Query Latency & HNSW Index Scans"]:::app
+    QUEUE_METRICS["BullMQ & Redis\n• Active Jobs, Waiting Depth\n• Failed Job Count & Worker Latency"]:::app
+    AI_METRICS["AI Agent Orchestrator\n• Model Latency & Token Usage\n• Tool Execution Rate & Approval TTLs"]:::app
+  end
+
+  subgraph PRIVACY_PIPELINE["2. Zero-PII Sanitization & Redaction Engine"]
+    direction TB
+    PII_SCRUBBER["Privacy Filter (ADR-008)\n• Strips Phone, Email, Postal Addresses\n• Strips Raw Resume Text & CTC Figures\n• Converts Tool Payloads to SHA-256 Hashes"]:::filter
+    CORRELATION_TAG["Context Enricher\n• Binds actorId, workspaceId, correlationId\n• Appends ISO-8601 Timestamp"]:::filter
+  end
+
+  subgraph OBSERVABILITY_SINKS["3. Persistence & Telemetry Sinks"]
+    direction LR
+    PROMETHEUS["Prometheus / OpenTelemetry\n• Time-Series Metric Storage\n• SLI/SLO Target Monitoring"]:::sink
+    GRAFANA["Grafana Dashboards\n• Real-Time Operations Overview\n• Error Spikes & P95 Latency Views"]:::sink
+    WORM_AUDIT[("WORM Audit Log (S3 Object Lock)\n• Immutable Append-Only Compliance Log\n• 7-Year Statutory Audit Retention")]:::sink
+  end
+
+  subgraph INCIDENT_ALERTING["4. Anomaly Detection & Incident Response"]
+    direction TB
+    ALERT_RULES["Alertmanager Rules\n• 5xx Error Spike > 1% in 5m\n• BullMQ DLQ Messages > 5\n• DB Connection Pool > 85%\n• Unauthorized Cross-Tenant Spike"]:::alert
+    PAGERDUTY["PagerDuty / Slack Alerts\n(On-Call Engineer Escalation)"]:::alert
+  end
+
+  TELEMETRY_SOURCES --> PII_SCRUBBER
+  PII_SCRUBBER --> CORRELATION_TAG
+
+  CORRELATION_TAG --> PROMETHEUS
+  CORRELATION_TAG --> WORM_AUDIT
+  PROMETHEUS --> GRAFANA
+
+  PROMETHEUS --> ALERT_RULES
+  ALERT_RULES --> PAGERDUTY
+```
+<!-- DIAGRAM:observability-architecture:END -->
+
+#### Architectural Breakdown:
+- **Zero-PII Telemetry Sink:** All log streams pass through an in-memory redaction filter stripping email addresses, phone numbers, raw resume text, and financial CTC figures prior to external ingestion.
+- **SLO-Driven Alerts:** Automated PagerDuty escalation triggers if API p95 latency exceeds 500ms or queue processing waiting time exceeds 120 seconds.
 
 ---
 

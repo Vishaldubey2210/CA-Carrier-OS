@@ -1,0 +1,640 @@
+openapi: 3.0.3
+info:
+  title: CA Career OS — Core REST API
+  description: >
+    Production-grade RESTful API specification for CA Career OS — the intelligent
+    career management and professional operations platform for Chartered Accountants in India.
+  version: 1.0.0
+  contact:
+    name: CA Career OS Engineering Team
+    email: architect@cacareer.os
+servers:
+  - url: https://api.cacareeros.com
+    description: Production API Gateway
+  - url: https://staging-api.cacareeros.com
+    description: Staging Environment
+  - url: http://localhost:4000
+    description: Local Development Server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Register a new candidate or recruiter account
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered and personal workspace provisioned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/400ValidationError'
+        '409':
+          description: User with email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /api/v1/auth/login:
+    post:
+      summary: Authenticate user credentials and issue session tokens
+      tags: [Authentication]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abc-123; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth/refresh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+
+  /api/v1/career/profile:
+    get:
+      summary: Fetch candidate career profile and skills
+      tags: [Career Intelligence]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Candidate profile details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateProfileResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+    post:
+      summary: Create or update candidate articleship inventory and preferences
+      tags: [Career Intelligence]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateProfileInput'
+      responses:
+        '200':
+          description: Profile successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateProfileResponse'
+        '400':
+          $ref: '#/components/responses/400ValidationError'
+
+  /api/v1/career/diagnostic:
+    post:
+      summary: Calculate 6-pathway fit scores and skill gaps
+      tags: [Career Intelligence]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Pathway recommendation and skill gap analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillGapReportResponse'
+
+  /api/v1/jobs:
+    get:
+      summary: Hybrid lexical and semantic search for verified CA jobs
+      tags: [Jobs & Recruitment]
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          description: Keyword search string (e.g., "Statutory Audit Manager")
+        - name: caPathway
+          in: query
+          schema:
+            type: string
+            enum: [AUDIT, TAX, FPA, CORP_FIN, IB, CONSULTING, PRACTICE]
+        - name: city
+          in: query
+          schema:
+            type: string
+            example: Mumbai
+        - name: minSalary
+          in: query
+          schema:
+            type: integer
+            example: 1200000
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Paginated job listings with match scores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListResponse'
+
+  /api/v1/resumes/tailor:
+    post:
+      summary: Tailor resume to target job with Zero-Fabrication Guard (ADR-009)
+      tags: [Resume & Branding]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumeTailorRequest'
+      responses:
+        '201':
+          description: Tailored resume draft ready for candidate attestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumeDraftResponse'
+
+  /api/v1/resumes/{id}/attest:
+    post:
+      summary: Attest factual claims and render downloadable PDF resume
+      tags: [Resume & Branding]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [candidateAttested]
+              properties:
+                candidateAttested:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Attestation recorded and PDF download URL issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      resumeVersionId:
+                        type: string
+                        format: uuid
+                      pdfDownloadUrl:
+                        type: string
+                        format: uri
+                      expiresAt:
+                        type: string
+                        format: date-time
+
+  /api/v1/interviews/sessions:
+    post:
+      summary: Initialize an interactive technical mock interview session
+      tags: [Interview & Skills Lab]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetRole, domain]
+              properties:
+                targetRole:
+                  type: string
+                  example: Senior Statutory Auditor
+                domain:
+                  type: string
+                  enum: [AUDIT, TAX, FPA]
+      responses:
+        '201':
+          description: Session created with initial technical scenario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InterviewSessionResponse'
+
+  /api/v1/financial/unbundle-ctc:
+    post:
+      summary: Unbundle CTC offer terms into take-home pay and tax estimates
+      tags: [Financial Intelligence]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnbundleCtcRequest'
+      responses:
+        '200':
+          description: Detailed breakdown of in-hand salary and tax impact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnbundleCtcResponse'
+
+  /api/v1/agent/chat:
+    post:
+      summary: Send prompt to AI Career Agent and stream response or approval cards
+      tags: [AI Career Agent]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  example: Review my profile and draft an application to Deloitte Statutory Audit
+      responses:
+        '200':
+          description: Assistant response or pending approval card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentChatResponse'
+
+  /api/v1/approvals/{id}/confirm:
+    post:
+      summary: Confirm and execute an EXPLICITLY_APPROVED_EXTERNAL agent action
+      tags: [AI Career Agent]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [signedApprovalToken]
+              properties:
+                signedApprovalToken:
+                  type: string
+      responses:
+        '200':
+          description: Action executed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      executionId:
+                        type: string
+                        format: uuid
+                      status:
+                        type: string
+                        example: COMPLETED
+        '410':
+          description: Approval token expired (15-minute TTL elapsed)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    WorkspaceIdHeader:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Active tenant workspace UUID
+
+    IdempotencyKeyHeader:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Client-generated unique UUID to prevent duplicate mutations
+
+  responses:
+    400ValidationError:
+      description: Schema validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    401Unauthorized:
+      description: Missing, invalid, or expired session token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    403Forbidden:
+      description: User lacks authorization to access workspace
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, firstName, lastName]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 12
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+            expiresIn:
+              type: integer
+              example: 900
+            user:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                email:
+                  type: string
+                firstName:
+                  type: string
+                role:
+                  type: string
+            defaultWorkspaceId:
+              type: string
+              format: uuid
+
+    CandidateProfileInput:
+      type: object
+      properties:
+        articleshipFirmTier:
+          type: string
+          enum: [BIG4, TOP10, MID_SIZE, SMALL]
+        articleshipAreas:
+          type: array
+          items:
+            type: string
+        targetCities:
+          type: array
+          items:
+            type: string
+        targetSalaryMin:
+          type: integer
+          example: 1200000
+
+    CandidateProfileResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+
+    SkillGapReportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            pathwayScores:
+              type: object
+            missingSkills:
+              type: array
+              items:
+                type: string
+
+    JobListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            jobs:
+              type: array
+              items:
+                type: object
+            pagination:
+              type: object
+
+    ResumeTailorRequest:
+      type: object
+      required: [baseResumeId, targetJobId]
+      properties:
+        baseResumeId:
+          type: string
+          format: uuid
+        targetJobId:
+          type: string
+          format: uuid
+        focusAreas:
+          type: array
+          items:
+            type: string
+
+    ResumeDraftResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            resumeVersionId:
+              type: string
+              format: uuid
+            status:
+              type: string
+              example: DRAFT_PENDING_ATTESTATION
+
+    InterviewSessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            sessionId:
+              type: string
+              format: uuid
+            currentTurn:
+              type: integer
+            initialQuestion:
+              type: string
+
+    UnbundleCtcRequest:
+      type: object
+      required: [grossCtc, fixedComponent]
+      properties:
+        grossCtc:
+          type: integer
+          example: 1500000
+        fixedComponent:
+          type: integer
+          example: 1200000
+        variableComponent:
+          type: integer
+          example: 200000
+        joiningBonus:
+          type: integer
+          example: 100000
+        cityTier:
+          type: string
+          enum: [METRO, NON_METRO]
+
+    UnbundleCtcResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            monthlyInHandOldRegime:
+              type: integer
+            monthlyInHandNewRegime:
+              type: integer
+            retiralsDeducted:
+              type: integer
+
+    AgentChatResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+            approvalRequired:
+              type: boolean
+            approvalCard:
+              type: object
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required: [code, message, correlationId, timestamp]
+          properties:
+            code:
+              type: string
+              example: VALIDATION_FAILED
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+            correlationId:
+              type: string
+              format: uuid
+            timestamp:
+              type: string
+              format: date-time

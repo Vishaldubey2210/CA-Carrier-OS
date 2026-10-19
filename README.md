@@ -7,7 +7,7 @@
 [![Security Model](https://img.shields.io/badge/Security-Zero--Trust%20%7C%20Human--in--the--Loop-blue.svg)](#6-security--privacy-principles)
 [![Architecture](https://img.shields.io/badge/Pattern-Modular%20Monolith%20(NestJS)-green.svg)](docs/architecture/decisions.md#adr-001-modular-monolith-architecture-over-microservices)
 [![Documentation](https://img.shields.io/badge/Docs-Architecture%20Handbook-blueviolet.svg)](docs/architecture/README.md)
-[![Diagrams](https://img.shields.io/badge/Mermaid%20Diagrams-14%20Validated-brightgreen.svg)](docs/architecture/README.md#18-visual-architecture-diagrams-catalog)
+[![Diagrams](https://img.shields.io/badge/Mermaid%20Diagrams-18%20Validated-brightgreen.svg)](docs/architecture/README.md#2-visual-architecture-diagrams-handbook)
 
 ---
 
@@ -485,37 +485,86 @@ flowchart TD
 
 | Dimension | Current Status | Notes |
 | :--- | :--- | :--- |
-| **System Architecture** | **Documented & Blueprinted** | Complete 14-diagram architecture handbook, 9 ADRs, threat model, and risk register documented. |
-| **Domain Data Model** | **Designed** | 21 relational entities, multi-tenant boundaries, and ER relationships defined in `data-architecture.mmd`. |
-| **Application Code** | **Implementation Pending** | Monorepo scaffolding, database migrations, and service implementations are scheduled for Phase 1 MVP sprint. |
-| **Provider Contracts** | **Specified** | AI provider zero-data retention and external job feed capabilities specified as integration requirements. |
-| **Verification State** | **Diagrams Parsed & Validated** | All 14 Mermaid diagrams validated via automated parser script (`scripts/validate-diagrams.mjs`). |
+| **System Architecture** | **Documented & Blueprinted** | Complete 18-diagram architecture handbook, 9 ADRs, STRIDE threat model, and risk register documented. |
+| **Product Specifications** | **Fully Specified (PRD)** | Complete functional requirements, 10 personas, 15 user journeys, 12 UX states, and monetization hypotheses. |
+| **Domain Data Model** | **Designed & Specified** | 21 relational entities, multi-tenant boundaries, Prisma models, and retention lifecycles specified. |
+| **REST API Contracts** | **Specified & OpenAPI Compliant** | Formal OpenAPI 3.0.3 specification (`api/openapi.yaml`) and REST architectural guidelines documented. |
+| **SRE & Operations** | **Runbooks Specified** | 6 operational runbooks covering deployment, rollback, PITR recovery, worker triage, provider failover, and incident response. |
+| **Application Code** | **Implementation Pending** | Monorepo scaffolding, database migrations, and service implementations scheduled for Phase 1 MVP sprint. |
+| **Verification State** | **Diagrams Parsed & Validated** | All 18 Mermaid diagrams validated via automated parser script (`scripts/validate-diagrams.mjs`). |
 
 ---
 
-## 9. Architecture Documentation Index
+## 9. Master Documentation & Architecture Blueprint Index
 
-The complete technical design specification is maintained in [`docs/architecture/`](docs/architecture/README.md):
+The CA Career OS engineering blueprint is structured across the following master specifications:
 
-| Document | Purpose & Description | Canonical Source |
-| :--- | :--- | :--- |
-| **[Master Architecture Handbook](docs/architecture/README.md)** | Comprehensive architectural handbook, component specifications, APIs, and roadmap. | [`docs/architecture/README.md`](docs/architecture/README.md) |
-| **[1. System Context Diagram](docs/architecture/system-context.mmd)** | Visual boundaries showing users, backend, AI providers, and external systems. | [`docs/architecture/system-context.mmd`](docs/architecture/system-context.mmd) |
-| **[2. Detailed Container Architecture](docs/architecture/system-architecture.mmd)** | Multi-tier service topology, API layers, domain modules, and queue topology. | [`docs/architecture/system-architecture.mmd`](docs/architecture/system-architecture.mmd) |
-| **[3. Backend Component Architecture](docs/architecture/backend-component-architecture.mmd)** | Internal NestJS component topology, guards, domain services, and persistence. | [`docs/architecture/backend-component-architecture.mmd`](docs/architecture/backend-component-architecture.mmd) |
-| **[4. Domain Module Dependencies](docs/architecture/domain-module-dependencies.mmd)** | Modular monolith module dependency graph and decoupled domain event bus. | [`docs/architecture/domain-module-dependencies.mmd`](docs/architecture/domain-module-dependencies.mmd) |
-| **[5. AI Agent System Architecture](docs/architecture/ai-agent-system.mmd)** | Multi-turn workflow, RAG grounding, context assembly, and safety gates. | [`docs/architecture/ai-agent-system.mmd`](docs/architecture/ai-agent-system.mmd) |
-| **[6. Agent Execution Flow](docs/architecture/agent-execution-flow.mmd)** | 4-tier permission router, idempotency verification, and human approval gateway. | [`docs/architecture/agent-execution-flow.mmd`](docs/architecture/agent-execution-flow.mmd) |
-| **[7. Human-Approval Sequence](docs/architecture/human-approval-sequence.mmd)** | Interactive confirmation cards, 15m signed tokens, and cancellation paths. | [`docs/architecture/human-approval-sequence.mmd`](docs/architecture/human-approval-sequence.mmd) |
-| **[8. Candidate User Journey](docs/architecture/user-journey.mmd)** | Candidate lifecycle across corporate employment and independent practice paths. | [`docs/architecture/user-journey.mmd`](docs/architecture/user-journey.mmd) |
-| **[9. Job Ingestion Pipeline](docs/architecture/job-ingestion-pipeline.mmd)** | Ingestion, normalization, SHA-256 deduplication, freshness, and vector indexing. | [`docs/architecture/job-ingestion-pipeline.mmd`](docs/architecture/job-ingestion-pipeline.mmd) |
-| **[10. Job Application Workflow](docs/architecture/job-application-workflow.mmd)** | State machine tracking job ingestion, tailoring, approval, and offer comparison. | [`docs/architecture/job-application-workflow.mmd`](docs/architecture/job-application-workflow.mmd) |
-| **[11. Database Architecture (ERD)](docs/architecture/data-architecture.mmd)** | 21 relational entities, foreign keys, and multi-tenant workspace boundaries. | [`docs/architecture/data-architecture.mmd`](docs/architecture/data-architecture.mmd) |
-| **[12. Security Boundaries Diagram](docs/architecture/security-boundaries.mmd)** | Trust zones, edge WAF, authentication guards, and KMS encryption boundaries. | [`docs/architecture/security-boundaries.mmd`](docs/architecture/security-boundaries.mmd) |
-| **[13. Background Jobs & Queues](docs/architecture/background-processing.mmd)** | BullMQ queues, worker pool, retry backoff, DLQ, and nightly reconciliation. | [`docs/architecture/background-processing.mmd`](docs/architecture/background-processing.mmd) |
-| **[14. Independent Practice Workflow](docs/architecture/independent-practice-workflow.mmd)** | COP checklist, firm constitution, ethics boundaries, client KYC, and compliance calendar. | [`docs/architecture/independent-practice-workflow.mmd`](docs/architecture/independent-practice-workflow.mmd) |
-| **[Architecture Decision Records](docs/architecture/decisions.md)** | 9 formal ADRs detailing modular monolith, pgvector, and security decisions. | [`docs/architecture/decisions.md`](docs/architecture/decisions.md) |
-| **[Assumptions, Risks & Constraints](docs/architecture/assumptions-and-risks.md)** | Threat models, ICAI ethical constraints, and research spike backlog. | [`docs/architecture/assumptions-and-risks.md`](docs/architecture/assumptions-and-risks.md) |
+### 9.1 Visual Architecture Diagrams (18 Canonical Views)
+
+| # | Diagram | Purpose & Description | Canonical Source |
+| :-: | :--- | :--- | :--- |
+| **01** | **[System Context Diagram](docs/architecture/system-context.mmd)** | Platform boundary, human actors, persistence, and external SaaS providers. | [`docs/architecture/system-context.mmd`](docs/architecture/system-context.mmd) |
+| **02** | **[Container Architecture](docs/architecture/system-architecture.mmd)** | Multi-tier service topology, API layers, domain modules, and queue topology. | [`docs/architecture/system-architecture.mmd`](docs/architecture/system-architecture.mmd) |
+| **03** | **[Backend Component Architecture](docs/architecture/backend-component-architecture.mmd)** | NestJS component topology, guards, domain services, repositories, and DB adapters. | [`docs/architecture/backend-component-architecture.mmd`](docs/architecture/backend-component-architecture.mmd) |
+| **04** | **[Domain Module Dependencies](docs/architecture/domain-module-dependencies.mmd)** | Modular monolith module dependency graph and decoupled domain event bus. | [`docs/architecture/domain-module-dependencies.mmd`](docs/architecture/domain-module-dependencies.mmd) |
+| **05** | **[AI Agent System Architecture](docs/architecture/ai-agent-system.mmd)** | Multi-turn workflow, RAG grounding, context assembly, and safety gates. | [`docs/architecture/ai-agent-system.mmd`](docs/architecture/ai-agent-system.mmd) |
+| **06** | **[Agent Execution Flow](docs/architecture/agent-execution-flow.mmd)** | 4-tier permission router, idempotency verification, and human approval gateway. | [`docs/architecture/agent-execution-flow.mmd`](docs/architecture/agent-execution-flow.mmd) |
+| **07** | **[Human-Approval Sequence](docs/architecture/human-approval-sequence.mmd)** | Interactive confirmation cards, 15m signed tokens, and cancellation paths. | [`docs/architecture/human-approval-sequence.mmd`](docs/architecture/human-approval-sequence.mmd) |
+| **08** | **[Candidate User Journey](docs/architecture/user-journey.mmd)** | Dual candidate lifecycles: corporate employment vs independent practice. | [`docs/architecture/user-journey.mmd`](docs/architecture/user-journey.mmd) |
+| **09** | **[Job Ingestion Pipeline](docs/architecture/job-ingestion-pipeline.mmd)** | Ingestion, normalization, SHA-256 deduplication, freshness, and vector indexing. | [`docs/architecture/job-ingestion-pipeline.mmd`](docs/architecture/job-ingestion-pipeline.mmd) |
+| **10** | **[Job Application Workflow](docs/architecture/job-application-workflow.mmd)** | State machine tracking discovery, resume tailoring, approval, and offer comparison. | [`docs/architecture/job-application-workflow.mmd`](docs/architecture/job-application-workflow.mmd) |
+| **11** | **[Database Architecture (ERD)](docs/architecture/data-architecture.mmd)** | 21 relational entities, foreign keys, and multi-tenant workspace boundaries. | [`docs/architecture/data-architecture.mmd`](docs/architecture/data-architecture.mmd) |
+| **12** | **[Security Boundaries Diagram](docs/architecture/security-boundaries.mmd)** | Trust zones, edge WAF, authentication guards, and KMS encryption boundaries. | [`docs/architecture/security-boundaries.mmd`](docs/architecture/security-boundaries.mmd) |
+| **13** | **[Background Jobs & Queues](docs/architecture/background-processing.mmd)** | BullMQ queues, worker pool, retry backoff, DLQ, and nightly reconciliation. | [`docs/architecture/background-processing.mmd`](docs/architecture/background-processing.mmd) |
+| **14** | **[Independent Practice Workflow](docs/architecture/independent-practice-workflow.mmd)** | COP checklist, firm constitution, ethics boundaries, client KYC, and compliance calendar. | [`docs/architecture/independent-practice-workflow.mmd`](docs/architecture/independent-practice-workflow.mmd) |
+| **15** | **[Deployment Architecture](docs/architecture/deployment-architecture.mmd)** | Multi-AZ ECS Fargate, Cloudflare WAF, Aurora PostgreSQL, and Redis in AWS Mumbai. | [`docs/architecture/deployment-architecture.mmd`](docs/architecture/deployment-architecture.mmd) |
+| **16** | **[Identity & Access Model](docs/architecture/identity-and-access.mmd)** | User authentication, workspace scopes, RBAC permissions, and session lifecycles. | [`docs/architecture/identity-and-access.mmd`](docs/architecture/identity-and-access.mmd) |
+| **17** | **[Billing & Commercial Lifecycle](docs/architecture/billing-lifecycle.mmd)** | Subscription state machine, Razorpay webhooks, idempotency, and grace periods. | [`docs/architecture/billing-lifecycle.mmd`](docs/architecture/billing-lifecycle.mmd) |
+| **18** | **[Observability Architecture](docs/architecture/observability-architecture.mmd)** | OpenTelemetry tracing, structured logs, Prometheus metrics, and alert triggers. | [`docs/architecture/observability-architecture.mmd`](docs/architecture/observability-architecture.mmd) |
+
+### 9.2 Product Management & UX Specifications (`docs/product/`)
+
+- [Product Vision & Strategic Scope](docs/product/vision-and-scope.md) — Product promise, scope bounds, and evidence register.
+- [Personas & Jobs to be Done](docs/product/personas-and-jobs-to-be-done.md) — 10 detailed personas with JTBD, permissions, and prohibited actions.
+- [Product Requirements Specification (PRD)](docs/product/product-requirements.md) — Structured functional requirements with stable IDs (`REQ-CAR-001`, `REQ-JOB-001`, etc.).
+- [Monetization & Business Model Hypotheses](docs/product/monetization-hypotheses.md) — 5-tier SaaS business model, unit economics, and billing risks.
+- [User Experience & IA Specification](docs/product/user-experience-specification.md) — Information architecture, route boundaries, 12 UX states, and WCAG accessibility.
+- [End-to-End User Journeys](docs/product/user-journeys.md) — 15 complete journeys with frontend, backend, DB, auth, and failure behavior.
+- [Feature Traceability Matrix & Gap Register](docs/product/feature-traceability.md) — Cross-document requirements traceability matrix.
+
+### 9.3 Technical Architecture Handbooks (`docs/architecture/`)
+
+- [Master Architecture Handbook](docs/architecture/README.md) — Canonical system architecture handbook with all 18 embedded diagrams.
+- [Modular Monolith System Overview](docs/architecture/system-overview.md) — Modular monolith topology, module boundaries, and trade-offs.
+- [Relational Database Schema](docs/architecture/database-schema.md) — Comprehensive relational schema with 21+ tables and representative Prisma schema.
+- [Data Ownership & Retention](docs/architecture/data-ownership-and-retention.md) — Tenant isolation boundaries, retention periods, and DPDP Act 2023 controls.
+- [REST API Architecture Guidelines](docs/architecture/api-design.md) — REST conventions, headers, error envelopes, and HTTP status codes.
+- [Asynchronous Queue Processing](docs/architecture/async-processing.md) — BullMQ queues, DLQ triage, retries, and Transactional Outbox pattern.
+- [STRIDE Security Threat Model](docs/architecture/security-threat-model.md) — Detailed STRIDE threat model, mitigations, and verification tests.
+- [Data Protection & File Handling](docs/architecture/data-protection.md) — Pre-signed S3 URLs, document parsing pipeline, and Zero-PII sanitization.
+- [Incident Response Policy](docs/architecture/incident-response.md) — P0-P3 severity levels, CERT-In 6-hour reporting mandate, and post-mortem runbooks.
+- [Reliability & Observability](docs/architecture/reliability-and-observability.md) — SLIs/SLOs, telemetry pipelines, and failure-handling matrix.
+- [Product Analytics Event Taxonomy](docs/architecture/product-analytics.md) — 14 core event schemas, prohibited properties, and product metrics.
+- [Testing Strategy & Quality Gates](docs/architecture/testing-strategy.md) — Test pyramid, mandatory negative test cases, and release readiness gates.
+- [Deployment & Environment Management](docs/architecture/deployment-and-environments.md) — 4-tier environments, zero-downtime database migrations, and AWS topology.
+- [Third-Party Integration Register](docs/architecture/integration-register.md) — Integration catalog covering AI, jobs, email, storage, and payment providers.
+- [Implementation Roadmap](docs/architecture/implementation-roadmap.md) — 5 implementation phases, team work packages, and definition of done.
+- [Assumptions, Risks & Open Spikes](docs/architecture/assumptions-risks-and-open-questions.md) — Risk register and prioritized engineering spikes.
+- [Domain & Architecture Glossary](docs/architecture/glossary.md) — Indian CA domain terminology and software engineering concepts.
+- [Architecture Decision Records (ADRs)](docs/architecture/decisions.md) — 9 formal ADRs detailing foundational system decisions.
+
+### 9.4 API Specifications & Contracts (`api/`)
+
+- [OpenAPI 3.0.3 Contract](api/openapi.yaml) — Formal REST API specification defining endpoints, request/response schemas, and auth scopes.
+
+### 9.5 SRE & Operational Runbooks (`runbooks/`)
+
+- [RB-OPS-001: Production Deployment Checklist](runbooks/deployment.md) — Step-by-step deployment procedure and ECS Fargate commands.
+- [RB-OPS-002: Production Rollback Procedure](runbooks/rollback.md) — Rollback triggers and automated reversion steps.
+- [RB-OPS-003: Database PITR & Disaster Recovery](runbooks/database-recovery.md) — Point-in-time restoration and database failover procedure.
+- [RB-OPS-004: Background Worker Failure & DLQ Triage](runbooks/worker-failures.md) — BullMQ stalled jobs, memory exhaustion, and dead-letter queue triage.
+- [RB-OPS-005: Upstream Provider Outage & Failover](runbooks/provider-outages.md) — LLM provider failover, email fallback, and degraded mode operation.
+- [RB-OPS-006: Security Incident Containment & Breach Filing](runbooks/security-incident.md) — Session revocation, credential rotation, and CERT-In regulatory notification.
 
 ---
 

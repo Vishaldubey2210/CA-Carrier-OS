@@ -1,0 +1,57 @@
+flowchart TB
+  classDef auth fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef token fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef rbac fill:#312e81,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+  classDef tenant fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef block fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+
+  subgraph AUTH_FLOW["1. Authentication & Token Lifecycle"]
+    CREDENTIALS["User Credentials\n(Email + Bcrypt Password)"]:::auth
+    AUTH_SERVICE["IdentityService.validateCredentials()\n• 12 Rounds Bcrypt Verification\n• Rate Limit: Max 5 Failed Attempts"]:::auth
+    TOKEN_GEN["TokenService.generateTokenPair()\n• Access Token: JWT (15m TTL in Memory)\n• Refresh Token: Crypto UUID (7d HttpOnly Cookie)"]:::token
+    REFRESH_ROTATION["Refresh Token Rotation\n• Single-Use Invalidation in Redis\n• Token Family Reuse Detection -> Revoke All"]:::token
+  end
+
+  subgraph CONTEXT_RESOLUTION["2. Workspace Context & Tenant Resolution"]
+    REQ_HEADER["Incoming Request Header:\nX-Workspace-Id: <uuid>"]:::tenant
+    WS_GUARD["TenantContextGuard (NestJS)\n• Verifies Workspace Exists\n• Verifies User is Active Member"]:::tenant
+    WS_TYPE{"Workspace Type"}:::tenant
+    
+    PERSONAL_WS["Personal Workspace\n• 1:1 Candidate Privacy Boundary\n• Resumes, Applications, Mock Drills"]:::tenant
+    ORG_WS["Organization Workspace\n• 1:N Firm / Employer Workspace\n• Job Requisitions, Applicant Pipeline"]:::tenant
+  end
+
+  subgraph RBAC_ENGINE["3. Role-Based Access Control (RBAC) Engine"]
+    ROLE_EVAL{"Workspace Member Role"}:::rbac
+    ROLE_OWNER["OWNER\nFull Control · Billing · Workspace Deletion"]:::rbac
+    ROLE_ADMIN["ADMIN\nMember Invites · Job Management · Pipeline"]:::rbac
+    ROLE_REC["RECRUITER\nPost Jobs · Review Applicants · Schedule Interviews"]:::rbac
+    ROLE_VIEW["VIEWER\nRead-Only Access to Requisitions & Analytics"]:::rbac
+  end
+
+  subgraph BLINDFOLD_RULE["4. Current Employer Privacy Blindfold"]
+    BLINDFOLD_CHECK{"Candidate Employed at\nViewing Organization?"}:::block
+    BLIND_APPLY["Mask Candidate Identity\n• Exclude from Recruiter Search\n• Zero Visibility into Personal Workspace"]:::block
+    PERMIT_VIEW["Allow Authorized Pipeline View\n(Only for Explicit Job Applications)"]:::tenant
+  end
+
+  CREDENTIALS --> AUTH_SERVICE
+  AUTH_SERVICE --> TOKEN_GEN
+  TOKEN_GEN --> REFRESH_ROTATION
+
+  TOKEN_GEN --> REQ_HEADER
+  REQ_HEADER --> WS_GUARD
+  WS_GUARD --> WS_TYPE
+
+  WS_TYPE -- "PERSONAL" --> PERSONAL_WS
+  WS_TYPE -- "ORGANIZATION" --> ORG_WS
+
+  ORG_WS --> ROLE_EVAL
+  ROLE_EVAL -- "OWNER" --> ROLE_OWNER
+  ROLE_EVAL -- "ADMIN" --> ROLE_ADMIN
+  ROLE_EVAL -- "RECRUITER" --> ROLE_REC
+  ROLE_EVAL -- "VIEWER" --> ROLE_VIEW
+
+  ORG_WS --> BLINDFOLD_CHECK
+  BLINDFOLD_CHECK -- "Yes (Current Employer)" --> BLIND_APPLY
+  BLINDFOLD_CHECK -- "No (Legitimate Applicant)" --> PERMIT_VIEW

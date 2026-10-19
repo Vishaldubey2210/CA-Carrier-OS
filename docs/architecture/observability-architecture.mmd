@@ -1,0 +1,41 @@
+flowchart TB
+  classDef app fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef filter fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef sink fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef alert fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+
+  subgraph TELEMETRY_SOURCES["1. Telemetry & Event Producers"]
+    API_REQ["NestJS API Layer\n• Request Latency & Status Codes\n• CorrelationID Tracking (x-request-id)"]:::app
+    DB_METRICS["Prisma & PostgreSQL\n• Connection Pool Saturation\n• Query Latency & HNSW Index Scans"]:::app
+    QUEUE_METRICS["BullMQ & Redis\n• Active Jobs, Waiting Depth\n• Failed Job Count & Worker Latency"]:::app
+    AI_METRICS["AI Agent Orchestrator\n• Model Latency & Token Usage\n• Tool Execution Rate & Approval TTLs"]:::app
+  end
+
+  subgraph PRIVACY_PIPELINE["2. Zero-PII Sanitization & Redaction Engine"]
+    direction TB
+    PII_SCRUBBER["Privacy Filter (ADR-008)\n• Strips Phone, Email, Postal Addresses\n• Strips Raw Resume Text & CTC Figures\n• Converts Tool Payloads to SHA-256 Hashes"]:::filter
+    CORRELATION_TAG["Context Enricher\n• Binds actorId, workspaceId, correlationId\n• Appends ISO-8601 Timestamp"]:::filter
+  end
+
+  subgraph OBSERVABILITY_SINKS["3. Persistence & Telemetry Sinks"]
+    direction LR
+    PROMETHEUS["Prometheus / OpenTelemetry\n• Time-Series Metric Storage\n• SLI/SLO Target Monitoring"]:::sink
+    GRAFANA["Grafana Dashboards\n• Real-Time Operations Overview\n• Error Spikes & P95 Latency Views"]:::sink
+    WORM_AUDIT[("WORM Audit Log (S3 Object Lock)\n• Immutable Append-Only Compliance Log\n• 7-Year Statutory Audit Retention")]:::sink
+  end
+
+  subgraph INCIDENT_ALERTING["4. Anomaly Detection & Incident Response"]
+    direction TB
+    ALERT_RULES["Alertmanager Rules\n• 5xx Error Spike > 1% in 5m\n• BullMQ DLQ Messages > 5\n• DB Connection Pool > 85%\n• Unauthorized Cross-Tenant Spike"]:::alert
+    PAGERDUTY["PagerDuty / Slack Alerts\n(On-Call Engineer Escalation)"]:::alert
+  end
+
+  TELEMETRY_SOURCES --> PII_SCRUBBER
+  PII_SCRUBBER --> CORRELATION_TAG
+
+  CORRELATION_TAG --> PROMETHEUS
+  CORRELATION_TAG --> WORM_AUDIT
+  PROMETHEUS --> GRAFANA
+
+  PROMETHEUS --> ALERT_RULES
+  ALERT_RULES --> PAGERDUTY

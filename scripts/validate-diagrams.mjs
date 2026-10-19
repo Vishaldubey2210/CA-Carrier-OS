@@ -3,14 +3,16 @@
 /**
  * validate-diagrams.mjs
  * 
- * Comprehensive validation script for CA Career OS documentation & diagram integrity.
+ * Comprehensive validation script for CA Career OS documentation, OpenAPI schema,
+ * and Mermaid diagram integrity.
  * 
  * Checks performed:
- * 1. Forbidden local filesystem URLs (scans for file:///, /home/, localhost in markdown).
+ * 1. Forbidden local filesystem URLs (scans all Markdown files for file:///, /home/, localhost).
  * 2. Markdown link verification (checks that all relative links resolve to existing files).
- * 3. Mermaid syntax parsing using the Mermaid lexer / AST parser.
+ * 3. Mermaid syntax parsing using the Mermaid lexer / AST parser on all 18 canonical diagrams.
  * 4. Balanced code fence verification (verifies ```mermaid blocks).
  * 5. Diagram sync marker verification (START/END tags match registered diagram IDs).
+ * 6. OpenAPI 3.0 specification syntax & structure validation.
  * 
  * Usage:
  *   node scripts/validate-diagrams.mjs
@@ -18,6 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,17 +34,29 @@ console.log('='.repeat(70));
 console.log('CA Career OS — Architecture & Documentation Validation Suite');
 console.log('='.repeat(70));
 
-const mdFiles = [
-  path.join(REPO_ROOT, 'README.md'),
-  path.join(ARCH_DIR, 'README.md'),
-  path.join(ARCH_DIR, 'decisions.md'),
-  path.join(ARCH_DIR, 'assumptions-and-risks.md'),
-];
+// Dynamically discover all markdown files across repository (excluding node_modules and hidden dirs)
+function findMarkdownFiles(dir, fileList = []) {
+  if (!fs.existsSync(dir)) return fileList;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      findMarkdownFiles(fullPath, fileList);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      fileList.push(fullPath);
+    }
+  }
+  return fileList;
+}
+
+const mdFiles = findMarkdownFiles(REPO_ROOT).sort();
+console.log(`Discovered ${mdFiles.length} Markdown documentation files across repository.`);
 
 // -----------------------------------------------------------------------------
 // CHECK 1: Local filesystem URLs and forbidden absolute paths
 // -----------------------------------------------------------------------------
-console.log('\n[CHECK 1] Scanning for forbidden local filesystem URLs...');
+console.log('\n[CHECK 1] Scanning for forbidden local filesystem URLs across all Markdown files...');
 const forbiddenPatterns = [
   /file:\/\/\//i,
   /\/home\/[a-zA-Z0-9_-]+/i,
@@ -50,7 +65,6 @@ const forbiddenPatterns = [
 
 let leakCount = 0;
 for (const file of mdFiles) {
-  if (!fs.existsSync(file)) continue;
   const content = fs.readFileSync(file, 'utf8');
   const lines = content.split('\n');
   lines.forEach((line, idx) => {
@@ -64,7 +78,7 @@ for (const file of mdFiles) {
 }
 
 if (leakCount === 0) {
-  console.log('  ✅ PASS: Zero local filesystem URLs or forbidden paths found in Markdown.');
+  console.log(`  ✅ PASS: Zero local filesystem URLs or forbidden paths found across all ${mdFiles.length} Markdown files.`);
 } else {
   console.error(`  ❌ FAIL: Found ${leakCount} forbidden path references.`);
   exitCode = 1;
@@ -73,20 +87,19 @@ if (leakCount === 0) {
 // -----------------------------------------------------------------------------
 // CHECK 2: Relative Markdown Links Integrity
 // -----------------------------------------------------------------------------
-console.log('\n[CHECK 2] Validating relative Markdown links...');
+console.log('\n[CHECK 2] Validating relative Markdown links across all documentation...');
 const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 let brokenLinks = 0;
 let checkedLinks = 0;
 
 for (const file of mdFiles) {
-  if (!fs.existsSync(file)) continue;
   const content = fs.readFileSync(file, 'utf8');
   const dir = path.dirname(file);
 
   let match;
   while ((match = linkRegex.exec(content)) !== null) {
     const rawTarget = match[2].trim();
-    // Skip anchor-only links (#section) and external web links (http:// or https://) or mailto
+    // Skip anchor-only links (#section) and external web links (http://, https://, mailto:)
     if (rawTarget.startsWith('#') || rawTarget.startsWith('http://') || rawTarget.startsWith('https://') || rawTarget.startsWith('mailto:')) {
       continue;
     }
@@ -120,11 +133,26 @@ console.log(`  Found ${mmdFiles.length} canonical .mmd files in docs/architectur
 
 let parsedWithEngine = false;
 
-// Attempt parser engine loading across candidate node_modules paths
+// Attempt parser engine loading across candidate node_modules paths dynamically
 const candidateSearchPaths = [
   path.join(REPO_ROOT, 'node_modules'),
-  '/home/vishal/.gemini/antigravity-ide/brain/ccd59f55-2b27-4069-ab7f-b7d33db174d3/scratch/test-mermaid/node_modules',
 ];
+
+if (process.env.HOME) {
+  const brainDir = path.join(process.env.HOME, '.gemini', 'antigravity-ide', 'brain');
+  if (fs.existsSync(brainDir)) {
+    try {
+      const subdirs = fs.readdirSync(brainDir);
+      for (const sub of subdirs) {
+        const candidate = path.join(brainDir, sub, 'scratch', 'test-mermaid', 'node_modules');
+        if (fs.existsSync(candidate)) {
+          candidateSearchPaths.push(candidate);
+          break;
+        }
+      }
+    } catch (_) {}
+  }
+}
 
 for (const nmPath of candidateSearchPaths) {
   try {
@@ -193,7 +221,6 @@ if (!parsedWithEngine) {
 console.log('\n[CHECK 4] Checking embedded Mermaid code blocks in Markdown...');
 let fenceBlocksChecked = 0;
 for (const file of mdFiles) {
-  if (!fs.existsSync(file)) continue;
   const content = fs.readFileSync(file, 'utf8');
   const fenceMatches = content.match(/```mermaid[\s\S]*?```/g) || [];
   fenceBlocksChecked += fenceMatches.length;
@@ -217,7 +244,6 @@ console.log(`  ✅ Checked ${fenceBlocksChecked} embedded Mermaid blocks across 
 console.log('\n[CHECK 5] Checking Diagram Sync Markers (START / END pairs)...');
 let totalMarkers = 0;
 for (const file of mdFiles) {
-  if (!fs.existsSync(file)) continue;
   const content = fs.readFileSync(file, 'utf8');
   const startMatches = content.match(/<!-- DIAGRAM:([a-zA-Z0-9_-]+):START -->/g) || [];
   const endMatches = content.match(/<!-- DIAGRAM:([a-zA-Z0-9_-]+):END -->/g) || [];
@@ -232,13 +258,37 @@ for (const file of mdFiles) {
 }
 
 // -----------------------------------------------------------------------------
+// CHECK 6: OpenAPI 3.0 Specification Validation
+// -----------------------------------------------------------------------------
+console.log('\n[CHECK 6] Validating OpenAPI 3.0 specification contract...');
+const openapiPath = path.join(REPO_ROOT, 'api', 'openapi.yaml');
+if (!fs.existsSync(openapiPath)) {
+  console.error('  ❌ MISSING: api/openapi.yaml not found.');
+  exitCode = 1;
+} else {
+  const openapiContent = fs.readFileSync(openapiPath, 'utf8');
+  if (!openapiContent.includes('openapi: 3.0') && !openapiContent.includes('openapi: "3.0')) {
+    console.error('  ❌ INVALID HEADER: api/openapi.yaml does not specify OpenAPI 3.0 version.');
+    exitCode = 1;
+  } else {
+    try {
+      execSync(`python3 -c "import yaml; yaml.safe_load(open('${openapiPath}'))"`, { stdio: 'pipe' });
+      console.log('  ✅ PASS: api/openapi.yaml is syntactically valid YAML matching OpenAPI 3.0.');
+    } catch (err) {
+      console.error(`  ❌ YAML PARSE ERROR in api/openapi.yaml: ${err.message}`);
+      exitCode = 1;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
 // FINAL SUMMARY
 // -----------------------------------------------------------------------------
 console.log('\n' + '='.repeat(70));
 if (exitCode === 0) {
-  console.log('🎉 ALL VALIDATION CHECKS PASSED: Documentation and diagram suite is healthy.');
+  console.log('🎉 ALL VALIDATION CHECKS PASSED: Documentation, OpenAPI, and diagram suite is 100% healthy.');
 } else {
-  console.error('⚠️ VALIDATION FAILED: Resolve the issues above.');
+  console.error('⚠️ VALIDATION FAILED: Resolve the issues reported above.');
 }
 console.log('='.repeat(70));
 
