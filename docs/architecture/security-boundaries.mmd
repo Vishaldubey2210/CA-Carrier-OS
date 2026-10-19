@@ -1,0 +1,85 @@
+flowchart TB
+  classDef boundary fill:#1e293b,stroke:#dc2626,stroke-width:2px,stroke-dasharray: 5 5,color:#f87171
+  classDef secureZone fill:#0f172a,stroke:#3b82f6,color:#93c5fd
+  classDef extZone fill:#1c1917,stroke:#78716c,color:#d6d3d1
+  classDef storageZone fill:#064e3b,stroke:#059669,color:#a7f3d0
+  classDef aiZone fill:#312e81,stroke:#6366f1,color:#c7d2fe
+  classDef auditZone fill:#1a2035,stroke:#0ea5e9,color:#bae6fd
+  classDef controlNode fill:#7f1d1d,stroke:#ef4444,color:#fecaca,font-weight:bold
+
+  subgraph CLIENT_TIER["Client Tier (Untrusted Environment)"]
+    BROWSER["Web Browser / Client Device\n• Candidate / Recruiter / Admin / Mentor\n• Local Storage: Short-lived access token only\n• Secure HttpOnly cookie: Refresh token"]
+  end
+
+  subgraph EDGE_GATEWAY["Edge & Perimeter Defense  [Trust Boundary 1: Ingress]"]
+    WAF["Cloudflare / AWS WAF\n• DDoS Mitigation & IP Reputation\n• TLS 1.3 Termination\n• Edge Rate Limiting (Token Bucket)"]
+  end
+
+  subgraph BACKEND_SECURE_ZONE["Backend Secure Zone (Trusted SaaS VPC)"]
+    direction TB
+    
+    subgraph API_INGRESS["API Security Controls"]
+      JWT_VAL["JWT Guard & Token Revocation Check\n(Session validation in Redis)"]:::controlNode
+      RBAC_GUARD["Workspace Context & RBAC Guard\n(Personal vs Org Workspace Scope)"]:::controlNode
+      SCHEMA_VAL["Strict Request Validation\n(Zod Schemas: Strip unknown fields)"]:::controlNode
+      API_RATE_LIMIT["Tenant / User Rate Limiter\n(Tier-based throttling)"]:::controlNode
+    end
+
+    subgraph CORE_SERVICES["Modular Monolith Services"]
+      CAREER_SVC["Career Intelligence & Job Services"]
+      RESUME_SVC["Resume & Branding Service\n• PII Redaction Engine before AI ops"]
+      AUDIT_SVC["Tamper-evident Audit Service\n• Append-only event queue"]
+      CRM_SVC["Practice Management Service\n• Tenant isolated data access"]
+    end
+
+    subgraph AI_ORCH_SECURITY["AI Execution Trust Boundary  [Trust Boundary 2: Agent Gateway]"]
+      PROMPT_INJECTION_DEF["Prompt Injection & Jailbreak Guard\n• Input Sanitization & Untrusted Document Filter"]:::controlNode
+      TOOL_ALLOWLIST["Tool Allowlist & Policy Router\n• Server-Side Permission Verification\n• Scope Constraint Enforcement"]:::controlNode
+      IDEMPOTENCY_CTR["Idempotency & Replay Guard\n• SHA-256 Signature Verification\n• Redis distributed locks"]:::controlNode
+      APPROVAL_GATEWAY["Human-in-the-Loop Approval Gateway\n• Enforces Explicit User Consent for External Actions\n• Signed approval tokens with 15m expiration"]:::controlNode
+      REDACTION_OUT["Output Sanitization & PII Redaction\n• Prevents Model Leakage of Sensitive Info"]:::controlNode
+    end
+  end
+
+  subgraph PERSISTENCE_SECURITY["Data Persistence Tier (Encrypted at Rest & in Transit)"]
+    direction TB
+    PG_DB[("PostgreSQL\n• Row-Level Security (RLS) / Tenant IDs\n• AES-256 at-rest encryption\n• TLS in-transit\n• Secrets/Tokens excluded from schema")]:::storageZone
+    REDIS_STORE[("Redis In-Memory\n• TLS enabled, Auth protected\n• TTL enforced on all cache/session keys")]:::storageZone
+    S3_STORE[("Object Storage (S3)\n• AWS KMS / SSE-S3 Encryption\n• Private buckets, Pre-signed URLs with 5m TTL\n• Anti-virus scan on file upload")]:::storageZone
+    SECRETS_VAULT[("Secrets Manager / KMS\n• Encr/Decr of external API keys\n• Database credentials rotation")]:::storageZone
+  end
+
+  subgraph EXTERNAL_INTEGRATIONS_TIER["External Integrations  [Trust Boundary 3: Egress]"]
+    direction TB
+    AI_MODELS["AI Model Providers (Gemini / Claude / OpenAI)\n• Zero Data Retention Agreements\n• No training on customer data\n• TLS 1.3 egress"]:::aiZone
+    JOB_PROVIDERS["Authorized Job Providers\n• Verified source attribution\n• Webhook signature verification"]:::extZone
+    NOTIFY_GATEWAY["Notification Providers (Resend / Twilio)\n• E.164 phone & email validation\n• Template-based messaging (no arbitrary text)"]:::extZone
+    PAY_GATEWAY["PCI-DSS Compliant Payment Gateway\n• Webhook HMAC signature verification\n• Zero credit card data stored locally"]:::extZone
+  end
+
+  subgraph AUDIT_MONITORING["Security Operations & Telemetry  [Audit Boundary]"]
+    SIEM["SIEM & Audit Event Stream\n• WORM (Write Once Read Many) storage\n• Actor, Workspace, Correlation ID, Timestamp\n• Redacted payload hashes (no raw resume/PII)"]:::auditZone
+    TELEMETRY["Prometheus / OpenTelemetry\n• Anomaly detection (unauthorized attempts)\n• Real-time alerting to PagerDuty"]:::auditZone
+  end
+
+  %% Relationships and Enforcements
+  CLIENT_TIER -->|"HTTPS / TLS 1.3"| EDGE_GATEWAY
+  EDGE_GATEWAY -->|"Validated Traffic"| API_INGRESS
+  API_INGRESS -->|"Authenticated & Authorized"| CORE_SERVICES
+  CORE_SERVICES -->|"AI Requests"| AI_ORCH_SECURITY
+  
+  AI_ORCH_SECURITY -->|"Sanitized Prompts"| AI_MODELS
+  AI_ORCH_SECURITY -->|"Consent Gate"| APPROVAL_GATEWAY
+  APPROVAL_GATEWAY -.->|"User Approval Prompt"| BROWSER
+
+  CORE_SERVICES -->|"Tenant-Scoped Queries (TLS)"| PG_DB
+  CORE_SERVICES -->|"Session/Lock Operations (TLS)"| REDIS_STORE
+  CORE_SERVICES -->|"Encrypted Upload / Pre-signed URLs"| S3_STORE
+  CORE_SERVICES -->|"Secret Retrieval"| SECRETS_VAULT
+
+  CORE_SERVICES -->|"Gated External Operations"| EXTERNAL_INTEGRATIONS_TIER
+  
+  API_INGRESS -.->|"Log Event (Zero PII)"| SIEM
+  CORE_SERVICES -.->|"Log Event (Zero PII)"| SIEM
+  AI_ORCH_SECURITY -.->|"Tool Execution Audit"| SIEM
+  SIEM --> TELEMETRY

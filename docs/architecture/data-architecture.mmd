@@ -1,0 +1,336 @@
+erDiagram
+  %% ─── Tenant & Identity ──────────────────────────────────────────
+  User {
+    uuid id PK
+    string email UK
+    string hashedPassword "bcrypt, never plain"
+    string firstName
+    string lastName
+    enum role "CANDIDATE | RECRUITER | MENTOR | ORG_ADMIN | PLATFORM_ADMIN"
+    boolean emailVerified
+    timestamp createdAt
+    timestamp updatedAt
+    timestamp deletedAt "soft delete"
+  }
+
+  Workspace {
+    uuid id PK
+    enum type "PERSONAL | ORGANIZATION"
+    string name
+    string slug UK
+    uuid ownerId FK
+    jsonb settings
+    timestamp createdAt
+  }
+
+  WorkspaceMembership {
+    uuid id PK
+    uuid workspaceId FK
+    uuid userId FK
+    enum memberRole "OWNER | ADMIN | MEMBER | RECRUITER | VIEWER"
+    boolean isDefault
+    timestamp joinedAt
+  }
+
+  Subscription {
+    uuid id PK
+    uuid workspaceId FK
+    enum plan "FREE | PRO | TEAM | ENTERPRISE"
+    enum status "ACTIVE | PAST_DUE | CANCELLED | TRIALING"
+    string externalSubscriptionId "Payment gateway ref"
+    timestamp currentPeriodEnd
+    timestamp createdAt
+  }
+
+  %% ─── Candidate Profile ──────────────────────────────────────────
+  CandidateProfile {
+    uuid id PK
+    uuid userId FK
+    uuid workspaceId FK
+    string icaiMembershipNo "Optional, user-provided"
+    date qualificationDate
+    string articleshipFirm
+    string_array articleshipAreas
+    string_array targetCities
+    enum workType "FULL_TIME | PART_TIME | CONSULTING | PRACTICE"
+    integer targetSalaryMin
+    integer targetSalaryMax
+    string summary
+    timestamp updatedAt
+  }
+
+  CareerPreference {
+    uuid id PK
+    uuid candidateProfileId FK
+    string_array preferredDomains
+    string_array preferredRoles
+    string_array preferredSectors
+    integer noticePeriodDays
+    boolean openToRelocation
+    jsonb additionalPreferences
+    timestamp updatedAt
+  }
+
+  Skill {
+    uuid id PK
+    string name UK
+    string category "domain | tool | soft"
+    string normalizedName
+  }
+
+  CandidateSkill {
+    uuid id PK
+    uuid candidateProfileId FK
+    uuid skillId FK
+    enum proficiency "BEGINNER | INTERMEDIATE | ADVANCED | EXPERT"
+    string source "articleship | self-declared | assessed"
+    boolean verified
+    timestamp addedAt
+  }
+
+  SkillGapReport {
+    uuid id PK
+    uuid candidateProfileId FK
+    string targetRole
+    jsonb gapAnalysis "required vs present skills"
+    jsonb learningPlan
+    timestamp generatedAt
+    timestamp expiresAt
+  }
+
+  %% ─── Jobs & Employers ───────────────────────────────────────────
+  Employer {
+    uuid id PK
+    uuid workspaceId FK "org workspace"
+    string name
+    string domain UK
+    boolean verified
+    enum verificationStatus "PENDING | VERIFIED | SUSPENDED"
+    string logoUrl "object storage path"
+    timestamp verifiedAt
+  }
+
+  JobSource {
+    uuid id PK
+    string name UK
+    string type "DIRECT_API | EMPLOYER_FEED | PLATFORM"
+    string baseUrl
+    boolean active
+    jsonb integrationCapabilityCheck "documented at setup time"
+    timestamp lastFetchedAt
+  }
+
+  Job {
+    uuid id PK
+    uuid employerId FK
+    uuid jobSourceId FK
+    string externalId "source-specific ID"
+    string title
+    string normalizedTitle
+    text description
+    string_array requiredSkills
+    string_array preferredSkills
+    string location
+    enum workMode "ON_SITE | HYBRID | REMOTE"
+    integer salaryMin
+    integer salaryMax
+    string currency "INR"
+    enum status "ACTIVE | EXPIRED | FILLED | REMOVED"
+    timestamp postedAt
+    timestamp expiresAt
+    timestamp lastVerifiedAt
+    vector embedding "pgvector 1536-dim"
+    timestamp createdAt
+  }
+
+  JobMatch {
+    uuid id PK
+    uuid jobId FK
+    uuid candidateProfileId FK
+    float matchScore "0.0–1.0"
+    jsonb matchReasons "explainable factors"
+    boolean shownToCandidate
+    timestamp calculatedAt
+  }
+
+  %% ─── Resume & Branding ──────────────────────────────────────────
+  Resume {
+    uuid id PK
+    uuid candidateProfileId FK
+    uuid workspaceId FK
+    string title
+    boolean isDefault
+    timestamp createdAt
+  }
+
+  ResumeVersion {
+    uuid id PK
+    uuid resumeId FK
+    integer versionNumber
+    string objectStoragePath "S3 path — access-controlled"
+    enum format "PDF | DOCX"
+    boolean isTailored
+    uuid tailoredForJobId FK "nullable"
+    string atsScore "provider-generated, nullable"
+    enum status "DRAFT | APPROVED | ARCHIVED | DELETED"
+    timestamp createdAt
+    timestamp deletedAt "soft delete"
+  }
+
+  %% ─── Applications ───────────────────────────────────────────────
+  Application {
+    uuid id PK
+    uuid candidateProfileId FK
+    uuid jobId FK
+    uuid resumeVersionId FK
+    enum status "SAVED | APPLIED | ACKNOWLEDGED | INTERVIEWING | OFFERED | ACCEPTED | REJECTED | WITHDRAWN | ARCHIVED"
+    string appliedVia "platform | direct"
+    boolean submittedByPlatform
+    timestamp appliedAt
+    timestamp statusUpdatedAt
+    timestamp followUpAt
+    text notes "candidate personal notes"
+  }
+
+  ApprovalRequest {
+    uuid id PK
+    uuid userId FK
+    uuid workspaceId FK
+    string toolName "submit_job_application | send_recruiter_message | book_paid_mentorship"
+    jsonb actionPayload
+    enum status "PENDING | APPROVED | DENIED | EXPIRED"
+    string correlationId
+    timestamp requestedAt
+    timestamp resolvedAt
+    timestamp expiresAt
+  }
+
+  %% ─── Interviews & Learning ──────────────────────────────────────
+  InterviewSession {
+    uuid id PK
+    uuid candidateProfileId FK
+    uuid jobId FK "nullable — may be general practice"
+    string domain
+    enum mode "TEXT | VOICE"
+    enum status "IN_PROGRESS | COMPLETED | ABANDONED"
+    integer durationSeconds
+    timestamp startedAt
+    timestamp endedAt
+  }
+
+  InterviewFeedback {
+    uuid id PK
+    uuid sessionId FK
+    jsonb questionAnswerPairs "synthetic/licensed data only"
+    jsonb scores "technical | communication | structure"
+    text overallFeedback
+    string_array improvementAreas
+    timestamp generatedAt
+  }
+
+  LearningTask {
+    uuid id PK
+    uuid candidateProfileId FK
+    uuid skillGapReportId FK "nullable"
+    string title
+    text description
+    string resourceUrl "licensed or official source"
+    enum status "TODO | IN_PROGRESS | COMPLETED | SKIPPED"
+    timestamp dueDate
+    timestamp completedAt
+  }
+
+  %% ─── Mentorship ─────────────────────────────────────────────────
+  MentorBooking {
+    uuid id PK
+    uuid mentorUserId FK
+    uuid candidateUserId FK
+    enum status "PENDING | CONFIRMED | COMPLETED | CANCELLED"
+    timestamp scheduledAt
+    integer durationMinutes
+    string meetingLink "nullable"
+    boolean isPaid
+    string paymentRef "external payment ref, nullable"
+    timestamp createdAt
+  }
+
+  %% ─── AI Agent Records ───────────────────────────────────────────
+  AIConversation {
+    uuid id PK
+    uuid userId FK
+    uuid workspaceId FK
+    string title
+    jsonb metadata "model used, token counts"
+    timestamp startedAt
+    timestamp lastActiveAt
+  }
+
+  AgentToolExecution {
+    uuid id PK
+    uuid conversationId FK
+    uuid approvalRequestId FK "nullable"
+    string toolName
+    enum permissionLevel "READ_ONLY | WRITE | EXTERNAL | DESTRUCTIVE"
+    enum status "PENDING | COMPLETED | FAILED | REJECTED | REPLAYED"
+    string idempotencyKey
+    jsonb inputHash "hashed — no PII in logs"
+    jsonb outputSummary "non-sensitive summary only"
+    integer durationMs
+    string correlationId
+    timestamp executedAt
+  }
+
+  IdempotencyRecord {
+    uuid id PK
+    string key UK "SHA-256 of operation signature"
+    string toolName
+    enum status "PROCESSING | COMPLETED | FAILED"
+    jsonb cachedResult "sanitised response"
+    timestamp createdAt
+    timestamp expiresAt
+  }
+
+  %% ─── Audit & Compliance ─────────────────────────────────────────
+  AuditEvent {
+    uuid id PK
+    uuid actorId FK "userId or system"
+    uuid workspaceId FK
+    string operation
+    string resourceType
+    uuid resourceId
+    enum outcome "SUCCESS | FAILURE | DENIED | CANCELLED"
+    jsonb metadata "no PII, no secrets"
+    string correlationId
+    inet ipAddress "hashed in logs"
+    string userAgent
+    timestamp occurredAt
+  }
+
+  %% ─── Relationships ──────────────────────────────────────────────
+  User ||--o{ WorkspaceMembership : "belongs to"
+  Workspace ||--o{ WorkspaceMembership : "has members"
+  Workspace ||--o| Subscription : "has"
+  User ||--o| CandidateProfile : "has"
+  CandidateProfile ||--o| CareerPreference : "has"
+  CandidateProfile ||--o{ CandidateSkill : "has"
+  Skill ||--o{ CandidateSkill : "tagged in"
+  CandidateProfile ||--o{ SkillGapReport : "has"
+  CandidateProfile ||--o{ Resume : "owns"
+  Resume ||--o{ ResumeVersion : "has versions"
+  CandidateProfile ||--o{ Application : "makes"
+  Application ||--|| Job : "targets"
+  Application ||--o| ResumeVersion : "uses"
+  Job ||--o{ JobMatch : "matched to"
+  CandidateProfile ||--o{ JobMatch : "receives"
+  Employer ||--o{ Job : "posts"
+  JobSource ||--o{ Job : "provides"
+  CandidateProfile ||--o{ InterviewSession : "has"
+  InterviewSession ||--o| InterviewFeedback : "produces"
+  CandidateProfile ||--o{ LearningTask : "assigned"
+  User ||--o{ MentorBooking : "as mentor"
+  User ||--o{ MentorBooking : "as candidate"
+  User ||--o{ AIConversation : "has"
+  AIConversation ||--o{ AgentToolExecution : "contains"
+  AgentToolExecution ||--o| ApprovalRequest : "may require"
+  User ||--o{ ApprovalRequest : "requests"
+  User ||--o{ AuditEvent : "generates"

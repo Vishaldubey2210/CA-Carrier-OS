@@ -1,0 +1,126 @@
+flowchart TB
+  classDef layer fill:#1e293b,stroke:#334155,color:#f1f5f9,font-weight:bold
+  classDef module fill:#0f172a,stroke:#3b82f6,color:#93c5fd
+  classDef external fill:#1c1917,stroke:#78716c,color:#d6d3d1
+  classDef store fill:#14532d,stroke:#16a34a,color:#bbf7d0
+  classDef security fill:#7f1d1d,stroke:#dc2626,color:#fca5a5
+  classDef ai fill:#312e81,stroke:#6366f1,color:#c7d2fe
+  classDef worker fill:#1e1b4b,stroke:#8b5cf6,color:#ddd6fe
+  classDef obs fill:#1a2035,stroke:#0ea5e9,color:#bae6fd
+
+  subgraph PRESENTATION["🖥  Presentation Layer"]
+    direction LR
+    CAND_APP["Candidate Dashboard\n(Next.js / React / TypeScript)"]
+    RECRUITER_PORTAL["Recruiter Portal\n(Next.js)"]
+    ADMIN_CONSOLE["Admin Console\n(Next.js / Role-gated)"]
+  end
+
+  subgraph AUTH_LAYER["🔐 Authentication & Authorization  [Trust Boundary]"]
+    direction LR
+    AUTH_SVC["Auth Service\nJWT + Refresh Tokens\nOAuth2 Social Login"]
+    RBAC["RBAC Engine\nRole × Workspace Permissions\nLeast-Privilege Enforcement"]
+    SESSION["Session Store\n(Redis — short TTL)"]
+  end
+
+  subgraph API_LAYER["⚡ API Layer"]
+    direction LR
+    REST_API["REST API\n(NestJS Controllers)"]
+    TRPC_API["tRPC Router\n(Type-safe RPC)"]
+    RATE_LIMITER["Rate Limiter\n(Redis Token Bucket)"]
+    API_GUARD["Request Validator\nZod Schema + JWT Guard"]
+  end
+
+  subgraph CAREER_MODULES["📚 Core Career Modules  [Modular Monolith]"]
+    direction TB
+    subgraph MOD_A["Career Intelligence"]
+      CI["Profile & Skills\nInventory\nCareer Path AI\nSkill-Gap Analysis\n30/60/90-Day Roadmap"]
+    end
+    subgraph MOD_B["Jobs & Recruitment"]
+      JR["Job Aggregator\nSemantic Search\nMatch Scoring\nApplication Tracker\nRecruiter Dashboard"]
+    end
+    subgraph MOD_C["Resume & Branding"]
+      RB["ATS Resume Builder\nJob Tailoring\nCover Letter Gen\nLinkedIn Optimizer\nPortfolio Builder"]
+    end
+    subgraph MOD_D["Interview & Skills Lab"]
+      IS["Mock Interviews\nQuestion Bank\nFeedback Engine\nAudit Simulations\nFinance Exercises"]
+    end
+    subgraph MOD_E["Career & Financial Intel"]
+      CF["Salary Insights\nOffer Comparator\nMentor Marketplace\nCommunity Network"]
+    end
+    subgraph MOD_F["Practice Management"]
+      PM["Post-Qual Checklist\nICAAI Resource Links\nClient CRM (Lite)\nTask & Doc Reminders"]
+    end
+  end
+
+  subgraph JOB_AGGREGATION["🔄 Job Aggregation & Normalization Worker"]
+    direction LR
+    JOB_FETCH["Source Fetcher\n(Verified APIs only)"]
+    JOB_NORM["Normalizer &\nDeduplicator"]
+    JOB_FRESH["Freshness Checker\n(TTL + re-verify)"]
+    JOB_INDEX["pgvector Indexer\n(Semantic embeddings)"]
+  end
+
+  subgraph AI_ORCH["🤖 AI Orchestration Layer"]
+    direction TB
+    AGENT_CORE["AI Career Agent\n(Stateful Orchestrator)"]
+    TOOL_POLICY["Tool Policy Engine\nAllowlist + JSON Schema\nPermission Router"]
+    APPROVAL_GW["Approval Gateway\nHuman-in-the-Loop\nExplicit Consent Store"]
+    LLM_ADAPTER["LLM Provider Adapter\n(Gemini / GPT-4 / Claude)\nStructured Output Enforcer"]
+    RAG_ENGINE["RAG Engine\nChunk Store + Retrieval\nSource Citation Builder"]
+    PROMPT_GUARD["Prompt Guard\nInjection Detector\nDoc Sanitizer"]
+  end
+
+  subgraph BG_WORKERS["⚙️ Background Workers  (BullMQ + Redis)"]
+    direction LR
+    EMAIL_WORKER["Email / WhatsApp\nNotification Worker"]
+    EMBED_WORKER["Embedding\nGeneration Worker"]
+    REMINDER_WORKER["Follow-Up\nReminder Worker"]
+    AUDIT_WRITER["Audit Event\nWriter"]
+    CRON_JOBS["Scheduled Jobs\nJob Refresh · Salary Sync\nSubscription Checks"]
+  end
+
+  subgraph PERSISTENCE["🗄  Persistence & Cache"]
+    direction LR
+    PG[("PostgreSQL\nApplication Data\npgvector Embeddings\nTenant-Isolated Schemas")]
+    REDIS_STORE[("Redis\nSessions · Queues\nIdempotency Keys\nRate-Limit Counters")]
+    S3[("Object Storage\nResumes · Documents\nAudit Archives\nServer-Side Encrypted")]
+  end
+
+  subgraph EXTERNAL["🌐 External Integrations"]
+    direction LR
+    JOB_APIS["Approved Job APIs\n(Naukri, LinkedIn, etc.)"]
+    AI_PROV["AI Providers\n(Gemini / OpenAI / Anthropic)"]
+    NOTIFY["Notification Services\n(SendGrid · Twilio)"]
+    PAYMENT["Payment Gateway\n(Razorpay / Stripe India)"]
+    ICAI["ICAI Portal\n(Reference Links Only)"]
+  end
+
+  subgraph OBSERVABILITY["📊 Observability & Audit  [Always On]"]
+    direction LR
+    AUDIT_LOG["Audit Log Store\nActor · Op · Outcome\nTimestamp · CorrelationID"]
+    METRICS["Metrics & Tracing\n(OpenTelemetry · Grafana)"]
+    ALERTS["Alerting\n(PagerDuty / Slack)"]
+    PRIVACY_LOG["Privacy-Safe App Logs\nNo PII · No Tokens\nNo Resume Content"]
+  end
+
+  %% --- Flows ---
+  PRESENTATION --> AUTH_LAYER
+  AUTH_LAYER --> API_LAYER
+  API_LAYER --> CAREER_MODULES
+  API_LAYER --> AI_ORCH
+  CAREER_MODULES --> JOB_AGGREGATION
+  AI_ORCH --> CAREER_MODULES
+  AI_ORCH --> APPROVAL_GW
+  CAREER_MODULES --> BG_WORKERS
+  AI_ORCH --> BG_WORKERS
+  CAREER_MODULES --> PERSISTENCE
+  AI_ORCH --> PERSISTENCE
+  JOB_AGGREGATION --> PERSISTENCE
+  BG_WORKERS --> PERSISTENCE
+  BG_WORKERS --> EXTERNAL
+  CAREER_MODULES --> EXTERNAL
+  AI_ORCH --> EXTERNAL
+  BG_WORKERS --> OBSERVABILITY
+  CAREER_MODULES --> OBSERVABILITY
+  AI_ORCH --> OBSERVABILITY
+  API_LAYER --> OBSERVABILITY

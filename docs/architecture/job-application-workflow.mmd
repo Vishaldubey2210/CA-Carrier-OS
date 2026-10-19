@@ -1,0 +1,102 @@
+stateDiagram-v2
+  [*] --> JobDiscovered : Job ingested from source
+
+  state JobDiscovered {
+    [*] --> Normalising
+    Normalising --> Deduplicating
+    Deduplicating --> FreshnessVerified
+    FreshnessVerified --> Indexed
+    Indexed --> [*]
+  }
+
+  JobDiscovered --> Available : Passes quality checks
+
+  state Available {
+    direction LR
+    [*] --> Searchable
+    Searchable --> SavedByCandidate : Candidate saves job
+    Searchable --> AlertSent : Matches job alert
+  }
+
+  SavedByCandidate --> ResumeVersionSelected : Candidate picks resume
+  AlertSent --> ResumeVersionSelected
+
+  state ResumeVersionSelected {
+    [*] --> SelectingVersion
+    SelectingVersion --> Tailoring : Candidate requests tailoring
+    Tailoring --> TailoredDraftReady
+    TailoredDraftReady --> CandidateReviewing
+    CandidateReviewing --> ApprovedForApplication : Candidate approves
+    CandidateReviewing --> Tailoring : Revise
+  }
+
+  ApprovedForApplication --> EligibilityCheck
+
+  state EligibilityCheck {
+    [*] --> CheckingRequirements
+    CheckingRequirements --> EligibilityMet : Requirements met
+    CheckingRequirements --> EligibilityWarning : Partial match
+    CheckingRequirements --> EligibilityFailed : Hard requirement missing
+    EligibilityWarning --> CandidateProceedsAnyway : User explicitly continues
+    EligibilityFailed --> [*] : Blocked — inform candidate
+  }
+
+  EligibilityMet --> PendingExplicitApproval
+  CandidateProceedsAnyway --> PendingExplicitApproval
+
+  state PendingExplicitApproval {
+    [*] --> ShowingApprovalDialog
+    ShowingApprovalDialog --> UserConfirmed : "Submit Application" clicked
+    ShowingApprovalDialog --> UserDeclined : Cancelled or timeout
+    UserDeclined --> [*]
+  }
+
+  UserConfirmed --> IdempotencyCheck
+
+  state IdempotencyCheck {
+    [*] --> CheckingKey
+    CheckingKey --> DuplicateDetected : Key already exists
+    CheckingKey --> NewSubmission : First attempt
+    DuplicateDetected --> ReplayingResult
+    ReplayingResult --> [*]
+  }
+
+  NewSubmission --> ApplicationSubmitted : External action via service
+
+  ApplicationSubmitted --> Tracking
+
+  state Tracking {
+    direction LR
+    [*] --> Applied
+    Applied --> AcknowledgedByEmployer : Employer viewed
+    Applied --> NoResponse
+    AcknowledgedByEmployer --> InterviewInvited
+    AcknowledgedByEmployer --> Rejected
+    InterviewInvited --> InterviewPrepStarted
+    InterviewPrepStarted --> InterviewCompleted
+    InterviewCompleted --> OfferReceived
+    InterviewCompleted --> Rejected
+    NoResponse --> FollowUpSent : Reminder triggered
+    FollowUpSent --> AcknowledgedByEmployer
+    FollowUpSent --> NoResponseFinal
+  }
+
+  OfferReceived --> OfferComparison
+  Rejected --> PostMortemFeedback
+  NoResponseFinal --> Archived
+
+  state OfferComparison {
+    [*] --> CTCAnalysis
+    CTCAnalysis --> BenefitsNormalisation
+    BenefitsNormalisation --> ComparisonReady
+  }
+
+  OfferComparison --> Accepted : Candidate accepts
+  OfferComparison --> Declined : Candidate declines
+
+  Accepted --> OfferLetterStored
+  Declined --> Archived
+  PostMortemFeedback --> Archived
+
+  OfferLetterStored --> [*]
+  Archived --> [*]

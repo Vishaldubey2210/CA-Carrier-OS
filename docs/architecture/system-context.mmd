@@ -1,0 +1,41 @@
+%%{init: {"theme": "base", "themeVariables": {"primaryColor": "#1e293b", "primaryTextColor": "#f1f5f9", "primaryBorderColor": "#334155", "lineColor": "#64748b", "secondaryColor": "#0f172a", "tertiaryColor": "#1e293b", "background": "#0f172a", "mainBkg": "#1e293b", "nodeBorder": "#334155", "clusterBkg": "#1e293b", "titleColor": "#f1f5f9", "edgeLabelBackground": "#1e293b", "fontSize": "14px"}}}%%
+
+C4Context
+  title CA Career OS — High-Level System Context
+
+  Person(candidate, "CA Candidate", "Newly qualified or recently cleared CA Final. Core product user seeking career guidance, job opportunities, and professional growth.")
+  Person(recruiter, "Recruiter / Employer", "Hiring manager or CA firm posting jobs and discovering candidates through the platform.")
+  Person(mentor, "Mentor", "Senior CA or industry professional offering paid or voluntary mentorship sessions.")
+  Person(platform_admin, "Platform Administrator", "Internal team member managing operational health, tenant oversight, and audited content access.")
+
+  System_Boundary(cacareer, "CA Career OS Platform") {
+    System(webapp, "Web Application", "Next.js / React / TypeScript. Responsive SaaS frontend. Candidate dashboard, recruiter portal, and admin console.")
+    System(backend, "Core SaaS Backend", "NestJS modular monolith. REST + tRPC API. Auth, career modules, job aggregation, AI orchestration, background workers.")
+    System(ai_agent, "AI Career Agent", "Permission-aware LLM orchestration layer. Retrieval-augmented tool execution with explicit approval gates and audit logging.")
+  }
+
+  System_Ext(job_sources, "External Job Sources", "Approved job board APIs, employer direct feeds, and platform-published listings. Each source has verified integration capability.")
+  System_Ext(ai_providers, "AI Model Providers", "Abstracted LLM provider interface. Google Gemini, OpenAI, or Anthropic Claude — interchangeable via provider adapter.")
+  System_Ext(notification_providers, "Notification Providers", "Email via SendGrid or Resend. Optional WhatsApp via Twilio or Meta Business API.")
+  System_Ext(icai_resources, "ICAI Official Resources", "Links and references to official ICAI documentation, membership portals, and regulatory guidance. Read-only reference integration.")
+  System_Ext(payment_gateway, "Payment Gateway", "Razorpay or Stripe India for subscription billing and paid mentorship transactions.")
+
+  SystemDb(postgres, "PostgreSQL", "Primary relational database. Application data, tenant isolation, vector embeddings via pgvector extension.")
+  SystemDb(redis, "Redis", "Session cache, job queue state, idempotency key store, rate-limit counters, and ephemeral agent context.")
+  SystemDb(object_storage, "Object Storage", "S3-compatible store for resumes, cover letters, profile documents, and audit log archives. Server-side encrypted.")
+
+  Rel(candidate, webapp, "Uses", "HTTPS")
+  Rel(recruiter, webapp, "Uses", "HTTPS")
+  Rel(mentor, webapp, "Uses", "HTTPS")
+  Rel(platform_admin, webapp, "Uses", "HTTPS / Admin Console")
+
+  Rel(webapp, backend, "API calls", "HTTPS / tRPC")
+  Rel(backend, ai_agent, "Orchestrates", "Internal")
+  Rel(backend, postgres, "Reads / Writes", "SSL")
+  Rel(backend, redis, "Cache / Queues", "TLS")
+  Rel(backend, object_storage, "Document ops", "HTTPS / S3 API")
+  Rel(ai_agent, ai_providers, "LLM inference", "HTTPS / API Key")
+  Rel(backend, job_sources, "Job ingestion", "HTTPS / Verified APIs")
+  Rel(backend, notification_providers, "Send alerts", "HTTPS / SMTP")
+  Rel(backend, payment_gateway, "Billing", "HTTPS")
+  Rel(backend, icai_resources, "Reference links", "HTTPS")

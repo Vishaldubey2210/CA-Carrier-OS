@@ -1,0 +1,71 @@
+flowchart TD
+  classDef milestone fill:#1e293b,stroke:#3b82f6,color:#bfdbfe,font-weight:bold
+  classDef action    fill:#0f172a,stroke:#64748b,color:#94a3b8
+  classDef ai        fill:#312e81,stroke:#6366f1,color:#c7d2fe
+  classDef alt       fill:#1c1917,stroke:#d97706,color:#fde68a
+  classDef decision  fill:#1e1b4b,stroke:#8b5cf6,color:#ddd6fe
+
+  %% ─── Main Journey ──────────────────────────────────────
+  START(["🎓 CA Final Cleared\nor Newly Qualified CA"]):::milestone
+
+  ONBOARD["📋 Onboarding & Profile Setup\n• Qualification details · Articleship area\n• Preferred city · Work type\n• Role interest · Salary expectation"]:::action
+
+  CAREER_DISC["🧭 Career Intelligence\n• AI path recommendations\n• 6 domain pathway options\n• Peer cohort comparison (anonymous)"]:::ai
+
+  SKILL_GAP["📊 Skill-Gap Analysis\n• Role-specific skill inventory\n• Articleship vs. target role delta\n• Prioritised learning plan"]:::ai
+
+  PATH_CHOICE{"Which path?"}:::decision
+
+  %% ─── Employment Path ────────────────────────────────────
+  subgraph EMPLOYMENT["💼 Employment Path"]
+    direction TB
+    JOB_MATCH["🔍 Job Matching\n• Semantic search + score\n• Freshness verified\n• Explainable match reason"]:::ai
+    RESUME_TAILOR["📄 Resume Tailoring\n• ATS-optimised per role\n• Verified claims only\n• Cover letter generation"]:::ai
+    APP_TRACK["📌 Application Tracking\n• Status per application\n• Follow-up reminders\n• Recruiter interactions"]:::action
+    INTERVIEW_PREP["🎤 Interview Preparation\n• Role-specific question bank\n• Mock interview sessions\n• Feedback & progress score"]:::ai
+    OFFER_COMPARE["💰 Offer Comparison\n• CTC breakdown\n• Fixed vs. variable analysis\n• Benefits normalisation"]:::action
+    JOB_ACCEPT["✅ Job Selection\n• Approved submission\n• Offer letter storage\n• Onboarding checklist"]:::action
+    FIRST_90["🚀 First 90 Days\n• Role-specific milestones\n• Learning tasks\n• Mentor access"]:::action
+    LONG_TERM["📈 Long-Term Growth\n• Skill upgrades\n• Role re-assessment\n• Community & alumni"]:::action
+  end
+
+  %% ─── Practice Path ───────────────────────────────────────
+  subgraph PRACTICE["🏢 Independent Practice Path"]
+    direction TB
+    POST_QUAL["📋 Post-Qualification Checklist\n• ICAI membership steps\n• COP application guidance\n• Official resource links"]:::alt
+    PRACTICE_SETUP["⚙️ Practice Setup\n• Office, branding, tools\n• GST, Income Tax registrations\n• Professional indemnity"]:::alt
+    CLIENT_CRM["👥 Client Onboarding\n• Engagement letters\n• KYC & document requests\n• Task & deadline reminders"]:::alt
+    PRACTICE_GROW["📊 Practice Growth\n• Service expansion planning\n• Staff & partner onboarding\n• Compliance calendar"]:::alt
+  end
+
+  %% ─── Flows ─────────────────────────────────────────────
+  START --> ONBOARD
+  ONBOARD --> CAREER_DISC
+  CAREER_DISC --> SKILL_GAP
+  SKILL_GAP --> PATH_CHOICE
+
+  PATH_CHOICE -- "Employment" --> JOB_MATCH
+  JOB_MATCH --> RESUME_TAILOR
+  RESUME_TAILOR --> APP_TRACK
+  APP_TRACK --> INTERVIEW_PREP
+  INTERVIEW_PREP --> OFFER_COMPARE
+  OFFER_COMPARE --> JOB_ACCEPT
+  JOB_ACCEPT --> FIRST_90
+  FIRST_90 --> LONG_TERM
+  LONG_TERM -- "Career pivot\nor advancement" --> CAREER_DISC
+
+  PATH_CHOICE -- "Independent Practice" --> POST_QUAL
+  POST_QUAL --> PRACTICE_SETUP
+  PRACTICE_SETUP --> CLIENT_CRM
+  CLIENT_CRM --> PRACTICE_GROW
+  PRACTICE_GROW -- "Add employment\noption later" --> PATH_CHOICE
+
+  %% ─── AI Agent Runs Throughout ───────────────────────────
+  AI_AGENT["🤖 AI Career Agent\nAvailable at every stage\nREAD · WRITE · Approved external\nNever acts without permission"]:::ai
+  AI_AGENT -.->|"assists"| CAREER_DISC
+  AI_AGENT -.->|"assists"| SKILL_GAP
+  AI_AGENT -.->|"assists"| JOB_MATCH
+  AI_AGENT -.->|"assists"| RESUME_TAILOR
+  AI_AGENT -.->|"assists"| INTERVIEW_PREP
+  AI_AGENT -.->|"assists"| OFFER_COMPARE
+  AI_AGENT -.->|"assists"| FIRST_90
