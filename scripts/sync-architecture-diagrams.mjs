@@ -93,16 +93,20 @@ for (const targetPath of TARGET_FILES) {
   let matchesInFile = 0;
 
   for (const [id, mmdSource] of Object.entries(loadedDiagrams)) {
-    const startTag = `<!-- DIAGRAM:${id}:START -->`;
-    const endTag = `<!-- DIAGRAM:${id}:END -->`;
+    const markerPairs = [
+      { startTag: `<!-- DIAGRAM:${id}:START -->`, endTag: `<!-- DIAGRAM:${id}:END -->` },
+      { startTag: `<!-- DIAGRAM:gallery-${id}:START -->`, endTag: `<!-- DIAGRAM:gallery-${id}:END -->` },
+    ];
 
-    const regex = new RegExp(`${escapeRegExp(startTag)}[\\s\\S]*?${escapeRegExp(endTag)}`, 'g');
+    for (const { startTag, endTag } of markerPairs) {
+      const regex = new RegExp(`${escapeRegExp(startTag)}[\\s\\S]*?${escapeRegExp(endTag)}`, 'g');
 
-    if (regex.test(originalContent)) {
-      matchesInFile++;
-      totalMarkersSynchronized++;
-      const replacementBlock = `${startTag}\n\`\`\`mermaid\n${mmdSource}\n\`\`\`\n${endTag}`;
-      updatedContent = updatedContent.replace(regex, replacementBlock);
+      if (regex.test(originalContent)) {
+        matchesInFile++;
+        totalMarkersSynchronized++;
+        const replacementBlock = `${startTag}\n\`\`\`mermaid\n${mmdSource}\n\`\`\`\n${endTag}`;
+        updatedContent = updatedContent.replace(regex, replacementBlock);
+      }
     }
   }
 
