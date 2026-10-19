@@ -1,0 +1,66 @@
+flowchart TB
+  classDef source fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef norm fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef dedup fill:#312e81,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+  classDef embed fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef store fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#bbf7d0
+  classDef alert fill:#451a03,stroke:#f59e0b,stroke-width:1px,color:#fef3c7
+
+  subgraph SOURCES["1. Ingestion Sources (Verified Only)"]
+    direction LR
+    SRC_EMPLOYER["Direct Recruiter Postings\n(Verified Org Workspaces)"]:::source
+    SRC_WEBHOOKS["Partner ATS Webhooks\n(Greenhouse · Lever · Darwinbox)"]:::source
+    SRC_FEEDS["Authorized Partner Feeds\n(Signed API Integrations)"]:::source
+  end
+
+  subgraph STAGE_NORM["2. Normalization & Validation Stage"]
+    direction TB
+    VALIDATE_SOURCE["Source Authenticator\n• HMAC Signature Verification\n• Source Attribution Tagging"]:::norm
+    SCHEMA_NORM["Job Schema Normalizer\n• Standardize Titles & CA Pathways\n• Indian CTC Bounds (Fixed/Variable)\n• City & Work Mode Normalization"]:::norm
+  end
+
+  subgraph STAGE_DEDUP["3. Deduplication & Freshness Engine"]
+    direction TB
+    FINGERPRINT["Generate Job Fingerprint\nSHA-256(Company + NormalizedTitle + City)"]:::dedup
+    DEDUP_CHECK{"Duplicate Fingerprint\nin Last 30 Days?"}:::dedup
+    DROP_DUP["Discard Duplicate Listing\n(Update Existing Timestamp Only)"]:::dedup
+    FRESH_RULE["Apply Freshness Policy\n• Set 30-Day Auto-Expiration Date\n• Flag Stale External Listings"]:::dedup
+  end
+
+  subgraph STAGE_EMBED["4. Semantic Embedding & Vectorization"]
+    direction TB
+    ENQUEUE_EMBED["Enqueue to BullMQ\n(vector-embedding-queue)"]:::embed
+    LLM_EMBED["Embedding Worker\n• Generate 1536-Dim Vector\n• Domain Skill Token Extraction"]:::embed
+  end
+
+  subgraph STAGE_PERSIST["5. Dual Relational & Vector Persistence"]
+    direction LR
+    PG_RELATIONAL[("PostgreSQL\nJob & JobSource Records\nStatus: ACTIVE")]:::store
+    PG_FTS[("PostgreSQL FTS\nGIN Index on Title & Skills")]:::store
+    PG_VECTOR[("pgvector HNSW Index\nCosine Distance Metric")]:::store
+  end
+
+  subgraph STAGE_ALERT["6. Matching & Candidate Notification"]
+    direction TB
+    MATCH_WORKER["Hybrid Match Evaluator\n(Reciprocal Rank Fusion RRF)"]:::alert
+    CAND_ALERTS["Dispatch Candidate Alerts\n(Email / In-App Notification)"]:::alert
+  end
+
+  SOURCES --> VALIDATE_SOURCE
+  VALIDATE_SOURCE --> SCHEMA_NORM
+  SCHEMA_NORM --> FINGERPRINT
+  FINGERPRINT --> DEDUP_CHECK
+
+  DEDUP_CHECK -- "Duplicate Found" --> DROP_DUP
+  DEDUP_CHECK -- "Unique Job" --> FRESH_RULE
+
+  FRESH_RULE --> ENQUEUE_EMBED
+  ENQUEUE_EMBED --> LLM_EMBED
+
+  LLM_EMBED --> PG_RELATIONAL
+  LLM_EMBED --> PG_FTS
+  LLM_EMBED --> PG_VECTOR
+
+  PG_RELATIONAL --> MATCH_WORKER
+  PG_VECTOR --> MATCH_WORKER
+  MATCH_WORKER --> CAND_ALERTS

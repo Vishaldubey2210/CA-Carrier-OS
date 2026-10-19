@@ -1,0 +1,60 @@
+sequenceDiagram
+  autonumber
+  actor Candidate as Candidate (Browser UI)
+  participant WebApp as Next.js Web App
+  participant Gateway as API Gateway & Guards
+  participant Agent as Agent Orchestrator
+  participant ApprovalGW as Approval Gateway Service
+  participant Redis as Redis (State & Locks)
+  participant ExtService as External Egress / Worker
+  participant Audit as Audit Logging Service
+
+  Note over Candidate, Agent: User requests an external side-effect via chat
+  Candidate->>WebApp: "Submit my application to KPMG Statutory Audit"
+  WebApp->>Gateway: POST /api/v1/agent/chat (JWT, workspaceId)
+  Gateway->>Agent: Process prompt in workspace context
+  Agent->>Agent: LLM generates tool call: submit_job_application
+  Agent->>ApprovalGW: Evaluate tool: submit_job_application (EXPLICITLY_APPROVED_EXTERNAL)
+
+  Note over ApprovalGW, Redis: Generate 15-Minute Signed Token & Approval Card
+  ApprovalGW->>ApprovalGW: Create ApprovalRequest (id, payload, diff)
+  ApprovalGW->>Redis: SET approval:{id} (data, status=PENDING, EX=900s)
+  ApprovalGW-->>Agent: Return ApprovalRequest metadata
+  Agent-->>Gateway: Return assistant message with interactive Approval Card
+  Gateway-->>WebApp: Stream response + Approval Card component
+  WebApp-->>Candidate: Display Approval Card in Chat UI (Preview resume, job details, 15m countdown)
+
+  alt Case A: Candidate Explicitly Approves
+    Candidate->>WebApp: Click "Confirm & Submit Application"
+    WebApp->>Gateway: POST /api/v1/approvals/{id}/confirm (Idempotency-Key, SignedToken)
+    Gateway->>ApprovalGW: Verify token, workspace scope, and idempotency
+    ApprovalGW->>Redis: Check approval:{id} status & acquire Redlock (30s)
+    Redis-->>ApprovalGW: Lock acquired, status valid
+    ApprovalGW->>ExtService: Enqueue / Execute application submission
+    ExtService-->>ApprovalGW: Submission acknowledged (ExternalRef ID)
+    ApprovalGW->>Redis: Update approval:{id} (status=COMPLETED), store result
+    ApprovalGW->>Audit: Log AuditEvent (tool=submit_job_application, outcome=SUCCESS)
+    ApprovalGW-->>Gateway: Return 200 OK (Submission confirmed)
+    Gateway-->>WebApp: HTTP 200 (Success payload)
+    WebApp-->>Candidate: Update UI: "Application Submitted Successfully!"
+
+  else Case B: Candidate Declines Action
+    Candidate->>WebApp: Click "Decline"
+    WebApp->>Gateway: POST /api/v1/approvals/{id}/decline
+    Gateway->>ApprovalGW: Process cancellation
+    ApprovalGW->>Redis: Update approval:{id} (status=CANCELLED)
+    ApprovalGW->>Audit: Log AuditEvent (outcome=CANCELLED)
+    ApprovalGW-->>WebApp: 200 OK (Cancelled)
+    WebApp-->>Candidate: Update UI: "Action cancelled. No application submitted."
+
+  else Case C: Expiration (15-Minute TTL Elapses)
+    Note over Redis, ApprovalGW: TTL 900s expires in Redis
+    Candidate->>WebApp: Attempts to click confirm after timeout
+    WebApp->>Gateway: POST /api/v1/approvals/{id}/confirm
+    Gateway->>ApprovalGW: Check approval token
+    ApprovalGW->>Redis: GET approval:{id} -> Key Expired / Null
+    ApprovalGW-->>Gateway: 410 Gone / 400 Expired
+    Gateway-->>WebApp: Error: "Approval request expired. Please re-initiate."
+    WebApp-->>Candidate: Display: "Request Expired. Please ask the agent again."
+    ApprovalGW->>Audit: Log AuditEvent (outcome=EXPIRED)
+  end

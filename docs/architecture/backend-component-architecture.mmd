@@ -1,0 +1,76 @@
+flowchart TB
+  classDef client fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef gateway fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe
+  classDef domain fill:#172554,stroke:#60a5fa,stroke-width:1px,color:#dbeafe
+  classDef infra fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef data fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef ext fill:#1c1917,stroke:#a8a29e,stroke-width:1px,color:#f5f5f4
+
+  subgraph CLIENT_LAYER["Presentation & Client Layer"]
+    WEB_CAND["Candidate Web App\n(Next.js App Router / React 19)"]:::client
+    WEB_REC["Recruiter & Firm Portal\n(Next.js App Router / React 19)"]:::client
+    WEB_ADMIN["Platform Admin Console\n(Next.js Role-Gated)"]:::client
+  end
+
+  subgraph INGRESS_LAYER["API Ingress & Gateway Layer (NestJS)"]
+    direction LR
+    JWT_GUARD["JWT Authentication Guard\n(Bearer Token / HttpOnly Cookie)"]:::gateway
+    WS_GUARD["Workspace Context Guard\n(Personal vs Org Workspace Scope)"]:::gateway
+    RATE_LIMIT["Rate Limit Interceptor\n(Redis Token Bucket per Tenant)"]:::gateway
+    ZOD_PIPE["Zod Validation Pipe\n(Strict Schema Enforcement)"]:::gateway
+    LOG_INTERCEPT["Privacy Logging Interceptor\n(Zero-PII Correlation Logger)"]:::gateway
+  end
+
+  subgraph DOMAIN_SERVICES["Core Domain Services (Modular Monolith)"]
+    direction TB
+    CAREER_SVC["CareerIntelligenceService\n• Diagnostics & Roadmaps\n• Skills Inventory & Gap Analysis"]:::domain
+    JOBS_SVC["JobsRecruitmentService\n• Job Ingestion & Normalization\n• Hybrid Search (FTS + pgvector)\n• Application Tracker Pipeline"]:::domain
+    RESUME_SVC["ResumeBrandingService\n• ATS Builder & Role Tailoring\n• Zero-Fabrication Guard (ADR-009)\n• Candidate Attestation Verifier"]:::domain
+    INTERVIEW_SVC["InterviewSkillsService\n• Technical Mock Interviews\n• Ind AS & Tax Synthetic Cases\n• Objective Feedback Engine"]:::domain
+    FINANCIAL_SVC["FinancialIntelService\n• CTC Unbundling & Offer Matrix\n• Anonymous Salary Benchmarking\n• Mentor Marketplace Advisory"]:::domain
+    PRACTICE_SVC["PracticeManagementService\n• Post-Qual & COP Checklists\n• Client KYC & Onboarding\n• Compliance Deadline Calendar"]:::domain
+    WORKSPACE_SVC["WorkspaceIdentityService\n• User Profiles & RBAC\n• Workspace Membership Isolation\n• Tenant Context Resolver"]:::domain
+    AUDIT_SVC["AuditLoggingService\n• Tamper-Evident Audit Events\n• WORM Storage Sync\n• SIEM Stream Dispatcher"]:::domain
+  end
+
+  subgraph CROSS_CUTTING["Cross-Cutting Infrastructure Services"]
+    direction TB
+    AGENT_ORCH["AgentOrchestratorService\n• Multi-Turn Context Planner\n• Tool Call Dispatcher"]:::infra
+    TOOL_POLICY["ToolPolicyEngine\n• 4-Tier Permission Router\n• Server-Side Tool Allowlist"]:::infra
+    APPROVAL_GW["ApprovalGatewayService\n• 15-Minute Signed Token Gate\n• Interactive Approval Cards"]:::infra
+    LLM_ADAPTER["LLMProviderAdapter\n• Gemini / Claude / GPT\n• JSON Schema Enforcer\n• PII Redaction Filter"]:::infra
+    LOCK_MGR["DistributedLockManager\n• Redis Redlock (30s TTL)\n• Idempotency Deduplication"]:::infra
+    QUEUE_MGR["QueueManagerService\n• BullMQ Queue Dispatcher\n• Dead-Letter Queue (DLQ) Handler"]:::infra
+    STORAGE_SVC["ObjectStorageService\n• S3 / Cloudflare R2 Client\n• Pre-Signed URLs (15m TTL)\n• KMS Server-Side Encryption"]:::infra
+  end
+
+  subgraph PERSISTENCE_LAYER["Persistence & Infrastructure Stores"]
+    direction LR
+    PG_DB[("PostgreSQL 16+\nPrisma ORM · pgvector\nRow-Level Security")]:::data
+    REDIS_STORE[("Redis 7+\nSessions · Queues · Cache\nIdempotency Keys")]:::data
+    S3_STORE[("S3-Compatible Object Store\nEncrypted Resumes & Docs")]:::data
+  end
+
+  subgraph EXTERNAL_TIER["External Services & APIs"]
+    direction LR
+    AI_PROVIDERS["AI Model APIs\n(Zero-Data Retention)"]:::ext
+    JOB_FEEDS["Verified Employer Feeds\n& Partner ATS Webhooks"]:::ext
+    NOTIFY_EXT["Resend / Twilio\nTransactional Alerts"]:::ext
+    PAY_GATEWAY["Razorpay Payment Gateway\nGST-Compliant Invoicing"]:::ext
+  end
+
+  CLIENT_LAYER --> INGRESS_LAYER
+  INGRESS_LAYER --> DOMAIN_SERVICES
+  INGRESS_LAYER --> AGENT_ORCH
+
+  DOMAIN_SERVICES --> CROSS_CUTTING
+  AGENT_ORCH --> TOOL_POLICY
+  TOOL_POLICY --> APPROVAL_GW
+  AGENT_ORCH --> LLM_ADAPTER
+  AGENT_ORCH --> DOMAIN_SERVICES
+
+  DOMAIN_SERVICES --> PERSISTENCE_LAYER
+  CROSS_CUTTING --> PERSISTENCE_LAYER
+
+  CROSS_CUTTING --> EXTERNAL_TIER
+  DOMAIN_SERVICES --> EXTERNAL_TIER

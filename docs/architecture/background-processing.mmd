@@ -1,0 +1,80 @@
+flowchart TB
+  classDef trigger fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef queue fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  classDef worker fill:#312e81,stroke:#a78bfa,stroke-width:1px,color:#ede9fe
+  classDef fail fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+  classDef store fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+  classDef ext fill:#1c1917,stroke:#a8a29e,stroke-width:1px,color:#f5f5f4
+
+  subgraph PRODUCERS["1. Event Triggers & Schedulers"]
+    CRON_SCHED["Cron Schedulers\n• Every 6h: Job Ingestion\n• Daily 02:00: Freshness Cleanup\n• Hourly: Application Follow-Ups"]:::trigger
+    DOMAIN_EVENTS["Domain Event Emitter\n• job.created\n• application.submitted\n• interview.completed"]:::trigger
+    API_ASYNC["API Async Mutations\n• Resume PDF Export\n• Heavy AI Diagnostic Tasks"]:::trigger
+  end
+
+  subgraph QUEUE_TIER["2. Distributed Task Queues (BullMQ + Redis 7+)"]
+    direction TB
+    Q_JOB["job-ingestion-queue\n(Priority: Normal, Rate: 50/min)"]:::queue
+    Q_EMBED["vector-embedding-queue\n(Priority: High, Rate: 100/min)"]:::queue
+    Q_FRESH["job-freshness-queue\n(Priority: Low, Daily Run)"]:::queue
+    Q_RESUME["resume-export-queue\n(Priority: High, PDF/DOCX)"]:::queue
+    Q_REMIND["reminder-queue\n(Priority: Normal, Hourly)"]:::queue
+    Q_AI_EVAL["ai-evaluation-queue\n(Priority: Normal, Scorecards)"]:::queue
+    Q_AUDIT["audit-event-queue\n(Priority: Critical, High-Throughput)"]:::queue
+  end
+
+  subgraph WORKER_POOL["3. Dedicated Worker Processes"]
+    direction TB
+    W_INGEST["JobIngestionWorker\n(Concurrency: 2, Timeout: 120s)"]:::worker
+    W_EMBED["EmbeddingWorker\n(Concurrency: 5, Timeout: 30s)"]:::worker
+    W_FRESH["FreshnessWorker\n(Concurrency: 1, Timeout: 300s)"]:::worker
+    W_RESUME["ResumeExportWorker\n(Concurrency: 3, Timeout: 45s)"]:::worker
+    W_REMIND["ReminderWorker\n(Concurrency: 4, Timeout: 15s)"]:::worker
+    W_AI_EVAL["InterviewEvaluationWorker\n(Concurrency: 3, Timeout: 60s)"]:::worker
+    W_AUDIT["AuditWriterWorker\n(Concurrency: 10, Timeout: 5s)"]:::worker
+  end
+
+  subgraph RELIABILITY["4. Reliability, Retries & Dead-Letter Handling"]
+    direction TB
+    RETRY_LOGIC["Exponential Backoff with Jitter\nRetries: 3-5 Attempts\n(Initial: 5s, Factor: 2x)"]:::fail
+    DLQ["Dead-Letter Queue (DLQ)\n• Persistent Failure Storage\n• Alerting via PagerDuty"]:::fail
+    RECONCILE["Nightly Reconciliation Worker\n• Resolves dangling approval tokens\n• Cross-checks external status"]:::fail
+  end
+
+  subgraph TARGETS["5. Target Storage & External Notification"]
+    PG[("PostgreSQL 16+\n(Relational Updates & pgvector)")]:::store
+    S3[("Object Storage (S3 / R2)\n(Generated PDF/DOCX Resumes)")]:::store
+    EXT_NOTIFY["Transactional Notification\n(Resend Email / Twilio Alerts)"]:::ext
+    AUDIT_WORM[("Immutable WORM Audit Store\n(SIEM & Compliance Bucket)")]:::store
+  end
+
+  PRODUCERS --> QUEUE_TIER
+
+  CRON_SCHED --> Q_JOB
+  CRON_SCHED --> Q_FRESH
+  CRON_SCHED --> Q_REMIND
+  DOMAIN_EVENTS --> Q_EMBED
+  DOMAIN_EVENTS --> Q_AUDIT
+  API_ASYNC --> Q_RESUME
+  API_ASYNC --> Q_AI_EVAL
+
+  Q_JOB --> W_INGEST
+  Q_EMBED --> W_EMBED
+  Q_FRESH --> W_FRESH
+  Q_RESUME --> W_RESUME
+  Q_REMIND --> W_REMIND
+  Q_AI_EVAL --> W_AI_EVAL
+  Q_AUDIT --> W_AUDIT
+
+  WORKER_POOL -.->|"On Unrecoverable Error"| RETRY_LOGIC
+  RETRY_LOGIC -.->|"Max Retries Exceeded"| DLQ
+  DLQ -.-> RECONCILE
+
+  W_INGEST --> PG
+  W_EMBED --> PG
+  W_FRESH --> PG
+  W_RESUME --> S3
+  W_REMIND --> EXT_NOTIFY
+  W_AI_EVAL --> PG
+  W_AUDIT --> AUDIT_WORM
+  RECONCILE --> PG

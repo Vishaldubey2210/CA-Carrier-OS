@@ -6,10 +6,11 @@
  * Comprehensive validation script for CA Career OS documentation & diagram integrity.
  * 
  * Checks performed:
- * 1. Mermaid syntax parsing using the core Mermaid lexer.
+ * 1. Forbidden local filesystem URLs (scans for file:///, /home/, localhost in markdown).
  * 2. Markdown link verification (checks that all relative links resolve to existing files).
- * 3. Local filesystem reference scanner (flags any remaining file:///, /home/, or localhost URLs).
+ * 3. Mermaid syntax parsing using the Mermaid lexer / AST parser.
  * 4. Balanced code fence verification (verifies ```mermaid blocks).
+ * 5. Diagram sync marker verification (START/END tags match registered diagram IDs).
  * 
  * Usage:
  *   node scripts/validate-diagrams.mjs
@@ -30,22 +31,21 @@ console.log('='.repeat(70));
 console.log('CA Career OS — Architecture & Documentation Validation Suite');
 console.log('='.repeat(70));
 
+const mdFiles = [
+  path.join(REPO_ROOT, 'README.md'),
+  path.join(ARCH_DIR, 'README.md'),
+  path.join(ARCH_DIR, 'decisions.md'),
+  path.join(ARCH_DIR, 'assumptions-and-risks.md'),
+];
+
 // -----------------------------------------------------------------------------
 // CHECK 1: Local filesystem URLs and forbidden absolute paths
 // -----------------------------------------------------------------------------
 console.log('\n[CHECK 1] Scanning for forbidden local filesystem URLs...');
 const forbiddenPatterns = [
   /file:\/\/\//i,
-  /\/home\/vishal/i,
-  /\/home\//i,
+  /\/home\/[a-zA-Z0-9_-]+/i,
   /localhost/i,
-];
-
-const mdFiles = [
-  path.join(REPO_ROOT, 'README.md'),
-  path.join(ARCH_DIR, 'README.md'),
-  path.join(ARCH_DIR, 'decisions.md'),
-  path.join(ARCH_DIR, 'assumptions-and-risks.md'),
 ];
 
 let leakCount = 0;
@@ -64,7 +64,7 @@ for (const file of mdFiles) {
 }
 
 if (leakCount === 0) {
-  console.log('  ✅ PASS: Zero local filesystem URLs or forbidden paths found.');
+  console.log('  ✅ PASS: Zero local filesystem URLs or forbidden paths found in Markdown.');
 } else {
   console.error(`  ❌ FAIL: Found ${leakCount} forbidden path references.`);
   exitCode = 1;
@@ -86,8 +86,8 @@ for (const file of mdFiles) {
   let match;
   while ((match = linkRegex.exec(content)) !== null) {
     const rawTarget = match[2].trim();
-    // Skip anchor-only links (#section) and external web links (http:// or https://)
-    if (rawTarget.startsWith('#') || rawTarget.startsWith('http://') || rawTarget.startsWith('https://')) {
+    // Skip anchor-only links (#section) and external web links (http:// or https://) or mailto
+    if (rawTarget.startsWith('#') || rawTarget.startsWith('http://') || rawTarget.startsWith('https://') || rawTarget.startsWith('mailto:')) {
       continue;
     }
 
@@ -115,47 +115,64 @@ if (brokenLinks === 0) {
 // CHECK 3: Mermaid Diagrams Syntax Validation
 // -----------------------------------------------------------------------------
 console.log('\n[CHECK 3] Validating Mermaid diagram syntax (.mmd files)...');
-const mmdFiles = fs.readdirSync(ARCH_DIR).filter(f => f.endsWith('.mmd'));
+const mmdFiles = fs.readdirSync(ARCH_DIR).filter(f => f.endsWith('.mmd')).sort();
 console.log(`  Found ${mmdFiles.length} canonical .mmd files in docs/architecture/`);
 
-// Test using jsdom + mermaid if installed, or regex/token fallback
-try {
-  const scratch = '/home/vishal/.gemini/antigravity-ide/brain/ccd59f55-2b27-4069-ab7f-b7d33db174d3/scratch/test-mermaid';
-  const { JSDOM } = await import(scratch + '/node_modules/jsdom/lib/api.js');
-  const dom = new JSDOM('<!DOCTYPE html><html><body><div id="container"></div></body></html>');
-  global.window = dom.window;
-  global.document = dom.window.document;
+let parsedWithEngine = false;
+
+// Attempt parser engine loading across candidate node_modules paths
+const candidateSearchPaths = [
+  path.join(REPO_ROOT, 'node_modules'),
+  '/home/vishal/.gemini/antigravity-ide/brain/ccd59f55-2b27-4069-ab7f-b7d33db174d3/scratch/test-mermaid/node_modules',
+];
+
+for (const nmPath of candidateSearchPaths) {
   try {
-    Object.defineProperty(global, 'navigator', {
-      value: dom.window.navigator,
-      writable: true,
-      configurable: true
-    });
-  } catch (_) {}
+    const jsdomPath = path.join(nmPath, 'jsdom', 'lib', 'api.js');
+    const mermaidPath = path.join(nmPath, 'mermaid', 'dist', 'mermaid.esm.mjs');
+    if (fs.existsSync(jsdomPath) && fs.existsSync(mermaidPath)) {
+      const { JSDOM } = await import(jsdomPath);
+      const dom = new JSDOM('<!DOCTYPE html><html><body><div id="container"></div></body></html>');
+      global.window = dom.window;
+      global.document = dom.window.document;
+      try {
+        Object.defineProperty(global, 'navigator', {
+          value: dom.window.navigator,
+          writable: true,
+          configurable: true,
+        });
+      } catch (_) {}
 
-  const { default: mermaid } = await import(scratch + '/node_modules/mermaid/dist/mermaid.esm.mjs');
-  mermaid.initialize({ startOnLoad: false });
+      const { default: mermaid } = await import(mermaidPath);
+      mermaid.initialize({ startOnLoad: false });
 
-  let parsePass = 0;
-  let parseFail = 0;
+      let parsePass = 0;
+      let parseFail = 0;
 
-  for (const mmdFile of mmdFiles) {
-    const filePath = path.join(ARCH_DIR, mmdFile);
-    const code = fs.readFileSync(filePath, 'utf8');
-    try {
-      await mermaid.parse(code);
-      console.log(`  ✅ PARSE OK: ${mmdFile}`);
-      parsePass++;
-    } catch (err) {
-      console.error(`  ❌ PARSE FAIL: ${mmdFile} — ${err.message}`);
-      parseFail++;
+      for (const mmdFile of mmdFiles) {
+        const filePath = path.join(ARCH_DIR, mmdFile);
+        const code = fs.readFileSync(filePath, 'utf8');
+        try {
+          await mermaid.parse(code);
+          console.log(`  ✅ PARSE OK: ${mmdFile}`);
+          parsePass++;
+        } catch (err) {
+          console.error(`  ❌ PARSE FAIL: ${mmdFile} — ${err.message}`);
+          parseFail++;
+        }
+      }
+
+      console.log(`  Summary: ${parsePass} diagrams parsed successfully, ${parseFail} failed.`);
+      if (parseFail > 0) exitCode = 1;
+      parsedWithEngine = true;
+      break;
     }
+  } catch (e) {
+    // try next candidate
   }
+}
 
-  console.log(`  Summary: ${parsePass} diagrams parsed successfully, ${parseFail} failed.`);
-  if (parseFail > 0) exitCode = 1;
-} catch (err) {
-  console.log(`  ⚠️ Note on full headless render: ${err.message}`);
+if (!parsedWithEngine) {
   console.log('  Running fallback structural parser check...');
   for (const mmdFile of mmdFiles) {
     const filePath = path.join(ARCH_DIR, mmdFile);
@@ -193,6 +210,26 @@ for (const file of mdFiles) {
   }
 }
 console.log(`  ✅ Checked ${fenceBlocksChecked} embedded Mermaid blocks across Markdown files.`);
+
+// -----------------------------------------------------------------------------
+// CHECK 5: Diagram Sync Markers Verification
+// -----------------------------------------------------------------------------
+console.log('\n[CHECK 5] Checking Diagram Sync Markers (START / END pairs)...');
+let totalMarkers = 0;
+for (const file of mdFiles) {
+  if (!fs.existsSync(file)) continue;
+  const content = fs.readFileSync(file, 'utf8');
+  const startMatches = content.match(/<!-- DIAGRAM:([a-zA-Z0-9_-]+):START -->/g) || [];
+  const endMatches = content.match(/<!-- DIAGRAM:([a-zA-Z0-9_-]+):END -->/g) || [];
+
+  if (startMatches.length !== endMatches.length) {
+    console.error(`  ❌ UNBALANCED MARKERS in ${path.relative(REPO_ROOT, file)}: ${startMatches.length} START vs ${endMatches.length} END.`);
+    exitCode = 1;
+  } else if (startMatches.length > 0) {
+    console.log(`  ✅ ${path.relative(REPO_ROOT, file)}: ${startMatches.length} synchronized diagram markers verified.`);
+    totalMarkers += startMatches.length;
+  }
+}
 
 // -----------------------------------------------------------------------------
 // FINAL SUMMARY

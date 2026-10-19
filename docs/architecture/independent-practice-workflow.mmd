@@ -1,0 +1,71 @@
+flowchart TD
+  classDef startNode fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef stepNode fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef ethicsNode fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+  classDef firmNode fill:#064e3b,stroke:#10b981,stroke-width:1px,color:#ecfdf5
+  classDef crmNode fill:#172554,stroke:#3b82f6,stroke-width:1px,color:#dbeafe
+  classDef opsNode fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#bbf7d0
+
+  START(["CA Final Cleared & ICAI Enrolment"]):::startNode
+
+  subgraph REGULATORY_PHASE["1. Regulatory & Statutory Licensing (ICAI SSP Portal)"]
+    MEMBERSHIP["Apply for ICAI Associate Membership (ACA)\n(Form 2 Submission)"]:::stepNode
+    COP_CHOICE{"Practice Mode Decision"}:::stepNode
+    COP_FULL["Apply for Full-Time COP (Form 6)\n(Public Practice License)"]:::stepNode
+    COP_PART["Apply for Part-Time COP\n(Subject to ICAI Guidelines)"]:::stepNode
+  end
+
+  subgraph ETHICAL_GUARD["2. Professional Ethics Boundary (ICAI Code of Ethics 2020)"]
+    direction TB
+    ETHICS_CHECK["Ethics Boundary Enforcement\n• Clause 6: Prohibition of Client Solicitation\n• Clause 7: Prohibition of Public Advertisement\n• Platform strictly acts as back-office CRM, NOT an advertising portal"]:::ethicsNode
+  end
+
+  subgraph FIRM_SETUP["3. Firm Constitution & Governance"]
+    direction TB
+    FIRM_TYPE{"Firm Constitution Type"}:::firmNode
+    PROP["Sole Proprietorship Firm"]:::firmNode
+    PARTNER["CA Partnership Firm"]:::firmNode
+    LLP["Limited Liability Partnership (LLP)"]:::firmNode
+    NAME_APPROVAL["Firm Name Approval Application\n(ICAI SSP Portal Deep-Link)"]:::firmNode
+    MEF_TRACK["Multipurpose Empanelment Form (MEF) Readiness\n(Bank Audit & PSU Empanelment Eligibility)"]:::firmNode
+  end
+
+  subgraph CRM_SUITE["4. CA Career OS Practice Operations Suite (Org Workspace)"]
+    direction TB
+    CLIENT_KYC["Client Master & KYC Verification\n(PAN, GSTIN, CIN, Director KYC Tracker)"]:::crmNode
+    ENGAGEMENT_DOC["Standard Engagement Letter Generator\n(Standard Terms under SA 210)"]:::crmNode
+    COMPLIANCE_CAL["Statutory Compliance Calendar Engine\n• Income Tax (ITR, TDS, 44AB Tax Audit)\n• GST (GSTR-1, GSTR-3B, GSTR-9/9C)\n• MCA / ROC Filings (AOC-4, MGT-7)"]:::crmNode
+    AUDIT_VAULT["Secure Client Working Paper Vault\n(KMS-Encrypted Audit Trails)"]:::crmNode
+  end
+
+  subgraph ONGOING_OPS["5. Continuous Compliance & Growth"]
+    CPE_TRACKER["ICAI CPE Credit Tracker\n(Monitor Mandatory 30-40 Hours/Year)"]:::opsNode
+    RECURRING_ALERTS["Automated Client Compliance Reminders\n(Email / WhatsApp Alerts)"]:::opsNode
+  end
+
+  START --> MEMBERSHIP
+  MEMBERSHIP --> COP_CHOICE
+  COP_CHOICE -- "Full-Time Practice" --> COP_FULL
+  COP_CHOICE -- "Part-Time Practice" --> COP_PART
+
+  COP_FULL --> ETHICS_CHECK
+  COP_PART --> ETHICS_CHECK
+
+  ETHICS_CHECK --> FIRM_TYPE
+  FIRM_TYPE --> PROP
+  FIRM_TYPE --> PARTNER
+  FIRM_TYPE --> LLP
+
+  PROP --> NAME_APPROVAL
+  PARTNER --> NAME_APPROVAL
+  LLP --> NAME_APPROVAL
+
+  NAME_APPROVAL --> MEF_TRACK
+  MEF_TRACK --> CLIENT_KYC
+
+  CLIENT_KYC --> ENGAGEMENT_DOC
+  ENGAGEMENT_DOC --> COMPLIANCE_CAL
+  COMPLIANCE_CAL --> AUDIT_VAULT
+
+  AUDIT_VAULT --> CPE_TRACKER
+  COMPLIANCE_CAL --> RECURRING_ALERTS

@@ -1,0 +1,86 @@
+flowchart TB
+  classDef inputNode fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef contextNode fill:#1e1b4b,stroke:#818cf8,stroke-width:1px,color:#e0e7ff
+  classDef modelNode fill:#312e81,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+  classDef policyNode fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fef3c7
+  classDef execNode fill:#064e3b,stroke:#10b981,stroke-width:1px,color:#ecfdf5
+  classDef humanNode fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fecaca
+  classDef auditNode fill:#1a2035,stroke:#0ea5e9,stroke-width:1px,color:#bae6fd
+
+  subgraph INPUT_STAGE["1. Ingestion & Pre-Processing"]
+    USER_PROMPT["User Prompt / Chat Message\n(Web Application Client)"]:::inputNode
+    PROMPT_GUARD["Prompt Guard & Injection Filter\n• Untrusted text sanitization\n• System prompt boundary isolation"]:::inputNode
+  end
+
+  subgraph CONTEXT_STAGE["2. Context Assembly & Grounding"]
+    direction TB
+    WS_RESOLVER["Workspace Context Resolver\n(Enforces Tenant Scope)"]:::contextNode
+    PROFILE_LOADER["Candidate Profile & Skill Snapshot\n(Articleship, Preferences, Active Apps)"]:::contextNode
+    RAG_STORE["RAG Domain Knowledge Retriever\n(ICAI Curriculum, Ind AS Summaries, Tax FAQs)"]:::contextNode
+  end
+
+  subgraph MODEL_STAGE["3. Model Planning & Structured Inference"]
+    direction TB
+    PROMPT_BUILDER["System Prompt Assembler\n• Persona: CA Career Mentor\n• Rules: ADR-009 Zero-Fabrication"]:::modelNode
+    LLM_ROUTER["Universal LLM Provider Adapter\n• Google Gemini Flash/Pro\n• Anthropic Claude 3.5\n• OpenAI GPT-4o"]:::modelNode
+    JSON_CONTRACT["Structured Output & Tool Call Parser\n(Strict JSON Schema Validation)"]:::modelNode
+  end
+
+  subgraph POLICY_STAGE["4. Policy Evaluation & Permission Gateway"]
+    direction TB
+    ALLOWLIST["Tool Registry Allowlist Check\n(Verify registered tool identifier)"]:::policyNode
+    TIER_ROUTER{"Permission Tier\nRouter"}:::policyNode
+    
+    TIER_READ["READ_ONLY\nDirect Query Replica / Cache"]:::execNode
+    TIER_WRITE["WRITE\nIdempotent DB Transaction"]:::execNode
+    TIER_EXT["EXPLICITLY_APPROVED_EXTERNAL\nHuman Confirmation Required"]:::humanNode
+    TIER_DEST["DESTRUCTIVE\nStatutory Check + 2-Step Modal"]:::humanNode
+  end
+
+  subgraph APPROVAL_STAGE["5. Human-in-the-Loop Gateway"]
+    direction TB
+    APPROVAL_CARD["Generate ApprovalRequest\n• Signed Token (15m TTL)\n• Action Preview & Diff"]:::humanNode
+    USER_MODAL{"User Action\nin Web UI"}:::humanNode
+    APPROVE_EXEC["Execute Authorized Action\n(Rate-Limited External Egress)"]:::execNode
+    DECLINE_ABORT["Abort & Record Rejection\n(Zero External Call)"]:::humanNode
+  end
+
+  subgraph OUTPUT_STAGE["6. Output Sanitization & Telemetry"]
+    direction TB
+    REDACT_OUT["PII Redaction & Provenance Verifier\n(Ensures No Fabricated Credentials)"]:::auditNode
+    STREAM_RESP["Stream Response to Web UI\n(SSE / Markdown Assistant Message)"]:::auditNode
+    AUDIT_SINK["Immutable Audit Event Stream\n(CorrelationId · Actor · Tool · Status)"]:::auditNode
+  end
+
+  USER_PROMPT --> PROMPT_GUARD
+  PROMPT_GUARD --> WS_RESOLVER
+  WS_RESOLVER --> PROFILE_LOADER
+  WS_RESOLVER --> RAG_STORE
+
+  PROFILE_LOADER --> PROMPT_BUILDER
+  RAG_STORE --> PROMPT_BUILDER
+  PROMPT_BUILDER --> LLM_ROUTER
+  LLM_ROUTER --> JSON_CONTRACT
+
+  JSON_CONTRACT -->|Plain Text| REDACT_OUT
+  JSON_CONTRACT -->|Tool Call| ALLOWLIST
+  ALLOWLIST --> TIER_ROUTER
+
+  TIER_ROUTER -->|READ_ONLY| TIER_READ
+  TIER_ROUTER -->|WRITE| TIER_WRITE
+  TIER_ROUTER -->|APPROVED EXTERNAL| TIER_EXT
+  TIER_ROUTER -->|DESTRUCTIVE| TIER_DEST
+
+  TIER_EXT --> APPROVAL_CARD
+  APPROVAL_CARD --> USER_MODAL
+  USER_MODAL -->|Confirmed| APPROVE_EXEC
+  USER_MODAL -->|Declined / Timeout| DECLINE_ABORT
+
+  TIER_READ --> REDACT_OUT
+  TIER_WRITE --> REDACT_OUT
+  APPROVE_EXEC --> REDACT_OUT
+  DECLINE_ABORT --> REDACT_OUT
+  TIER_DEST --> REDACT_OUT
+
+  REDACT_OUT --> STREAM_RESP
+  REDACT_OUT --> AUDIT_SINK

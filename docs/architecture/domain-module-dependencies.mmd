@@ -1,0 +1,84 @@
+flowchart TB
+  classDef foundation fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef business fill:#172554,stroke:#3b82f6,stroke-width:1px,color:#dbeafe
+  classDef orch fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+  classDef infra fill:#064e3b,stroke:#10b981,stroke-width:1px,color:#ecfdf5
+  classDef event fill:#451a03,stroke:#f59e0b,stroke-width:1px,stroke-dasharray: 4 4,color:#fef3c7
+
+  subgraph ORCHESTRATION["Orchestration Layer"]
+    AGENT_MOD["AgentModule\n(Cross-Module Orchestration & Policy)"]:::orch
+  end
+
+  subgraph BUSINESS_MODULES["Core Business Modules (Modular Monolith)"]
+    direction TB
+    CAREER_MOD["CareerModule\n(Diagnostics · Roadmaps · Skills)"]:::business
+    JOBS_MOD["JobsModule\n(Job Feeds · Match Engine · Pipeline)"]:::business
+    RESUME_MOD["ResumeModule\n(ATS Tailor · Attestation · PDF/DOCX)"]:::business
+    INTERVIEW_MOD["InterviewModule\n(Technical Drills · Case Simulator)"]:::business
+    FINANCIAL_MOD["FinancialIntelModule\n(CTC Unbundler · Offer Matrix)"]:::business
+    PRACTICE_MOD["PracticeModule\n(COP Checklist · Client CRM)"]:::business
+  end
+
+  subgraph FOUNDATION_MODULES["Foundation & Security Modules"]
+    direction LR
+    IDENTITY_MOD["IdentityModule\n(Auth · Users · Tokens)"]:::foundation
+    WORKSPACE_MOD["WorkspaceModule\n(Tenancy · RBAC · Isolation)"]:::foundation
+    AUDIT_MOD["AuditModule\n(Tamper-Evident WORM Logging)"]:::foundation
+    NOTIFY_MOD["NotificationModule\n(Email · WhatsApp Alert Router)"]:::foundation
+  end
+
+  subgraph INFRA_MODULES["Shared Infrastructure Modules"]
+    direction LR
+    PRISMA_MOD["DatabaseModule\n(Prisma ORM · PostgreSQL · pgvector)"]:::infra
+    REDIS_MOD["CacheQueueModule\n(Redis 7+ · BullMQ · Distributed Locks)"]:::infra
+    LLM_MOD["LlmAdapterModule\n(Universal Provider Adapter · JSON Contracts)"]:::infra
+    STORAGE_MOD["StorageModule\n(S3 / R2 Client · Pre-Signed URLs)"]:::infra
+  end
+
+  subgraph EVENT_BUS["Decoupled Domain Event Bus"]
+    EVENTS["EventEmitter2\n• job.created\n• application.submitted\n• resume.tailored\n• interview.completed\n• approval.requested"]:::event
+  end
+
+  %% Orchestration dependencies
+  AGENT_MOD -->|"Inspects & Invokes"| BUSINESS_MODULES
+  AGENT_MOD --> LLM_MOD
+  AGENT_MOD --> WORKSPACE_MOD
+  AGENT_MOD --> AUDIT_MOD
+
+  %% Business module cross-dependencies (Strict & Minimal)
+  CAREER_MOD --> WORKSPACE_MOD
+  CAREER_MOD --> PRISMA_MOD
+  CAREER_MOD -.->|"Emits Profile Events"| EVENTS
+
+  JOBS_MOD --> WORKSPACE_MOD
+  JOBS_MOD --> PRISMA_MOD
+  JOBS_MOD --> REDIS_MOD
+  JOBS_MOD -.->|"Emits Job Events"| EVENTS
+
+  RESUME_MOD --> WORKSPACE_MOD
+  RESUME_MOD --> PRISMA_MOD
+  RESUME_MOD --> STORAGE_MOD
+  RESUME_MOD -.->|"Reads Skills"| CAREER_MOD
+
+  INTERVIEW_MOD --> WORKSPACE_MOD
+  INTERVIEW_MOD --> PRISMA_MOD
+  INTERVIEW_MOD --> LLM_MOD
+
+  FINANCIAL_MOD --> WORKSPACE_MOD
+  FINANCIAL_MOD --> PRISMA_MOD
+
+  PRACTICE_MOD --> WORKSPACE_MOD
+  PRACTICE_MOD --> PRISMA_MOD
+
+  %% All modules emit to Event Bus
+  BUSINESS_MODULES -.->|"Asynchronous Events"| EVENTS
+  EVENTS -.->|"Consumes Events"| NOTIFY_MOD
+  EVENTS -.->|"Consumes Events"| AUDIT_MOD
+  EVENTS -.->|"Enqueues Jobs"| REDIS_MOD
+
+  %% Foundation dependencies
+  IDENTITY_MOD --> PRISMA_MOD
+  WORKSPACE_MOD --> IDENTITY_MOD
+  WORKSPACE_MOD --> PRISMA_MOD
+  AUDIT_MOD --> PRISMA_MOD
+  NOTIFY_MOD --> REDIS_MOD
