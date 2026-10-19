@@ -1,160 +1,145 @@
 flowchart TD
-  classDef reqNode   fill:#1e293b,stroke:#3b82f6,color:#bfdbfe,font-weight:bold
-  classDef authNode  fill:#1e1b4b,stroke:#6366f1,color:#c7d2fe
-  classDef policyNode fill:#1c1917,stroke:#f59e0b,color:#fde68a
-  classDef readNode  fill:#14532d,stroke:#22c55e,color:#bbf7d0
-  classDef writeNode fill:#1e3a5f,stroke:#3b82f6,color:#bfdbfe
-  classDef extNode   fill:#3b1f00,stroke:#f97316,color:#fed7aa
-  classDef destNode  fill:#450a0a,stroke:#ef4444,color:#fca5a5
-  classDef auditNode fill:#0c1425,stroke:#0ea5e9,color:#bae6fd
-  classDef errorNode fill:#3b0764,stroke:#a855f7,color:#e9d5ff
-  classDef cacheNode fill:#1a2e1a,stroke:#4ade80,color:#bbf7d0
-  classDef userNode  fill:#0f2027,stroke:#06b6d4,color:#a5f3fc
-  classDef successNode fill:#052e16,stroke:#16a34a,color:#bbf7d0
+  classDef reqNode fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe,font-weight:bold
+  classDef authNode fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#c7d2fe
+  classDef policyNode fill:#1c1917,stroke:#f59e0b,stroke-width:2px,color:#fde68a
+  classDef readNode fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#bbf7d0
+  classDef writeNode fill:#1e3a5f,stroke:#3b82f6,stroke-width:2px,color:#bfdbfe
+  classDef extNode fill:#3b1f00,stroke:#f97316,stroke-width:2px,color:#fed7aa
+  classDef destNode fill:#450a0a,stroke:#ef4444,stroke-width:2px,color:#fca5a5
+  classDef auditNode fill:#0c1425,stroke:#0ea5e9,stroke-width:2px,color:#bae6fd
+  classDef errorNode fill:#3b0764,stroke:#a855f7,stroke-width:2px,color:#e9d5ff
+  classDef cacheNode fill:#1a2e1a,stroke:#4ade80,stroke-width:2px,color:#bbf7d0
+  classDef userNode fill:#0f2027,stroke:#06b6d4,stroke-width:2px,color:#a5f3fc
+  classDef successNode fill:#052e16,stroke:#16a34a,stroke-width:2px,color:#bbf7d0
 
-  %% ─── Entry ───────────────────────────────────────────
-  USER(["👤 User / AI Agent\nTool Request"]):::userNode
+  USER(["User / AI Agent Tool Call Request"]):::userNode
 
-  %% ─── Auth & Workspace ────────────────────────────────
-  AUTH{"🔐 Step 1\nAuthenticate\nJWT Validation"}:::authNode
-  AUTH_FAIL(["❌ 401 Unauthorized\nReturn Error"]):::errorNode
+  AUTH{"Step 1: Authenticate\nJWT Validation"}:::authNode
+  AUTH_FAIL(["401 Unauthorized\nInvalid / Expired Token"]):::errorNode
 
-  WS_AUTH{"🏢 Step 2\nWorkspace\nAuthorization\nScope Check"}:::authNode
-  WS_FAIL(["❌ 403 Forbidden\nWorkspace Access\nDenied"]):::errorNode
+  WS_AUTH{"Step 2: Workspace Auth\nScope & Membership Check"}:::authNode
+  WS_FAIL(["403 Forbidden\nWorkspace Access Denied"]):::errorNode
 
-  %% ─── Tool Policy ─────────────────────────────────────
-  TOOL_ALLOW{"📋 Step 3\nTool Allowlist\nCheck"}:::policyNode
-  TOOL_DENY(["❌ 403 Tool Not\nPermitted"]):::errorNode
+  TOOL_ALLOW{"Step 3: Tool Allowlist\nCheck Tool Registry"}:::policyNode
+  TOOL_DENY(["403 Forbidden\nTool Not in Allowlist"]):::errorNode
 
-  SCHEMA_VAL{"📐 Step 4\nJSON Schema\nValidation"}:::policyNode
-  SCHEMA_FAIL(["❌ 400 Invalid\nRequest Schema"]):::errorNode
+  SCHEMA_VAL{"Step 4: Schema Validation\nStrict Zod Parse"}:::policyNode
+  SCHEMA_FAIL(["400 Bad Request\nMalformed Tool Payload"]):::errorNode
 
-  RATE_CHECK{"⏱ Step 5\nRate Limit\nCheck"}:::policyNode
-  RATE_FAIL(["⏳ 429 Rate\nLimit Exceeded"]):::errorNode
+  RATE_CHECK{"Step 5: Rate Limiting\nRedis Token Bucket"}:::policyNode
+  RATE_FAIL(["429 Too Many Requests\nRate Limit Exceeded"]):::errorNode
 
-  PERM_ROUTER{"🔀 Step 6\nPermission\nRouter"}:::policyNode
+  PERM_ROUTER{"Step 6: Permission\nTier Router"}:::policyNode
 
-  %% ─── READ_ONLY Branch ────────────────────────────────
-  subgraph READ_PATH["✅ READ_ONLY Path  (No side effects)"]
+  subgraph READ_PATH["READ_ONLY Path (Zero State Mutation)"]
     direction TB
-    READ_OPS["📖 Tools:\nget_user_profile\nget_user_preferences\nsearch_jobs\nget_job_details\nget_application_status\nget_skill_gap_report\nget_learning_tasks"]:::readNode
-    READ_CACHE{"💾 Cache\nHit?"}:::cacheNode
-    READ_DB["🗄 Query\nDatabase\n(Read replica)"]:::readNode
-    READ_CACHE_STORE["📦 Store in\nCache (TTL)"]:::cacheNode
+    READ_OPS["Tools: get_user_profile · search_jobs\nget_application_status · get_skill_gap_report"]:::readNode
+    READ_CACHE{"Cache Hit in Redis?"}:::cacheNode
+    READ_DB["Query DB Replica\nScoped by Workspace ID"]:::readNode
+    READ_CACHE_STORE["Cache Sanitized Result (TTL)"]:::cacheNode
   end
 
-  %% ─── WRITE Branch ────────────────────────────────────
-  subgraph WRITE_PATH["✏️  WRITE Path  (Controlled mutations)"]
+  subgraph WRITE_PATH["WRITE Path (Controlled State Mutation)"]
     direction TB
-    WRITE_OPS["📝 Tools:\ncreate_career_task\nupdate_user_preferences\nsave_job\ncreate_application_tracking_record\ncreate_resume_draft\nschedule_follow_up"]:::writeNode
-    IDEMPOTENCY{"🔑 Idempotency\nKey Present?"}:::cacheNode
-    IDEMPOTENCY_CACHED["📦 Return Cached\nResult (Replay)"]:::cacheNode
-    IDEMPOTENCY_GEN["🔑 Generate &\nStore Idem. Key\n(Redis, 24h TTL)"]:::cacheNode
-    TXN_EXEC["🔄 Execute DB\nTransaction\n(Prisma + PG)"]:::writeNode
-    TXN_FAIL(["⚠️ Rollback\nTransaction\nReturn 500"]):::errorNode
-    IDEMPOTENCY_MARK["✅ Mark Idem. Key\nas COMPLETED"]:::cacheNode
+    WRITE_OPS["Tools: create_career_task · update_user_preferences\nsave_job · create_resume_draft"]:::writeNode
+    IDEMPOTENCY{"Idempotency Key\nExists in Redis/DB?"}:::cacheNode
+    IDEMPOTENCY_REPLAY["Replay Cached Result\n(Prevent Duplicate Writes)"]:::cacheNode
+    IDEMPOTENCY_GEN["Generate Distributed Lock\n& Record Key (PROCESSING)"]:::cacheNode
+    TXN_EXEC["Execute DB Transaction\n(Prisma + PostgreSQL)"]:::writeNode
+    TXN_FAIL(["Transaction Failed\nRollback & Release Lock"]):::errorNode
+    IDEMPOTENCY_MARK["Mark Key COMPLETED\nCache Output (24h TTL)"]:::cacheNode
   end
 
-  %% ─── EXPLICIT APPROVAL Branch ─────────────────────────
-  subgraph EXT_PATH["🟠 EXPLICITLY APPROVED EXTERNAL Actions"]
+  subgraph EXT_PATH["EXPLICITLY APPROVED EXTERNAL Actions"]
     direction TB
-    EXT_OPS["🌐 Tools:\nsubmit_job_application\nsend_recruiter_message\nbook_paid_mentorship"]:::extNode
-    INTENT_CHECK{"✋ User Intent\n& Consent\nValidated?"}:::extNode
-    INTENT_FAIL(["❌ Action Cancelled\nRequire Explicit\nUser Confirmation"]):::errorNode
-    APPROVAL_UI["📱 Present Approval\nRequest to User\n(Action details + consequences)"]:::extNode
-    USER_CONFIRM{"👆 User\nConfirmed?"}:::extNode
-    EXT_IDEM{"🔑 Idempotency\nKey Check\n(Prevent duplicate\nexternal calls)"}:::cacheNode
-    EXT_EXEC["🚀 Execute External\nAction via Service\n(Rate-limited, timeout)"]:::extNode
-    EXT_FAIL(["⚠️ External\nAction Failed\nNotify User"]):::errorNode
+    EXT_OPS["Tools: submit_job_application\nsend_recruiter_message · book_paid_mentorship"]:::extNode
+    APPROVAL_CARD["Create ApprovalRequest\nGenerate 15-Minute Signed Token"]:::extNode
+    USER_GATE{"Human-in-the-Loop Gate\nUser Action in UI?"}:::extNode
+    EXT_EXPIRED(["Approval Expired\n15m TTL Elapsed without Confirmation"]):::errorNode
+    EXT_CANCELLED(["Approval Cancelled\nUser Explicitly Rejected Action"]):::errorNode
+    EXT_IDEM{"Idempotency Check\nExternal Call Signature"}:::cacheNode
+    EXT_EXEC["Execute External Integration\nRate-Limited Egress via Worker"]:::extNode
+    EXT_FAIL(["External Service Failed\nEnqueue Dead-Letter / Alert"]):::errorNode
   end
 
-  %% ─── DESTRUCTIVE Branch ──────────────────────────────
-  subgraph DEST_PATH["🔴 DESTRUCTIVE Path  (Explicit confirmation required)"]
+  subgraph DEST_PATH["DESTRUCTIVE Path (Confirmed Deletion)"]
     direction TB
-    DEST_OPS["🗑 Tools:\ndelete_resume_version\nremove_saved_personal_document\ndelete_user_data"]:::destNode
-    RETENTION_CHECK{"📅 Legal\nRetention\nPolicy Check"}:::destNode
-    RETENTION_BLOCK(["🚫 Deletion Blocked\nRetention Period\nActive"]):::errorNode
-    FINAL_CONFIRM["📱 Show Final\nConfirmation Dialog\n(Non-reversible warning)"]:::destNode
-    DEST_CONFIRM{"☑️ Explicit\nUser Confirmed?"}:::destNode
-    DEST_CANCEL(["✋ Action\nCancelled"]):::errorNode
-    SOFT_DELETE["🗂 Soft-Delete\n+ Tombstone\nRecord"]:::destNode
-    HARD_DELETE_QUEUE["🗑 Queue Hard\nDelete (Async,\n30-day grace)"]:::destNode
+    DEST_OPS["Tools: delete_resume_version\nremove_saved_personal_document · delete_user_data"]:::destNode
+    RETENTION_CHECK{"Statutory Legal\nRetention Active?"}:::destNode
+    RETENTION_BLOCK(["Deletion Blocked\nStatutory Retention Mandated"]):::errorNode
+    CONFIRM_MODAL["Display Two-Step Warning Modal\nRequire Explicit Confirmation"]:::destNode
+    DEST_DECISION{"User Confirmed?"}:::destNode
+    DEST_CANCEL(["Deletion Cancelled by User"]):::errorNode
+    SOFT_DELETE["Soft-Delete Record\nWrite Tombstone & Set 30d Purge Queue"]:::destNode
   end
 
-  %% ─── Audit & Telemetry ───────────────────────────────
-  subgraph AUDIT_LAYER["📊 Audit & Telemetry  (Every execution path)"]
+  subgraph AUDIT_LAYER["Telemetry & Audit Layer (All Execution Outcomes)"]
     direction LR
-    AUDIT_LOG["📋 Audit Event:\nactor · workspace · tool\noperation · outcome\ntimestamp · correlationID"]:::auditNode
-    PRIVACY_SAFE["🔒 Privacy Filter:\nNo PII · No tokens\nNo resume content\nNo secrets in logs"]:::auditNode
-    METRICS["📈 Metrics:\nlatency · error rate\ntool usage · approval rate"]:::auditNode
-    ALERT["🔔 Alert on:\nunauth attempts\nerror spikes\nsuspicious patterns"]:::auditNode
+    AUDIT_EVENT["Immutable Audit Event:\nactorId · workspaceId · toolName · outcome\ncorrelationId · durationMs · timestamp"]:::auditNode
+    PRIVACY_FILTER["Privacy Redaction Filter:\nSHA-256 Payload Hashes Only\nZero PII · Zero Raw Resume Text · Zero Tokens"]:::auditNode
+    METRICS_EMIT["Emit Prometheus Metrics\n& Alert on Anomalies"]:::auditNode
   end
 
-  %% ─── Success Response ────────────────────────────────
-  SUCCESS(["✅ Return Result\nto Caller"]):::successNode
+  SUCCESS(["Return Success Result to Caller"]):::successNode
 
-  %% ─── Main Flow ───────────────────────────────────────
   USER --> AUTH
-  AUTH -- "Invalid Token" --> AUTH_FAIL
+  AUTH -- "Invalid" --> AUTH_FAIL
   AUTH -- "Valid" --> WS_AUTH
-  WS_AUTH -- "No Access" --> WS_FAIL
+  WS_AUTH -- "Unauthorized" --> WS_FAIL
   WS_AUTH -- "Authorized" --> TOOL_ALLOW
-  TOOL_ALLOW -- "Not in Allowlist" --> TOOL_DENY
-  TOOL_ALLOW -- "Permitted" --> SCHEMA_VAL
+  TOOL_ALLOW -- "Denied" --> TOOL_DENY
+  TOOL_ALLOW -- "Allowed" --> SCHEMA_VAL
   SCHEMA_VAL -- "Invalid" --> SCHEMA_FAIL
   SCHEMA_VAL -- "Valid" --> RATE_CHECK
   RATE_CHECK -- "Exceeded" --> RATE_FAIL
-  RATE_CHECK -- "OK" --> PERM_ROUTER
+  RATE_CHECK -- "Within Quota" --> PERM_ROUTER
 
   PERM_ROUTER -- "READ_ONLY" --> READ_OPS
   PERM_ROUTER -- "WRITE" --> WRITE_OPS
-  PERM_ROUTER -- "EXTERNAL" --> EXT_OPS
+  PERM_ROUTER -- "APPROVED EXTERNAL" --> EXT_OPS
   PERM_ROUTER -- "DESTRUCTIVE" --> DEST_OPS
 
-  %% READ flow
   READ_OPS --> READ_CACHE
-  READ_CACHE -- "HIT" --> SUCCESS
-  READ_CACHE -- "MISS" --> READ_DB
+  READ_CACHE -- "Hit" --> SUCCESS
+  READ_CACHE -- "Miss" --> READ_DB
   READ_DB --> READ_CACHE_STORE --> SUCCESS
 
-  %% WRITE flow
   WRITE_OPS --> IDEMPOTENCY
-  IDEMPOTENCY -- "Key exists\n(already processed)" --> IDEMPOTENCY_CACHED --> SUCCESS
-  IDEMPOTENCY -- "New request" --> IDEMPOTENCY_GEN
+  IDEMPOTENCY -- "Exists (Cached)" --> IDEMPOTENCY_REPLAY --> SUCCESS
+  IDEMPOTENCY -- "New Operation" --> IDEMPOTENCY_GEN
   IDEMPOTENCY_GEN --> TXN_EXEC
   TXN_EXEC -- "Error" --> TXN_FAIL
   TXN_EXEC -- "Success" --> IDEMPOTENCY_MARK --> SUCCESS
 
-  %% EXTERNAL flow
-  EXT_OPS --> INTENT_CHECK
-  INTENT_CHECK -- "Not validated" --> INTENT_FAIL
-  INTENT_CHECK -- "Validated" --> APPROVAL_UI
-  APPROVAL_UI --> USER_CONFIRM
-  USER_CONFIRM -- "Denied / Timeout" --> DEST_CANCEL
-  USER_CONFIRM -- "Confirmed" --> EXT_IDEM
-  EXT_IDEM -- "Duplicate\n(already sent)" --> IDEMPOTENCY_CACHED
+  EXT_OPS --> APPROVAL_CARD
+  APPROVAL_CARD --> USER_GATE
+  USER_GATE -- "User Declined" --> EXT_CANCELLED
+  USER_GATE -- "Token Expired" --> EXT_EXPIRED
+  USER_GATE -- "User Approved" --> EXT_IDEM
+  EXT_IDEM -- "Duplicate" --> IDEMPOTENCY_REPLAY
   EXT_IDEM -- "New" --> EXT_EXEC
-  EXT_EXEC -- "Failure" --> EXT_FAIL
+  EXT_EXEC -- "Error" --> EXT_FAIL
   EXT_EXEC -- "Success" --> SUCCESS
 
-  %% DESTRUCTIVE flow
   DEST_OPS --> RETENTION_CHECK
-  RETENTION_CHECK -- "Retention Active" --> RETENTION_BLOCK
-  RETENTION_CHECK -- "OK to Delete" --> FINAL_CONFIRM
-  FINAL_CONFIRM --> DEST_CONFIRM
-  DEST_CONFIRM -- "Not Confirmed" --> DEST_CANCEL
-  DEST_CONFIRM -- "Confirmed" --> SOFT_DELETE
-  SOFT_DELETE --> HARD_DELETE_QUEUE --> SUCCESS
+  RETENTION_CHECK -- "Retention Mandated" --> RETENTION_BLOCK
+  RETENTION_CHECK -- "Permitted" --> CONFIRM_MODAL
+  CONFIRM_MODAL --> DEST_DECISION
+  DEST_DECISION -- "Declined" --> DEST_CANCEL
+  DEST_DECISION -- "Confirmed" --> SOFT_DELETE
+  SOFT_DELETE --> SUCCESS
 
-  %% Audit everywhere
-  SUCCESS --> AUDIT_LOG
-  AUTH_FAIL --> AUDIT_LOG
-  WS_FAIL --> AUDIT_LOG
-  TOOL_DENY --> AUDIT_LOG
-  INTENT_FAIL --> AUDIT_LOG
-  RETENTION_BLOCK --> AUDIT_LOG
-  TXN_FAIL --> AUDIT_LOG
-  EXT_FAIL --> AUDIT_LOG
-  AUDIT_LOG --> PRIVACY_SAFE
-  PRIVACY_SAFE --> METRICS
-  METRICS --> ALERT
+  SUCCESS --> AUDIT_EVENT
+  AUTH_FAIL --> AUDIT_EVENT
+  WS_FAIL --> AUDIT_EVENT
+  TOOL_DENY --> AUDIT_EVENT
+  SCHEMA_FAIL --> AUDIT_EVENT
+  RATE_FAIL --> AUDIT_EVENT
+  TXN_FAIL --> AUDIT_EVENT
+  EXT_EXPIRED --> AUDIT_EVENT
+  EXT_CANCELLED --> AUDIT_EVENT
+  EXT_FAIL --> AUDIT_EVENT
+  RETENTION_BLOCK --> AUDIT_EVENT
+  DEST_CANCEL --> AUDIT_EVENT
+
+  AUDIT_EVENT --> PRIVACY_FILTER --> METRICS_EMIT

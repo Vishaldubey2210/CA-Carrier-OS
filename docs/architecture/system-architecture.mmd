@@ -8,102 +8,101 @@ flowchart TB
   classDef worker fill:#1e1b4b,stroke:#8b5cf6,color:#ddd6fe
   classDef obs fill:#1a2035,stroke:#0ea5e9,color:#bae6fd
 
-  subgraph PRESENTATION["🖥  Presentation Layer"]
+  subgraph PRESENTATION["Presentation Tier"]
     direction LR
     CAND_APP["Candidate Dashboard\n(Next.js / React / TypeScript)"]
     RECRUITER_PORTAL["Recruiter Portal\n(Next.js)"]
-    ADMIN_CONSOLE["Admin Console\n(Next.js / Role-gated)"]
+    ADMIN_CONSOLE["Admin Console\n(Next.js / Role-Gated)"]
   end
 
-  subgraph AUTH_LAYER["🔐 Authentication & Authorization  [Trust Boundary]"]
+  subgraph AUTH_LAYER["Authentication & Authorization (Trust Boundary)"]
     direction LR
     AUTH_SVC["Auth Service\nJWT + Refresh Tokens\nOAuth2 Social Login"]
-    RBAC["RBAC Engine\nRole × Workspace Permissions\nLeast-Privilege Enforcement"]
-    SESSION["Session Store\n(Redis — short TTL)"]
+    RBAC["RBAC Engine\nRole x Workspace Permissions\nLeast-Privilege Enforcement"]
+    SESSION["Session Store\n(Redis short TTL)"]
   end
 
-  subgraph API_LAYER["⚡ API Layer"]
+  subgraph API_LAYER["API Gateway Layer"]
     direction LR
     REST_API["REST API\n(NestJS Controllers)"]
-    TRPC_API["tRPC Router\n(Type-safe RPC)"]
+    TRPC_API["tRPC Router\n(Type-Safe RPC)"]
     RATE_LIMITER["Rate Limiter\n(Redis Token Bucket)"]
     API_GUARD["Request Validator\nZod Schema + JWT Guard"]
   end
 
-  subgraph CAREER_MODULES["📚 Core Career Modules  [Modular Monolith]"]
+  subgraph CAREER_MODULES["Core SaaS Domain Modules (Modular Monolith)"]
     direction TB
-    subgraph MOD_A["Career Intelligence"]
-      CI["Profile & Skills\nInventory\nCareer Path AI\nSkill-Gap Analysis\n30/60/90-Day Roadmap"]
+    subgraph MOD_A["[A] Career Intelligence"]
+      CI["Profile & Skills Inventory\nCareer Path Recommendations\nSkill-Gap Diagnostic\n30/60/90-Day Transition Roadmap"]
     end
-    subgraph MOD_B["Jobs & Recruitment"]
-      JR["Job Aggregator\nSemantic Search\nMatch Scoring\nApplication Tracker\nRecruiter Dashboard"]
+    subgraph MOD_B["[B] Jobs & Recruitment"]
+      JR["Verified Job Feed Aggregator\nSemantic Search & Match Scoring\nApplication Tracker Pipeline\nRecruiter Posting Portal"]
     end
-    subgraph MOD_C["Resume & Branding"]
-      RB["ATS Resume Builder\nJob Tailoring\nCover Letter Gen\nLinkedIn Optimizer\nPortfolio Builder"]
+    subgraph MOD_C["[C] Resume & Branding"]
+      RB["ATS-Optimized Resume Builder\nRole-Specific Tailoring Engine\nCover Letter Generator\nLinkedIn Optimization Review"]
     end
-    subgraph MOD_D["Interview & Skills Lab"]
-      IS["Mock Interviews\nQuestion Bank\nFeedback Engine\nAudit Simulations\nFinance Exercises"]
+    subgraph MOD_D["[D] Interview & Skills Lab"]
+      IS["Technical Mock Interviews\nInd AS / Tax Case Simulations\nExcel Modeling Drills\nObjective Scoring Engine"]
     end
-    subgraph MOD_E["Career & Financial Intel"]
-      CF["Salary Insights\nOffer Comparator\nMentor Marketplace\nCommunity Network"]
+    subgraph MOD_E["[E] Career & Financial Intel"]
+      CF["Salary Transparency Engine\nFixed vs Variable CTC Unbundler\nOffer Decision Matrix\nMentor Marketplace"]
     end
-    subgraph MOD_F["Practice Management"]
-      PM["Post-Qual Checklist\nICAAI Resource Links\nClient CRM (Lite)\nTask & Doc Reminders"]
+    subgraph MOD_F["[F] Practice Management"]
+      PM["Post-Qualification Checklist\nCOP Application Guide\nOfficial ICAI Links\nPractice CRM & Compliance Tasks"]
     end
   end
 
-  subgraph JOB_AGGREGATION["🔄 Job Aggregation & Normalization Worker"]
+  subgraph JOB_AGGREGATION["Job Ingestion & Normalization Worker"]
     direction LR
-    JOB_FETCH["Source Fetcher\n(Verified APIs only)"]
+    JOB_FETCH["Source Fetcher\n(Authorized Feeds Only)"]
     JOB_NORM["Normalizer &\nDeduplicator"]
-    JOB_FRESH["Freshness Checker\n(TTL + re-verify)"]
-    JOB_INDEX["pgvector Indexer\n(Semantic embeddings)"]
+    JOB_FRESH["Freshness Verifier\n(TTL + 30d Expiry)"]
+    JOB_INDEX["pgvector Indexer\n(Embeddings Generation)"]
   end
 
-  subgraph AI_ORCH["🤖 AI Orchestration Layer"]
+  subgraph AI_ORCH["AI Agent Orchestration & Policy Gateway"]
     direction TB
-    AGENT_CORE["AI Career Agent\n(Stateful Orchestrator)"]
-    TOOL_POLICY["Tool Policy Engine\nAllowlist + JSON Schema\nPermission Router"]
-    APPROVAL_GW["Approval Gateway\nHuman-in-the-Loop\nExplicit Consent Store"]
-    LLM_ADAPTER["LLM Provider Adapter\n(Gemini / GPT-4 / Claude)\nStructured Output Enforcer"]
-    RAG_ENGINE["RAG Engine\nChunk Store + Retrieval\nSource Citation Builder"]
-    PROMPT_GUARD["Prompt Guard\nInjection Detector\nDoc Sanitizer"]
+    AGENT_CORE["AI Career Agent Core\n(Multi-Turn Workflow Engine)"]
+    TOOL_POLICY["Tool Policy Engine\nAllowlist + JSON Schema Guard\nPermission Tier Router"]
+    APPROVAL_GW["Human-in-the-Loop Gateway\nSigned Token Approval Queue\nMandatory User Confirmation"]
+    LLM_ADAPTER["LLM Provider Adapter\n(Gemini / GPT-4 / Claude)\nStructured JSON Enforcer"]
+    RAG_ENGINE["RAG Engine\nVerified Knowledge Chunk Store\nSource Attribution Builder"]
+    PROMPT_GUARD["Prompt Guard\nInjection Detector\nUntrusted Document Filter"]
   end
 
-  subgraph BG_WORKERS["⚙️ Background Workers  (BullMQ + Redis)"]
+  subgraph BG_WORKERS["Background Workers (BullMQ + Redis)"]
     direction LR
-    EMAIL_WORKER["Email / WhatsApp\nNotification Worker"]
-    EMBED_WORKER["Embedding\nGeneration Worker"]
-    REMINDER_WORKER["Follow-Up\nReminder Worker"]
-    AUDIT_WRITER["Audit Event\nWriter"]
-    CRON_JOBS["Scheduled Jobs\nJob Refresh · Salary Sync\nSubscription Checks"]
+    EMAIL_WORKER["Notification Worker\n(Email & WhatsApp Alerts)"]
+    EMBED_WORKER["Vector Embedding Worker\n(Batch Processing)"]
+    REMINDER_WORKER["Application Follow-Up\nReminder Worker"]
+    AUDIT_WRITER["Audit Event Ingest Worker\n(Append-Only)"]
+    CRON_JOBS["Scheduled Cron Tasks\nFeed Refresh · Stale Cleanup"]
   end
 
-  subgraph PERSISTENCE["🗄  Persistence & Cache"]
+  subgraph PERSISTENCE["Persistence & Cache Tier"]
     direction LR
-    PG[("PostgreSQL\nApplication Data\npgvector Embeddings\nTenant-Isolated Schemas")]
-    REDIS_STORE[("Redis\nSessions · Queues\nIdempotency Keys\nRate-Limit Counters")]
-    S3[("Object Storage\nResumes · Documents\nAudit Archives\nServer-Side Encrypted")]
+    PG[("PostgreSQL 16+\nApplication Tables\npgvector Index (HNSW)\nTenant Row-Level Security")]
+    REDIS_STORE[("Redis 7+\nSessions · Queues\nIdempotency Keys\nDistributed Locks")]
+    S3[("Object Storage (S3)\nEncrypted Resumes & Docs\nPre-Signed URLs (15m TTL)")]
   end
 
-  subgraph EXTERNAL["🌐 External Integrations"]
+  subgraph EXTERNAL["External Integrations (Egress Boundary)"]
     direction LR
-    JOB_APIS["Approved Job APIs\n(Naukri, LinkedIn, etc.)"]
-    AI_PROV["AI Providers\n(Gemini / OpenAI / Anthropic)"]
-    NOTIFY["Notification Services\n(SendGrid · Twilio)"]
-    PAYMENT["Payment Gateway\n(Razorpay / Stripe India)"]
-    ICAI["ICAI Portal\n(Reference Links Only)"]
+    JOB_APIS["Approved Job APIs & Feeds"]
+    AI_PROV["AI Model Providers (Gemini / Claude / OpenAI)"]
+    NOTIFY["Notification Services (Resend / Twilio)"]
+    PAYMENT["Payment Gateway (Razorpay)"]
+    ICAI["Official ICAI Resource Links"]
   end
 
-  subgraph OBSERVABILITY["📊 Observability & Audit  [Always On]"]
+  subgraph OBSERVABILITY["Observability & Audit Sinks"]
     direction LR
-    AUDIT_LOG["Audit Log Store\nActor · Op · Outcome\nTimestamp · CorrelationID"]
-    METRICS["Metrics & Tracing\n(OpenTelemetry · Grafana)"]
-    ALERTS["Alerting\n(PagerDuty / Slack)"]
-    PRIVACY_LOG["Privacy-Safe App Logs\nNo PII · No Tokens\nNo Resume Content"]
+    AUDIT_LOG["WORM Audit Log Store\nActor · Tool · Outcome · CorrelationID"]
+    METRICS["OpenTelemetry & Prometheus\nLatency · Error Spikes · Tool Rates"]
+    ALERTS["Alerting Engine (PagerDuty)"]
+    PRIVACY_LOG["Privacy-Filtered App Logs\nZero PII · Zero Raw Resume Text"]
   end
 
-  %% --- Flows ---
   PRESENTATION --> AUTH_LAYER
   AUTH_LAYER --> API_LAYER
   API_LAYER --> CAREER_MODULES

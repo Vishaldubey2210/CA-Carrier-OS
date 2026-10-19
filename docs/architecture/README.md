@@ -1,24 +1,39 @@
-# CA Career OS — Complete System Architecture Specification
+# CA Career OS — Master System Architecture Specification
 
-> **Version:** 1.0.0-draft  
-> **Status:** Production-Ready Architectural Blueprint  
-> **Author:** Principal Software Architect & AI Systems Engineering Team  
-> **Target Audience:** Engineering Leads, SaaS Architects, Security Auditors, Product Managers  
+> **Document Type:** Production-Grade SaaS Architecture Blueprint & Engineering Specification  
+> **Status:** Architecture Blueprint — Implementation Pending  
+> **Target Audience:** Principal Software Architects, Backend Engineers, Security Auditors, Product Leads  
+> **Repository:** `Vishaldubey2210/CA-Carrier-OS`
+
+[![Architecture Status](https://img.shields.io/badge/Status-Blueprint%20%7C%20Implementation%20Pending-yellow.svg)](#14-architecture-status--implementation-phases)
+[![Design Pattern](https://img.shields.io/badge/Pattern-Modular%20Monolith-blue.svg)](decisions.md#adr-001-modular-monolith-architecture-over-microservices)
+[![Security Standard](https://img.shields.io/badge/Security-Zero--Trust%20Gateway%20%7C%20Human--in--the--Loop-green.svg)](#6-ai-agent-request--execution-lifecycle)
+[![ICAI Ethics Alignment](https://img.shields.io/badge/Domain-ICAI%20Ethics%20Alignment%20(Under%20Review)-orange.svg)](#16-legal-professional-ethics--disclaimers)
 
 ---
 
 ## Table of Contents
 
 1. [Executive Summary & Product Vision](#1-executive-summary--product-vision)
-2. [Product Modules & Responsibilities](#2-product-modules--responsibilities)
-3. [Inter-Module Data Flows](#3-inter-module-data-flows)
-4. [AI Agent Architecture & Tool Execution Engine](#4-ai-agent-architecture--tool-execution-engine)
-5. [Feature-to-Pain-Point Matrix](#5-feature-to-pain-point-matrix)
-6. [Multi-Tenant Isolation & Workspace Model](#6-multi-tenant-isolation--workspace-model)
-7. [Implementation Roadmap: MVP vs Future Phases](#7-implementation-roadmap-mvp-vs-future-phases)
-8. [Architecture Diagrams Directory](#8-architecture-diagrams-directory)
-9. [Architecture Glossary](#9-architecture-glossary)
-10. [Reference Links & Architecture Decisions](#10-reference-links--architecture-decisions)
+2. [System Context & External Boundaries](#2-system-context--external-boundaries)
+3. [Core Module Specifications & Technical Contracts](#3-core-module-specifications--technical-contracts)
+4. [Internal Backend Components & Dependencies](#4-internal-backend-components--dependencies)
+5. [User Workflows (Candidate & Recruiter)](#5-user-workflows-candidate--recruiter)
+6. [AI Agent Request & Execution Lifecycle](#6-ai-agent-request--execution-lifecycle)
+7. [Permission Tiers & Human-in-the-Loop Gateway](#7-permission-tiers--human-in-the-loop-gateway)
+8. [Idempotency, Retries, Failure Handling & Reconciliation](#8-idempotency-retries-failure-handling--reconciliation)
+9. [Workspace Multi-Tenancy & Data Isolation Model](#9-workspace-multi-tenancy--data-isolation-model)
+10. [Database Entities, Relationships & Ownership](#10-database-entities-relationships--ownership)
+11. [API Contracts, Protocols & Error Handling](#11-api-contracts-protocols--error-handling)
+12. [Background Workers & Scheduled Tasks](#12-background-workers--scheduled-tasks)
+13. [Security Architecture & Threat Model](#13-security-architecture--threat-model)
+14. [Observability, Telemetry & Failure Recovery](#14-observability-telemetry--failure-recovery)
+15. [Feature-to-Pain-Point Traceability Matrix](#15-feature-to-pain-point-traceability-matrix)
+16. [Architecture Decision Records & Trade-Offs](#16-architecture-decision-records--trade-offs)
+17. [Implementation Phases & Scope Boundaries](#17-implementation-phases--scope-boundaries)
+18. [Visual Architecture Diagrams Catalog](#18-visual-architecture-diagrams-catalog)
+19. [Architecture Glossary](#19-architecture-glossary)
+20. [Legal, Professional Ethics & Disclaimers](#20-legal-professional-ethics--disclaimers)
 
 ---
 
@@ -28,250 +43,403 @@
 
 > *"From CA qualification to career success — one intelligent workspace."*
 
-**CA Career OS** is an AI-powered career management and professional growth SaaS platform engineered specifically for Chartered Accountants in India, with focused capabilities for candidates who have recently cleared CA Final and newly qualified CAs (0–3 years post-qualification).
+**CA Career OS** is an integrated software-as-a-service (SaaS) platform engineered specifically for Chartered Accountants in India, with focused emphasis on candidates who have recently cleared CA Final and newly qualified CAs (0–3 years post-qualification).
 
-Rather than acting as a superficial, passive job board, CA Career OS is an active career copilot unifying:
-1. Personalized career discovery and path recommendations.
-2. Verified, deduplicated job aggregation and transparent matching.
-3. ATS-optimized, ethics-compliant resume generation.
-4. Technical mock interviews and practical skills simulation labs.
-5. Objective salary and offer comparison intelligence.
-6. Professional practice setup and lightweight client practice management.
-7. An orchestrated, permission-governed AI Career Agent.
+Rather than acting as another passive, unverified job listing directory, CA Career OS provides an active, personalized career copilot combining:
+1. Pathway diagnostics and personalized 30/60/90-day transition roadmaps.
+2. Verified, deduplicated job discovery and explainable semantic matching.
+3. ATS-optimized resume building with strict zero-fabrication verification.
+4. Technical mock interviews and domain simulation labs.
+5. Transparent CTC unbundling and side-by-side offer decision comparison.
+6. Post-qualification compliance checklists and independent practice setup tools.
+7. A permission-governed AI Career Agent operating under strict human-in-the-loop controls.
 
 ### 1.2 Core Architectural Principles
 
-- **Security First:** Strict separation of personal candidate workspaces from employer organization workspaces.
-- **Controlled AI Autonomy:** Deterministic 4-tier permission model. Autonomous read and write operations; **mandatory human-in-the-loop approval** for all external side effects; zero autonomous destructive actions.
-- **Truth & Ethics in AI:** Strict zero-fabrication policies for candidate credentials and metrics; clear provenance and date-stamping on all regulatory tax/compliance simulations.
-- **Modular Monolith Baseline:** Single deployable NestJS service with clear domain boundaries, avoiding distributed system sprawl while preserving clear future extraction pathways.
+- **Security & Multi-Tenant Isolation First:** Personal candidate workspaces and employer organization workspaces are strictly decoupled. A candidate's current employer can never observe their job search or career planning activities.
+- **Deterministic AI Safeguards:** LLMs are never granted autonomous write permissions for external side effects. Tool invocations are partitioned into four deterministic tiers (`READ_ONLY`, `WRITE`, `EXPLICITLY_APPROVED_EXTERNAL`, and `DESTRUCTIVE`).
+- **Zero-Fabrication Guard (ADR-009):** The platform strictly prohibits AI fabrication of credentials, client names, engagement fees, or professional metrics. All resume claims require explicit candidate attestation.
+- **Modular Monolith Baseline:** Single deployable NestJS service with clear domain boundaries, avoiding microservices network latency while preserving clean future extraction boundaries.
 
 ---
 
-## 2. Product Modules & Responsibilities
+## 2. System Context & External Boundaries
+
+The platform operates within a well-defined boundary interacting with four primary user roles, verified external job feeds, interchangeable AI providers, transactional notification gateways, and secure persistence stores.
+
+```mermaid
+flowchart TB
+  classDef userClass fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f0f9ff
+  classDef appClass fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc
+  classDef extClass fill:#1c1917,stroke:#a8a29e,stroke-width:2px,color:#f5f5f4
+  classDef dbClass fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
+
+  subgraph USERS["Platform Users"]
+    CANDIDATE["CA Candidate\n(Newly qualified / CA Final cleared)"]:::userClass
+    RECRUITER["Recruiter / CA Firm\n(Hiring team & employer)"]:::userClass
+    MENTOR["Senior CA Mentor\n(Advisory sessions)"]:::userClass
+    ADMIN["Platform Administrator\n(Operational oversight & audit)"]:::userClass
+  end
+
+  subgraph PLATFORM["CA Career OS SaaS Platform"]
+    WEB_APP["Web Application\n(Next.js / TypeScript / React 19)"]:::appClass
+    BACKEND["Core SaaS Backend\n(NestJS Modular Monolith API)"]:::appClass
+    AI_AGENT["AI Career Agent\n(Permission-Governed Orchestration)"]:::appClass
+  end
+
+  subgraph DATA_STORES["Persistence & Infrastructure"]
+    PG[("PostgreSQL\nPrimary Relational Store\npgvector Embeddings")]:::dbClass
+    REDIS[("Redis\nSessions · Queues\nIdempotency Keys")]:::dbClass
+    S3[("Object Storage\nResumes & Documents\nServer-Side Encrypted")]:::dbClass
+  end
+
+  subgraph EXT_SERVICES["External Integrations"]
+    JOB_FEEDS["External Job Feeds\n(Approved APIs & Feeds)"]:::extClass
+    AI_PROVIDERS["AI Model Providers\n(Gemini / OpenAI / Claude)"]:::extClass
+    NOTIFICATIONS["Notification Services\n(Resend / Twilio)"]:::extClass
+    PAYMENT_GATEWAY["Payment Gateway\n(Razorpay / Stripe India)"]:::extClass
+    ICAI_RESOURCES["ICAI Portal Links\n(Official Regulatory Refs)"]:::extClass
+  end
+
+  CANDIDATE -->|"HTTPS"| WEB_APP
+  RECRUITER -->|"HTTPS"| WEB_APP
+  MENTOR -->|"HTTPS"| WEB_APP
+  ADMIN -->|"HTTPS / Role-Gated"| WEB_APP
+
+  WEB_APP -->|"REST / tRPC API"| BACKEND
+  BACKEND <-->|"Orchestrates Tools"| AI_AGENT
+
+  BACKEND -->|"Relational & Vector Queries"| PG
+  BACKEND -->|"Cache & Queues"| REDIS
+  BACKEND -->|"Document Operations"| S3
+
+  AI_AGENT -->|"Inference & Structured JSON"| AI_PROVIDERS
+  BACKEND -->|"Ingest Job Feeds"| JOB_FEEDS
+  BACKEND -->|"Transactional Alerts"| NOTIFICATIONS
+  BACKEND -->|"Billing & Subscriptions"| PAYMENT_GATEWAY
+  BACKEND -->|"Reference Verification"| ICAI_RESOURCES
+```
+
+---
+
+## 3. Core Module Specifications & Technical Contracts
 
 ```
-+---------------------------------------------------------------------------------------------------------+
-|                                        CA CAREER OS MODULE SUITE                                        |
-+---------------------------------------------------------------------------------------------------------+
-|  [A] Career Intelligence    | Profile & skills inventory · AI pathway matching · 30/60/90 roadmaps      |
-|  [B] Jobs & Recruitment     | Verified job discovery · Semantic search · Recruiter ATS pipeline         |
-|  [C] AI Resume & Branding   | ATS resume builder · Role tailoring · Verification flags · Portfolio      |
-|  [D] Interview & Skills Lab | Voice/text mock interviews · Ind AS/Tax scenarios · Excel modeling       |
-|  [E] Financial Intelligence | Salary transparency · CTC unbundling · Offer compare · Mentorship         |
-|  [F] Practice Management    | Post-qual checklist · COP guidance · Client CRM · Task tracking           |
-|  [G] AI Career Agent        | Cross-module assistant · Safe tool execution · Approval gateway           |
-+---------------------------------------------------------------------------------------------------------+
++───────────────────────────────────────────────────────────────────────────────────────────+
+|                                    CORE DOMAIN MODULES                                    |
++───────────────────────────────────────────────────────────────────────────────────────────+
+|  [A] Career Intelligence    | Profile & skills inventory · AI pathway matching · Roadmaps |
+|  [B] Jobs & Recruitment     | Verified job discovery · Semantic search · Recruiter ATS    |
+|  [C] AI Resume & Branding   | ATS resume builder · Role tailoring · Verification flags    |
+|  [D] Interview & Skills Lab | Voice/text mock interviews · Ind AS/Tax drills · Modeling   |
+|  [E] Financial Intelligence | Salary transparency · CTC unbundling · Offer matrix         |
+|  [F] Practice Management    | Post-qual checklist · COP guidance · Client CRM (Lite)      |
+|  [G] AI Career Agent        | Cross-module orchestrator · Safe tool execution gateway     |
++───────────────────────────────────────────────────────────────────────────────────────────+
 ```
 
 ### Module A: Career Intelligence
-- **Responsibilities:**
-  - Manages the candidate's canonical professional profile (articleship firm, exposure areas, technical domain skills, city preference, target compensation).
-  - Evaluates candidate profile against 6 major CA pathways: Statutory Audit & Assurance, Direct & Indirect Taxation, FP&A & Corporate Finance, Investment Banking & Private Equity, Management Consulting & Risk Advisory, and Independent Practice.
-  - Generates personalized 30-day, 60-day, and 90-day transition roadmaps with role-specific skill-gap reports.
-- **Boundaries:** Does not scrape candidate profiles without consent; does not promise job placement or rank candidates publicly.
+- **Domain Responsibilities:** Manages canonical professional profile (articleship firm, exposure areas, technical domain skills, city preference, target compensation). Evaluates candidate profile against 6 major CA pathways: Statutory Audit & Assurance, Direct & Indirect Taxation, FP&A & Corporate Finance, Investment Banking & Private Equity, Management Consulting & Risk Advisory, and Independent Practice.
+- **Inputs:** `CandidateProfileInput` (articleship area, firm tier, examination attempt, target roles, preferred locations).
+- **Outputs:** `CareerPathRecommendation`, `SkillGapReport` (with percentage coverage per domain), and `RoadmapPlan` (30/60/90 days).
+- **Validation Rules:** Zod schema validation; target salary range must be positive; notice period $\ge 0$ days.
+- **Persistence Effects:** Writes to `CandidateProfile`, `CareerPreference`, `CandidateSkill`, and `SkillGapReport` tables.
+- **Security & Privacy:** Scoped strictly to `workspaceId`. No articleship firm ratings or disparaging content permitted.
 
 ### Module B: Jobs and Recruitment
-- **Responsibilities:**
-  - Aggregates job opportunities exclusively through authorized employer feeds, direct platform postings, and verified partner APIs.
-  - De-duplicates and normalizes job descriptions; computes explainable semantic match scores (0.0–1.0) using hybrid lexical + vector search (`pgvector`).
-  - Manages candidate application tracking lifecycle (`SAVED` $\rightarrow$ `APPLIED` $\rightarrow$ `INTERVIEWING` $\rightarrow$ `OFFERED` $\rightarrow$ `ARCHIVED`).
-  - Recruiter Portal: Job posting, applicant pipeline management, verified employer badging, and suspicious listing reporting.
-- **Boundaries:** Zero unauthorized scraping of commercial job boards. All job listings feature source provenance and freshness verification (auto-expiry at 30 days).
+- **Domain Responsibilities:** Ingests jobs exclusively from verified sources (direct recruiter postings, authorized employer ATS webhooks, approved feeds). Deduplicates listings, computes hybrid lexical + vector match scores (`pgvector`), and manages applicant pipeline states.
+- **Inputs:** `JobSearchQuery` (keywords, location, mode, salary range, domain filters).
+- **Outputs:** Paginated `Job` results with explainable `JobMatch` scores ($0.0-1.0$) and human-readable match factors.
+- **Validation Rules:** Ingestion requires verified employer ID or verified job source ID. Unapproved third-party scraping is blocked. Listings auto-expire after 30 days without re-verification.
+- **Persistence Effects:** Inserts/updates `Job`, `JobSource`, `JobMatch`, and `Application`.
+- **Security & Privacy:** Recruiter search algorithms exclude candidates who have marked the recruiter firm as their current articleship or employer firm.
 
 ### Module C: AI Resume and Professional Branding
-- **Responsibilities:**
-  - Generates ATS-friendly resume versions formatted in PDF and DOCX.
-  - Dynamically tailors resume bullet points to specific target job descriptions while enforcing the **Zero Fabrication Rule** (ADR-009).
-  - Drafts contextual cover letters and recruiter outreach messages.
-  - Generates LinkedIn headline and summary optimization recommendations.
-  - Builds verified project portfolios highlighting articleship audit engagements and financial modeling assignments.
-- **Boundaries:** The model cannot invent numbers, client names, or credentials. All metrics require candidate attestation.
+- **Domain Responsibilities:** Generates ATS-friendly resume versions formatted in PDF and DOCX. Dynamically tailors resume bullet points to target job descriptions while enforcing the **Zero Fabrication Rule (ADR-009)**.
+- **Inputs:** `ResumeDraftInput` (selected profile sections, target `jobId`).
+- **Outputs:** `ResumeVersion` record and binary PDF/DOCX stored in private object storage.
+- **Validation Rules:** Mandatory candidate attestation checkbox before finalizing a resume version. All suggested metrics must link to candidate-provided inputs.
+- **Persistence Effects:** Writes to `Resume` and `ResumeVersion`; uploads encrypted file to S3.
+- **Security & Privacy:** PII redaction engine strips phone numbers, email, and full postal addresses before prompt submission to external LLMs. Pre-signed download URLs have a 15-minute expiration.
 
 ### Module D: AI Interview and Practical Skills Lab
-- **Responsibilities:**
-  - Conducts turn-based text and voice mock technical interviews tailored to target roles (e.g., Ind AS 115 revenue recognition cases, Transfer Pricing documentation, GST audit checks).
-  - Provides objective, granular scoring across technical accuracy, structured communication, and regulatory awareness.
-  - Practical Simulation Exercises: Synthetic financial statements for audit reconciliations, financial model templates, and tax computation drills.
-- **Boundaries:** All scenario data uses synthetic or properly licensed source material. Educational simulation only — does not provide formal legal/tax opinions.
+- **Domain Responsibilities:** Conducts role-specific technical mock interviews across Ind AS revenue recognition, Transfer Pricing, GST input credit checks, and financial modeling drills. Produces structured evaluations with constructive feedback.
+- **Inputs:** `InterviewSessionStart` (`targetRole`, `domain`, `mode: TEXT | VOICE`).
+- **Outputs:** `InterviewSession`, real-time conversational prompts, and final `InterviewFeedback` scorecards.
+- **Validation Rules:** Only synthetic or properly licensed case data used for exercises. Max turn limit enforced (default: 8 question-answer rounds per session).
+- **Persistence Effects:** Writes to `InterviewSession` and `InterviewFeedback`.
+- **Security & Privacy:** Audio recordings (Phase 2) are processed ephemerally with zero persistent storage of candidate voice data beyond session scoring.
 
 ### Module E: Career and Financial Intelligence
-- **Responsibilities:**
-  - Aggregates self-reported, anonymized salary benchmarks tagged with sample size ($N$), percentile distributions (25th, 50th, 75th), and effective dates.
-  - Offer Unbundling Calculator: Normalizes CTC offers by splitting fixed in-hand salary, variable performance bonuses, joining bonuses, retiral benefits (PF/Gratuity), and stock incentives.
-  - Side-by-side offer comparison tool with personalized cost-of-living index adjustments across Indian metro cities (Mumbai, Bengaluru, Delhi-NCR, Pune, Hyderabad, Chennai).
-  - Mentorship Marketplace: Discovery, availability calendar, and appointment scheduling with senior industry CAs.
-- **Boundaries:** No salary or career projection is presented as a guarantee. All statistics show sample size provenance.
+- **Domain Responsibilities:** Collects anonymous, self-reported compensation data with sample-size ($N$) indicators. Unbundles CTC offers into fixed in-hand pay, performance bonuses, joining incentives, retiral contributions, and stock options, adjusting for city cost-of-living differences.
+- **Inputs:** `OfferTermsInput` (fixed pay, variable pay, PF, gratuity, bonus, city).
+- **Outputs:** `OfferComparisonReport` with monthly estimated take-home pay, tax projections under Indian tax regimes, and side-by-side offer decision matrices.
+- **Validation Rules:** Sample size ($N$) must be prominently displayed; salary estimates are marked as directional benchmarks, not guarantees.
+- **Persistence Effects:** Optional anonymous entry in salary benchmark pool; confidential offer storage in `CandidateProfile`.
+- **Security & Privacy:** Offer documents are encrypted with KMS keys accessible only by the candidate's personal workspace.
 
 ### Module F: Professional Setup and Practice Management
-- **Responsibilities:**
-  - Post-qualification step-by-step checklist: ICAI associate membership application, Certificate of Practice (COP) forms, and firm registration prerequisites.
-  - Curated, dated reference links to official ICAI portals, CPE credit guidelines, and professional ethics resources.
-  - Lightweight Practice CRM: Client onboarding templates, KYC document checklists, recurring compliance calendar (advance tax, GST returns, statutory audit deadlines), and task reminders.
-- **Boundaries:** Strict adherence to ICAI Code of Ethics (no client solicitation or public commercial advertising). Back-office productivity workflows only.
+- **Domain Responsibilities:** Guides candidates seeking to launch an independent CA practice. Provides post-qualification step-by-step checklists (ICAI associate membership application, Certificate of Practice (COP) form filing), curated links to official ICAI portals, and a lightweight practice CRM (client onboarding, KYC document tracking, statutory compliance calendar).
+- **Inputs:** `PracticeSetupInput` (firm type, target services, location).
+- **Outputs:** `ComplianceChecklist`, `ClientOnboardingTemplate`, and recurring compliance reminders.
+- **Validation Rules:** Strict adherence to the ICAI Code of Ethics (no client solicitation or public advertising). All compliance guides display an "As of [Date]" stamp.
+- **Persistence Effects:** Writes to practice CRM entities in organization workspaces.
+- **Security & Privacy:** Client confidential financial data stored in dedicated tenant schemas.
 
 ### Module G: AI Career Agent (Cross-Module Orchestrator)
-- **Responsibilities:**
-  - Conversational copilot that parses candidate career intents (e.g., *"I have 3 years of statutory audit articleship and want an FP&A role in Mumbai; prepare my plan and tailor my resume"*).
-  - Coordinates cross-module tool invocations in accordance with the 4-tier security policy.
-  - Surfaces structured approval cards for high-consequence operations.
-- **Boundaries:** The LLM can never bypass server-side authorization guards or autonomously initiate external actions.
+- **Domain Responsibilities:** Natural language copilot that plans and coordinates cross-module tasks on behalf of the user. Translates candidate intent into safely validated tool calls governed by the 4-tier permission policy.
+- **Inputs:** User chat prompt, permitted profile context, active workspace context.
+- **Outputs:** Streaming conversational response, structured tool suggestions, and pending `ApprovalRequest` cards.
+- **Validation Rules:** All tool calls must match allowlist schemas and execute within server-side authorization boundaries.
 
 ---
 
-## 3. Inter-Module Data Flows
+## 4. Internal Backend Components & Dependencies
 
-```
-+---------------------------------------------------------------------------------------------------------+
-|                                      INTER-MODULE DATA FLOW DIAGRAM                                     |
-+---------------------------------------------------------------------------------------------------------+
-|                                                                                                         |
-|  [Candidate Onboarding]                                                                                 |
-|           |                                                                                             |
-|           v                                                                                             |
-|  [Module A: Career Intel]  ====(Skills & Domain)====>  [Module D: Interview Lab]                        |
-|           |                                                      |                                      |
-|    (Target Roles)                                         (Readiness Score)                             |
-|           |                                                      |                                      |
-|           v                                                      v                                      |
-|  [Module B: Jobs Search]   ====(Job Description)===>  [Module C: Resume Tailor]                         |
-|           |                                                      |                                      |
-|   (Saved & Applied Jobs)                                 (Tailored Resume)                              |
-|           |                                                      |                                      |
-|           +-----------------------\      /-----------------------+                                      |
-|                                   v      v                                                              |
-|                            [Application Record]                                                         |
-|                                     |                                                                   |
-|                              (Offer Received)                                                           |
-|                                     |                                                                   |
-|                                     v                                                                   |
-|                       [Module E: Offer Comparison]                                                      |
-|                                     |                                                                   |
-|                       +-------------+-------------+                                                     |
-|                       |                           |                                                     |
-|                 (Corporate Job)            (Independent Practice)                                       |
-|                       |                           |                                                     |
-|                       v                           v                                                     |
-|             [First 90-Days Plan]       [Module F: Practice CRM]                                         |
-|                                                                                                         |
-+---------------------------------------------------------------------------------------------------------+
-```
+The backend is organized as a modular monolith in NestJS:
 
-1. **Profile to Skill Gap & Recommendations:** Module A digests user articleship details and queries the Skill catalog. The generated `SkillGapReport` informs Module D of target interview drill areas and Module B of semantic search queries.
-2. **Job Description to Tailored Resume:** When a candidate saves a job in Module B, the job's required skills and responsibilities are passed to Module C. Module C cross-references the candidate's verified profile data and creates a job-tailored `ResumeVersion`.
-3. **Application Tracking to Offer Analysis:** Once an employer issues an offer, the application status transitions to `OFFERED`. The candidate uploads the offer terms into Module E, where fixed vs. variable components are parsed, normalized, and benchmarked against cohort statistics.
-4. **Transition to Practice:** Candidates electing the practice route trigger Module F, generating an ICAI compliance roadmap, firm registration workflow, and initializing the practice CRM workspace.
+```mermaid
+flowchart TB
+  subgraph PRESENTATION["Presentation Tier"]
+    CAND_APP["Candidate Dashboard"]
+    RECRUITER_PORTAL["Recruiter Portal"]
+    ADMIN_CONSOLE["Admin Console"]
+  end
+
+  subgraph API_GATEWAY["API Gateway Layer"]
+    JWT_GUARD["JWT Guard\n(Token validation)"]
+    WS_GUARD["Workspace Guard\n(Tenancy scope)"]
+    RATE_LIMIT["Rate Limiter\n(Redis token bucket)"]
+    VALIDATION_PIPE["Zod Validation Pipe\n(Schema enforcement)"]
+  end
+
+  subgraph DOMAIN_SERVICES["Domain Services (Modular Monolith)"]
+    CAREER_SVC["CareerIntelligenceService"]
+    JOBS_SVC["JobsRecruitmentService"]
+    RESUME_SVC["ResumeBrandingService"]
+    INTERVIEW_SVC["InterviewSkillsService"]
+    FINANCIAL_SVC["FinancialIntelService"]
+    PRACTICE_SVC["PracticeManagementService"]
+    AGENT_SVC["AgentOrchestratorService"]
+  end
+
+  subgraph INFRA_SERVICES["Core Infrastructure Services"]
+    POLICY_ENGINE["ToolPolicyEngine"]
+    APPROVAL_GATEWAY["ApprovalGatewayService"]
+    LLM_ADAPTER["LLMProviderAdapter"]
+    QUEUE_SERVICE["QueueManagerService (BullMQ)"]
+    AUDIT_SERVICE["AuditLoggingService"]
+  end
+
+  subgraph PERSISTENCE_LAYER["Persistence & External"]
+    DB[(PostgreSQL + pgvector)]
+    CACHE[(Redis 7+)]
+    STORAGE[(Object Storage S3)]
+  end
+
+  PRESENTATION --> API_GATEWAY
+  API_GATEWAY --> DOMAIN_SERVICES
+  DOMAIN_SERVICES --> INFRA_SERVICES
+  INFRA_SERVICES --> PERSISTENCE_LAYER
+```
 
 ---
 
-## 4. AI Agent Architecture & Tool Execution Engine
+## 5. User Workflows (Candidate & Recruiter)
 
-The AI Career Agent is built on a **Permission-Aware Deterministic Gateway** inspired by enterprise zero-trust principles:
+### 5.1 Candidate Dual-Pathway Journey
 
-```
-[Agent Tool Call Request]
-          |
-          v
-[1. Authentication Guard] ---- (Invalid JWT) ----> [401 Unauthorized + Audit Log]
-          | (Valid)
-          v
-[2. Workspace Guard] --------- (Cross-tenant) ---> [403 Forbidden + Audit Log]
-          | (Authorized)
-          v
-[3. Tool Allowlist Check] ---- (Unregistered) ---> [403 Tool Denied + Audit Log]
-          | (Permitted)
-          v
-[4. Zod Schema Validation] --- (Invalid schema) -> [400 Bad Request + Audit Log]
-          | (Valid)
-          v
-[5. Rate Limiter Check] ------ (Limit exceeded) -> [429 Rate Limited + Audit Log]
-          | (Within quota)
-          v
-[6. Permission Level Router]
-          |
-          +---> [READ_ONLY]  ---------> [Query DB / Cache] -------> [Result]
-          |
-          +---> [WRITE] --------------> [Idempotency Check] ------> [DB Transaction] --> [Result]
-          |
-          +---> [EXTERNAL ACTION] ----> [Human Approval Gate] ----> [User Confirms?]
-          |                                                             |-- YES --> [Service Call]
-          |                                                             \-- NO ---> [Cancel Action]
-          |
-          +---> [DESTRUCTIVE] --------> [Retention Check] --------> [Final Warning Dialog]
-                                                                        |-- YES --> [Soft Delete]
-                                                                        \-- NO ---> [Cancel Action]
-          |
-          v
-[7. Privacy-Safe Audit Logging & Telemetry Engine] (Actor, Tool, Outcome, Latency, Zero PII)
+```mermaid
+flowchart TD
+  START(["CA Qualification Cleared"]) --> ONBOARD["Profile & Articleship Inventory\n(Experience, Domains, Target Cities)"]
+  ONBOARD --> DIAGNOSTIC["Career Intelligence Diagnostic\n(Assess Fit across 6 CA Pathways)"]
+  DIAGNOSTIC --> PATH_DECISION{"Selected Pathway"}
+
+  subgraph EMPLOYMENT_TRACK["Corporate Employment Track"]
+    SKILL_GAP["Skill-Gap Analysis & Bridging Tasks"] --> JOB_DISCOVERY["Verified Job Search & Match Scoring"]
+    JOB_DISCOVERY --> RESUME_TAILOR["Job-Tailored ATS Resume\n(Verified Claims Only)"]
+    RESUME_TAILOR --> APP_TRACK["Application Tracker & Reminders"]
+    APP_TRACK --> MOCK_INTERVIEWS["Technical Mock Interviews\n(Ind AS / Tax / Finance Drills)"]
+    MOCK_INTERVIEWS --> OFFER_COMPARE["CTC Unbundler & Offer Decision Matrix"]
+    OFFER_COMPARE --> ONBOARD_CORP["First 90 Days Success Plan"]
+  end
+
+  subgraph PRACTICE_TRACK["Independent Practice Track"]
+    POST_QUAL["Post-Qualification Compliance Checklist"] --> COP_GUIDE["Certificate of Practice (COP) Steps"]
+    COP_GUIDE --> FIRM_SETUP["Firm Registration & Setup Guidance"]
+    FIRM_SETUP --> CLIENT_CRM["Client Onboarding & Compliance Calendar"]
+  end
+
+  PATH_DECISION -- "Corporate Career" --> EMPLOYMENT_TRACK
+  PATH_DECISION -- "Independent Practice" --> PRACTICE_TRACK
 ```
 
-### Tool Categorization Table
+### 5.2 Job Application Lifecycle State Machine
 
-| Tool Name | Tier | Description | Side Effects | Guardrails & Controls |
-| :--- | :--- | :--- | :--- | :--- |
-| `get_user_profile` | **READ_ONLY** | Retrieves candidate profile | None | Workspace-scoped read; excludes hashed credentials |
-| `get_user_preferences` | **READ_ONLY** | Reads target roles and cities | None | Workspace-scoped read |
-| `search_jobs` | **READ_ONLY** | Performs hybrid job search | None | Filtered by verified job sources |
-| `get_job_details` | **READ_ONLY** | Fetches full job description | None | Checks job active status |
-| `get_application_status` | **READ_ONLY** | Queries status of applications | None | Candidate's own applications only |
-| `get_skill_gap_report` | **READ_ONLY** | Fetches latest skill gap report | None | Cached in Redis (1h TTL) |
-| `get_learning_tasks` | **READ_ONLY** | Lists assigned learning tasks | None | Workspace-scoped read |
-| `create_career_task` | **WRITE** | Adds item to career roadmap | DB Insert | Idempotency key; max 50 active tasks |
-| `update_user_preferences`| **WRITE** | Updates preferred domains/salary | DB Update | Strict Zod validation; change audit event |
-| `save_job` | **WRITE** | Bookmarks job for candidate | DB Upsert | Prevents duplicate bookmarks |
-| `create_application_tracking_record` | **WRITE** | Creates new tracking entry | DB Insert | Idempotency key; validates job existence |
-| `create_resume_draft` | **WRITE** | Generates tailored resume draft | DB Insert + S3 | ADR-009 Zero-Fabrication prompt guard |
-| `schedule_follow_up` | **WRITE** | Sets reminder date for job | DB Insert | Dispatches BullMQ reminder job |
-| `submit_job_application` | **EXTERNAL** | Sends application to employer | External API / Email | **Mandatory Approval Request** card; explicit user click |
-| `send_recruiter_message` | **EXTERNAL** | Sends outreach to recruiter | External Email / Portal| **Mandatory Approval Request** card; preview message |
-| `book_paid_mentorship` | **EXTERNAL** | Initiates paid mentor booking | Razorpay charge | **Mandatory Approval Request**; checkout authorization |
-| `delete_resume_version` | **DESTRUCTIVE** | Removes a tailored resume version| Soft-delete | Two-step confirmation; 30-day tombstone |
-| `remove_saved_personal_document` | **DESTRUCTIVE** | Deletes uploaded doc/certificate | S3 soft-delete | Confirmation dialog; check if linked to live app |
-| `delete_user_data` | **DESTRUCTIVE** | GDPR/DPDP user erasure request | Async purge queue | Statutory retention check; 14-day grace period |
+```mermaid
+stateDiagram-v2
+  [*] --> JobDiscovered : Ingested from verified source
+  JobDiscovered --> Available : Passes deduplication & freshness check
+  Available --> SavedByCandidate : Candidate bookmarks job
+  SavedByCandidate --> ResumeVersionSelected : Candidate selects base resume
+  ResumeVersionSelected --> TailoredDraftReady : AI tailoring complete
+  TailoredDraftReady --> ApprovedForApplication : Candidate reviews & attests claims
+  ApprovedForApplication --> EligibilityCheck : Pre-application verification
+  EligibilityCheck --> PendingExplicitApproval : Eligibility verified
+  PendingExplicitApproval --> ApplicationSubmitted : Explicit human click confirmed
+  PendingExplicitApproval --> [*] : User declined or 15m timeout
+  ApplicationSubmitted --> Tracking : Recorded in pipeline
+  state Tracking {
+    [*] --> Applied
+    Applied --> AcknowledgedByEmployer
+    AcknowledgedByEmployer --> InterviewInvited
+    InterviewInvited --> OfferReceived
+    InterviewInvited --> Rejected
+  }
+  OfferReceived --> OfferComparison : Upload offer terms
+  OfferComparison --> Accepted : Candidate accepts
+  OfferComparison --> Declined : Candidate declines
+  Accepted --> [*]
+  Declined --> [*]
+```
 
 ---
 
-## 5. Feature-to-Pain-Point Matrix
+## 6. AI Agent Request & Execution Lifecycle
 
-| User Pain Point | Target User | Proposed Feature | Required System Components | Required Data | Security Considerations | Success Metric | Phase |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Career Path Uncertainty** | Newly qualified CA | Career Intelligence Engine & 6-pathway diagnostic | `CareerModule`, LLM Adapter, `Skill` Catalog | Articleship details, domain interests, preferred cities | Personal workspace isolation; no sharing with current employer | Completion of career diagnostic; reduction in time to career choice | **MVP** |
-| **2. Articleship Experience Gap** | CA Final passed / Fresh CA | Role-Specific Skill-Gap Analysis & Practical Roadmap | `CareerModule`, `LearningModule`, RAG Engine | Target job requirements vs articleship exposure | Objective scoring; no disparagement of articleship firms | $>75\%$ completion rate of assigned bridging tasks | **MVP** |
-| **3. Fragmented & Stale Job Listings** | All CA job seekers | Unified Verified Job Aggregator with Hybrid Search | `JobsModule`, Job Ingestion Worker, `pgvector`, Redis | Standardized job feeds from verified employers & APIs | Zero unauthorized scraping; source attribution check | Stale/ghost listing rate $<2\%$; search relevance CTR $>40\%$ | **MVP** |
-| **4. Generic Resumes Fail ATS** | Job applicants | Job-Specific ATS Resume Tailor with Provenance Link | `ResumeModule`, PDF/DOCX Generator, Prompt Guard | Candidate verified profile, Target Job Description | **Zero-Fabrication Guard (ADR-009)**; mandatory candidate attestation | Verified resume creation time $<10$ min; interview shortlist rate $+35\%$ | **MVP** |
-| **5. Technical Interview Anxiety** | Candidates facing corporate interviews | AI Mock Interview & Domain Case Simulator | `InterviewModule`, Speech-to-Text, Feedback Engine | Role question banks, Ind AS / Tax synthetic case studies | Synthetic data only; zero PII in audio storage; encrypted logs | $\ge 2$ mock sessions completed per candidate; score uplift $>20\%$ | **MVP** (Text), **Phase 2** (Voice) |
-| **6. Opaque CTC & Offer Comparison** | Candidates evaluating offers | CTC Unbundler & Offer Decision Matrix | `FinancialIntelModule`, Cost-of-Living Index API | Offer letter terms (fixed, variable, ESOPs, retiral) | Confidential offer storage; client-side unbundling; no employer leaks | $100\%$ candidate comprehension of in-hand vs CTC; decision time $<48$h | **MVP** |
-| **7. Scattered Applications & Tools** | Active job seekers | Unified Application Tracker & Follow-Up Automation | `JobsModule`, BullMQ Reminder Worker, Email Service | Application state, follow-up dates, recruiter correspondence | Idempotent status updates; strict user opt-in for alerts | Application follow-up rate $>80\%$; tracking completeness $>90\%$ | **MVP** |
-| **8. Independent Practice Hurdles** | CAs entering practice | Practice Setup Assistant & Lightweight Client CRM | `PracticeModule`, Compliance Calendar Worker | Post-qualification steps, KYC checklists, deadline schemas | ICAI Code of Ethics compliance; strictly no client solicitation | Practice setup completion time reduced from 30 days to 7 days | **Phase 3** |
+Every AI Career Agent tool call follows a deterministic execution lifecycle:
+
+```mermaid
+flowchart TD
+  REQ["AI Agent Tool Call Request"] --> AUTH{"Step 1: Auth &\nWorkspace Check"}
+  
+  AUTH -- "Invalid Token / Wrong Scope" --> REQ_DENIED["401 / 403 Forbidden\nLog Security Event"]
+  AUTH -- "Authorized" --> ALLOW{"Step 2: Tool Allowlist\n& Schema Validation"}
+
+  ALLOW -- "Unregistered Tool / Bad Schema" --> REQ_REJECTED["400 Bad Request\nLog Validation Failure"]
+  ALLOW -- "Valid" --> ROUTE{"Step 3: Permission\nTier Router"}
+
+  ROUTE -- "READ_ONLY" --> READ_PATH["Read-Only Pipeline\nQuery DB Replica or Cache"]
+  READ_PATH --> EXEC_READ["Return Safe Data\n(No State Mutation)"]
+
+  ROUTE -- "WRITE" --> IDEM_CHECK{"Step 4: Idempotency\nKey Check"}
+  IDEM_CHECK -- "Duplicate Key" --> REPLAY["Replay Cached Result\n(Prevent Double Mutation)"]
+  IDEM_CHECK -- "New Request" --> DB_TXN["Execute DB Transaction\nRollback on Error"]
+  DB_TXN --> TXN_OK["Commit & Cache Result"]
+
+  ROUTE -- "APPROVED EXTERNAL" --> APPROVAL_GATE["Step 4: Human-in-the-Loop Gate\nGenerate ApprovalRequest"]
+  APPROVAL_GATE --> USER_PROMPT{"User Confirmed\nin UI?"}
+  USER_PROMPT -- "Denied / Expired (15m)" --> ACTION_CANCELLED["Action Cancelled\nNotify Agent & User"]
+  USER_PROMPT -- "Explicitly Confirmed" --> EXT_CALL["Execute External Service\n(Apply / Message / Book)"]
+
+  ROUTE -- "DESTRUCTIVE" --> RETENTION{"Step 4: Legal Retention\nPolicy Active?"}
+  RETENTION -- "Active" --> BLOCKED["Deletion Blocked\nStatutory Retention Period"]
+  RETENTION -- "Eligible" --> CONFIRM_DIALOG{"Two-Step Confirmation\nVerified by User?"}
+  CONFIRM_DIALOG -- "Declined" --> ACTION_CANCELLED
+  CONFIRM_DIALOG -- "Confirmed" --> SOFT_DEL["Soft Delete & Tombstone\n(30-Day Recovery Grace)"]
+
+  EXEC_READ --> AUDIT["Privacy-Safe Audit Log\nActor · Tool · Outcome · Latency\n(Zero PII · Zero Raw Resume Text)"]
+  REPLAY --> AUDIT
+  TXN_OK --> AUDIT
+  EXT_CALL --> AUDIT
+  SOFT_DEL --> AUDIT
+  REQ_DENIED --> AUDIT
+  REQ_REJECTED --> AUDIT
+  ACTION_CANCELLED --> AUDIT
+  BLOCKED --> AUDIT
+```
 
 ---
 
-## 6. Multi-Tenant Isolation & Workspace Model
+## 7. Permission Tiers & Human-in-the-Loop Gateway
+
+| Tool Name | Permission Tier | Execution Behavior | Safety Guarantees |
+| :--- | :--- | :--- | :--- |
+| `get_user_profile` | **`READ_ONLY`** | Reads candidate profile data | Workspace-scoped; credentials excluded |
+| `get_user_preferences` | **`READ_ONLY`** | Reads target roles, cities, salary | Workspace-scoped read |
+| `search_jobs` | **`READ_ONLY`** | Hybrid lexical + semantic job query | Verified sources only; active listings |
+| `get_job_details` | **`READ_ONLY`** | Fetches detailed job description | Checks active expiration status |
+| `get_application_status` | **`READ_ONLY`** | Queries candidate's own pipeline | Personal workspace isolation |
+| `get_skill_gap_report` | **`READ_ONLY`** | Fetches latest skill gap diagnostic | Cached in Redis (1h TTL) |
+| `get_learning_tasks` | **`READ_ONLY`** | Lists assigned roadmap tasks | Scoped to active candidate profile |
+| `create_career_task` | **`WRITE`** | Inserts task into roadmap | Idempotency key; max 50 active tasks |
+| `update_user_preferences` | **`WRITE`** | Updates target domains/salary | Strict Zod validation; audit event |
+| `save_job` | **`WRITE`** | Bookmarks job for candidate | Prevents duplicate bookmarks |
+| `create_application_tracking_record` | **`WRITE`** | Creates tracking board record | Idempotency check; validates job existence |
+| `create_resume_draft` | **`WRITE`** | Generates tailored resume version | ADR-009 Zero-Fabrication guard |
+| `schedule_follow_up` | **`WRITE`** | Sets reminder date for application | Dispatches BullMQ reminder job |
+| `submit_job_application` | **`APPROVED EXTERNAL`** | Transmits application to employer | **Mandatory user click on approval card** |
+| `send_recruiter_message` | **`APPROVED EXTERNAL`** | Sends outreach to hiring manager | **Mandatory user preview & confirmation** |
+| `book_paid_mentorship` | **`APPROVED EXTERNAL`** | Initiates mentor payment session | **Mandatory payment checkout authorization** |
+| `delete_resume_version` | **`DESTRUCTIVE`** | Deletes tailored resume version | Two-step confirmation modal; soft-delete |
+| `remove_saved_personal_document` | **`DESTRUCTIVE`** | Deletes uploaded certificate | Validates document not linked to active app |
+| `delete_user_data` | **`DESTRUCTIVE`** | Full account erasure request | Statutory retention check; 14-day grace |
+
+---
+
+## 8. Idempotency, Retries, Failure Handling & Reconciliation
 
 ```
-+---------------------------------------------------------------------------------------------------------+
-|                                    WORKSPACE MULTI-TENANCY MODEL                                        |
-+---------------------------------------------------------------------------------------------------------+
-|                                                                                                         |
-|    +----------------------------------+          +------------------------------------+                 |
-|    |    PERSONAL WORKSPACE            |          |    ORGANIZATION WORKSPACE          |                 |
-|    |    (Owned by 1 Candidate)        |          |    (CA Firm / Corporate Employer)  |                 |
-|    +----------------------------------+          +------------------------------------+                 |
-|    | • Resumes & Tailored Versions    |          | • Employer Profile & Verification  |                 |
-|    | • Career Diagnostics & Roadmaps  |          | • Job Postings & Ingested Feeds    |                 |
-|    | • Interview Transcripts & Scores |          | • Applicant Tracking Pipeline      |                 |
-|    | • Saved Jobs & Applications      |          | • Team Members (Admin, Recruiter)  |                 |
-|    | • Confidential Offer Letters     |          | • Subscription & Team Invoicing    |                 |
-|    +----------------------------------+          +------------------------------------+                 |
-|                     |                                              |                                    |
-|                     +----------------------\      /----------------+                                    |
-|                                            v      v                                                     |
-|                           [POSTGRESQL MULTI-TENANT PERSISTENCE]                                         |
-|                           • Row-Level Security (RLS) enforcement                                        |
-|                           • Tenant ID on every query via WorkspaceGuard                                 |
-|                           • Zero cross-tenant data exposure guarantee                                   |
-|                                                                                                         |
-+---------------------------------------------------------------------------------------------------------+
+[Incoming Mutation Request]
+           │
+           ▼
+[Check SHA-256 Idempotency Key in Redis]
+           │
+           ├────► [Key Found with status: COMPLETED]
+           │            │
+           │            ▼
+           │      [Replay Cached Response (HTTP 200) without executing DB/API]
+           │
+           ├────► [Key Found with status: PROCESSING]
+           │            │
+           │            ▼
+           │      [Return HTTP 409 Conflict: Concurrent Operation in Progress]
+           │
+           └────► [Key Not Found]
+                        │
+                        ▼
+                  [Acquire Redis Distributed Lock (30s TTL)]
+                        │
+                        ▼
+                  [Execute Prisma DB Transaction]
+                        │
+                        ├────► [Transaction Success] ──► [Save Result, Mark COMPLETED, Release Lock]
+                        │
+                        └────► [Transaction Error]   ──► [Rollback DB, Delete Key, Release Lock]
+```
+
+- **Idempotency Strategy:** All `WRITE`, `APPROVED EXTERNAL`, and `DESTRUCTIVE` operations require an `Idempotency-Key` header (UUIDv4 or SHA-256 hash of operation payload). Cached results are stored in Redis with a 24-hour TTL.
+- **Retry Policy for External Side Effects:** If an external API call (`submit_job_application`) times out after client confirmation, the worker queries the downstream provider for operation status before retrying to prevent duplicate applications.
+- **Dead-Letter Queue & Reconciliation:** Failed background jobs move to a BullMQ Dead-Letter Queue (DLQ). A nightly reconciliation worker identifies dangling records and alerts engineering.
+
+---
+
+## 9. Workspace Multi-Tenancy & Data Isolation Model
+
+```
++───────────────────────────────────────────────────────────────────────────────────────────+
+|                                    WORKSPACE MULTI-TENANCY MODEL                          |
++───────────────────────────────────────────────────────────────────────────────────────────+
+|                                                                                           |
+|    +──────────────────────────────────+          +────────────────────────────────────+   |
+|    |    PERSONAL WORKSPACE            |          |    ORGANIZATION WORKSPACE          |   |
+|    |    (Owned by 1 Candidate)        |          |    (CA Firm / Corporate Employer)  |   |
+|    +──────────────────────────────────+          +────────────────────────────────────+   |
+|    | • Resumes & Tailored Versions    |          | • Employer Profile & Verification  |   |
+|    | • Career Diagnostics & Roadmaps  |          | • Job Postings & Ingested Feeds    |   |
+|    | • Interview Transcripts & Scores |          | • Applicant Tracking Pipeline      |   |
+|    | • Saved Jobs & Applications      |          | • Team Members (Admin, Recruiter)  |   |
+|    | • Confidential Offer Letters     |          | • Subscription & Team Invoicing    |   |
+|    +──────────────────────────────────+          +────────────────────────────────────+   |
+|                     │                                              │                      |
+|                     +──────────────────────\      /────────────────+                      |
+|                                            ▼      ▼                                       |
+|                           [POSTGRESQL MULTI-TENANT PERSISTENCE]                           |
+|                           • Row-Level Security (RLS) enforcement                          |
+|                           • Tenant ID on every query via WorkspaceGuard                   |
+|                           • Zero cross-tenant data exposure guarantee                     |
+|                                                                                           |
++───────────────────────────────────────────────────────────────────────────────────────────+
 ```
 
 ### Access Isolation Rules
@@ -280,869 +448,12 @@ The AI Career Agent is built on a **Permission-Aware Deterministic Gateway** ins
 
 ---
 
-## 7. Implementation Roadmap: MVP vs Future Phases
+## 10. Database Entities, Relationships & Ownership
 
-```
-+---------------------------------------------------------------------------------------------------+
-|                                      IMPLEMENTATION TIMELINE                                      |
-+---------------------------------------------------------------------------------------------------+
-|  [PHASE 1: MVP]                                                                                   |
-|  * Candidate Onboarding & Profile Engine                                                          |
-|  * Career Intelligence diagnostic & 30/60/90 roadmap                                              |
-|  * Direct Job Publishing + Partner Feed Ingestion                                                |
-|  * Hybrid Job Search & Match Scoring (Postgres FTS + pgvector)                                     |
-|  * ATS Resume Generator & Tailoring with Zero-Fabrication Guard                                   |
-|  * Application Tracking Board & Follow-up Notifications                                           |
-|  * Text-based Mock Technical Interviews & Scoring                                                 |
-|  * Basic CTC & Offer Comparison Calculator                                                        |
-|  * AI Career Agent with 4-Tier Permission Router & Approval Gate                                  |
-|  * Tamper-evident Audit Logging & Admin Controls                                                  |
-+---------------------------------------------------------------------------------------------------+
-|  [PHASE 2: ENHANCED INTELLIGENCE & COMMUNITY]                                                     |
-|  * Real-time Voice Mock Interviews (Speech-to-Text & Text-to-Speech)                              |
-|  * ATS Partner Integrations (Greenhouse, Lever, Darwinbox)                                        |
-|  * Advanced Financial Modeling & Audit Case Simulator Lab                                        |
-|  * Mentorship Marketplace with Calendar Scheduling & Razorpay Gateway                             |
-|  * Anonymous Salary Intelligence Engine with Cohort Percentiles                                   |
-|  * Verified Employer Badging & Company Profile Pages                                              |
-+---------------------------------------------------------------------------------------------------+
-|  [PHASE 3: ENTERPRISE & PRACTICE SUITE]                                                           |
-|  * Professional Practice Management Suite (Client CRM, KYC, Compliance Calendar)                  |
-|  * Enterprise Recruiter Analytics & Bulk Candidate Matching Pipeline                              |
-|  * WhatsApp Business API Alerts for High-Priority Interview Invites                               |
-|  * Alumni & Regional Chapter Professional Networking Circles                                      |
-|  * Continuous Professional Education (CPE) Credit Tracker with ICAI Guidelines                    |
-+---------------------------------------------------------------------------------------------------+
-```
-
----
-
-## 8. Architecture Diagrams Directory & Visual Previews
-
-All architecture diagrams are authored in pure Mermaid format to ensure GitHub-native rendering. You can view the standalone `.mmd` source files or examine the interactive diagrams embedded below.
-
----
-
-### Diagram 1: High-Level System Context (C4 Model)
-*Source:* [`./system-context.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/system-context.mmd)
-
-```mermaid
-C4Context
-  title CA Career OS — High-Level System Context
-
-  Person(candidate, "CA Candidate", "Newly qualified or recently cleared CA Final. Core product user seeking career guidance, job opportunities, and professional growth.")
-  Person(recruiter, "Recruiter / Employer", "Hiring manager or CA firm posting jobs and discovering candidates through the platform.")
-  Person(mentor, "Mentor", "Senior CA or industry professional offering paid or voluntary mentorship sessions.")
-  Person(platform_admin, "Platform Administrator", "Internal team member managing operational health, tenant oversight, and audited content access.")
-
-  System_Boundary(cacareer, "CA Career OS Platform") {
-    System(webapp, "Web Application", "Next.js / React / TypeScript. Responsive SaaS frontend. Candidate dashboard, recruiter portal, and admin console.")
-    System(backend, "Core SaaS Backend", "NestJS modular monolith. REST + tRPC API. Auth, career modules, job aggregation, AI orchestration, background workers.")
-    System(ai_agent, "AI Career Agent", "Permission-aware LLM orchestration layer. Retrieval-augmented tool execution with explicit approval gates and audit logging.")
-  }
-
-  System_Ext(job_sources, "External Job Sources", "Approved job board APIs, employer direct feeds, and platform-published listings. Each source has verified integration capability.")
-  System_Ext(ai_providers, "AI Model Providers", "Abstracted LLM provider interface. Google Gemini, OpenAI, or Anthropic Claude — interchangeable via provider adapter.")
-  System_Ext(notification_providers, "Notification Providers", "Email via SendGrid or Resend. Optional WhatsApp via Twilio or Meta Business API.")
-  System_Ext(icai_resources, "ICAI Official Resources", "Links and references to official ICAI documentation, membership portals, and regulatory guidance. Read-only reference integration.")
-  System_Ext(payment_gateway, "Payment Gateway", "Razorpay or Stripe India for subscription billing and paid mentorship transactions.")
-
-  SystemDb(postgres, "PostgreSQL", "Primary relational database. Application data, tenant isolation, vector embeddings via pgvector extension.")
-  SystemDb(redis, "Redis", "Session cache, job queue state, idempotency key store, rate-limit counters, and ephemeral agent context.")
-  SystemDb(object_storage, "Object Storage", "S3-compatible store for resumes, cover letters, profile documents, and audit log archives. Server-side encrypted.")
-
-  Rel(candidate, webapp, "Uses", "HTTPS")
-  Rel(recruiter, webapp, "Uses", "HTTPS")
-  Rel(mentor, webapp, "Uses", "HTTPS")
-  Rel(platform_admin, webapp, "Uses", "HTTPS / Admin Console")
-
-  Rel(webapp, backend, "API calls", "HTTPS / tRPC")
-  Rel(backend, ai_agent, "Orchestrates", "Internal")
-  Rel(backend, postgres, "Reads / Writes", "SSL")
-  Rel(backend, redis, "Cache / Queues", "TLS")
-  Rel(backend, object_storage, "Document ops", "HTTPS / S3 API")
-  Rel(ai_agent, ai_providers, "LLM inference", "HTTPS / API Key")
-  Rel(backend, job_sources, "Job ingestion", "HTTPS / Verified APIs")
-  Rel(backend, notification_providers, "Send alerts", "HTTPS / SMTP")
-  Rel(backend, payment_gateway, "Billing", "HTTPS")
-  Rel(backend, icai_resources, "Reference links", "HTTPS")
-```
-
----
-
-### Diagram 2: Detailed Layered System Architecture
-*Source:* [`./system-architecture.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/system-architecture.mmd)
-
-```mermaid
-flowchart TB
-  classDef layer fill:#1e293b,stroke:#334155,color:#f1f5f9,font-weight:bold
-  classDef module fill:#0f172a,stroke:#3b82f6,color:#93c5fd
-  classDef external fill:#1c1917,stroke:#78716c,color:#d6d3d1
-  classDef store fill:#14532d,stroke:#16a34a,color:#bbf7d0
-  classDef security fill:#7f1d1d,stroke:#dc2626,color:#fca5a5
-  classDef ai fill:#312e81,stroke:#6366f1,color:#c7d2fe
-  classDef worker fill:#1e1b4b,stroke:#8b5cf6,color:#ddd6fe
-  classDef obs fill:#1a2035,stroke:#0ea5e9,color:#bae6fd
-
-  subgraph PRESENTATION["🖥  Presentation Layer"]
-    direction LR
-    CAND_APP["Candidate Dashboard\n(Next.js / React / TypeScript)"]
-    RECRUITER_PORTAL["Recruiter Portal\n(Next.js)"]
-    ADMIN_CONSOLE["Admin Console\n(Next.js / Role-gated)"]
-  end
-
-  subgraph AUTH_LAYER["🔐 Authentication & Authorization  [Trust Boundary]"]
-    direction LR
-    AUTH_SVC["Auth Service\nJWT + Refresh Tokens\nOAuth2 Social Login"]
-    RBAC["RBAC Engine\nRole × Workspace Permissions\nLeast-Privilege Enforcement"]
-    SESSION["Session Store\n(Redis — short TTL)"]
-  end
-
-  subgraph API_LAYER["⚡ API Layer"]
-    direction LR
-    REST_API["REST API\n(NestJS Controllers)"]
-    TRPC_API["tRPC Router\n(Type-safe RPC)"]
-    RATE_LIMITER["Rate Limiter\n(Redis Token Bucket)"]
-    API_GUARD["Request Validator\nZod Schema + JWT Guard"]
-  end
-
-  subgraph CAREER_MODULES["📚 Core Career Modules  [Modular Monolith]"]
-    direction TB
-    subgraph MOD_A["Career Intelligence"]
-      CI["Profile & Skills\nInventory\nCareer Path AI\nSkill-Gap Analysis\n30/60/90-Day Roadmap"]
-    end
-    subgraph MOD_B["Jobs & Recruitment"]
-      JR["Job Aggregator\nSemantic Search\nMatch Scoring\nApplication Tracker\nRecruiter Dashboard"]
-    end
-    subgraph MOD_C["Resume & Branding"]
-      RB["ATS Resume Builder\nJob Tailoring\nCover Letter Gen\nLinkedIn Optimizer\nPortfolio Builder"]
-    end
-    subgraph MOD_D["Interview & Skills Lab"]
-      IS["Mock Interviews\nQuestion Bank\nFeedback Engine\nAudit Simulations\nFinance Exercises"]
-    end
-    subgraph MOD_E["Career & Financial Intel"]
-      CF["Salary Insights\nOffer Comparator\nMentor Marketplace\nCommunity Network"]
-    end
-    subgraph MOD_F["Practice Management"]
-      PM["Post-Qual Checklist\nICAAI Resource Links\nClient CRM (Lite)\nTask & Doc Reminders"]
-    end
-  end
-
-  subgraph JOB_AGGREGATION["🔄 Job Aggregation & Normalization Worker"]
-    direction LR
-    JOB_FETCH["Source Fetcher\n(Verified APIs only)"]
-    JOB_NORM["Normalizer &\nDeduplicator"]
-    JOB_FRESH["Freshness Checker\n(TTL + re-verify)"]
-    JOB_INDEX["pgvector Indexer\n(Semantic embeddings)"]
-  end
-
-  subgraph AI_ORCH["🤖 AI Orchestration Layer"]
-    direction TB
-    AGENT_CORE["AI Career Agent\n(Stateful Orchestrator)"]
-    TOOL_POLICY["Tool Policy Engine\nAllowlist + JSON Schema\nPermission Router"]
-    APPROVAL_GW["Approval Gateway\nHuman-in-the-Loop\nExplicit Consent Store"]
-    LLM_ADAPTER["LLM Provider Adapter\n(Gemini / GPT-4 / Claude)\nStructured Output Enforcer"]
-    RAG_ENGINE["RAG Engine\nChunk Store + Retrieval\nSource Citation Builder"]
-    PROMPT_GUARD["Prompt Guard\nInjection Detector\nDoc Sanitizer"]
-  end
-
-  subgraph BG_WORKERS["⚙️ Background Workers  (BullMQ + Redis)"]
-    direction LR
-    EMAIL_WORKER["Email / WhatsApp\nNotification Worker"]
-    EMBED_WORKER["Embedding\nGeneration Worker"]
-    REMINDER_WORKER["Follow-Up\nReminder Worker"]
-    AUDIT_WRITER["Audit Event\nWriter"]
-    CRON_JOBS["Scheduled Jobs\nJob Refresh · Salary Sync\nSubscription Checks"]
-  end
-
-  subgraph PERSISTENCE["🗄  Persistence & Cache"]
-    direction LR
-    PG[("PostgreSQL\nApplication Data\npgvector Embeddings\nTenant-Isolated Schemas")]
-    REDIS_STORE[("Redis\nSessions · Queues\nIdempotency Keys\nRate-Limit Counters")]
-    S3[("Object Storage\nResumes · Documents\nAudit Archives\nServer-Side Encrypted")]
-  end
-
-  subgraph EXTERNAL["🌐 External Integrations"]
-    direction LR
-    JOB_APIS["Approved Job APIs\n(Naukri, LinkedIn, etc.)"]
-    AI_PROV["AI Providers\n(Gemini / OpenAI / Anthropic)"]
-    NOTIFY["Notification Services\n(SendGrid · Twilio)"]
-    PAYMENT["Payment Gateway\n(Razorpay / Stripe India)"]
-    ICAI["ICAI Portal\n(Reference Links Only)"]
-  end
-
-  subgraph OBSERVABILITY["📊 Observability & Audit  [Always On]"]
-    direction LR
-    AUDIT_LOG["Audit Log Store\nActor · Op · Outcome\nTimestamp · CorrelationID"]
-    METRICS["Metrics & Tracing\n(OpenTelemetry · Grafana)"]
-    ALERTS["Alerting\n(PagerDuty / Slack)"]
-    PRIVACY_LOG["Privacy-Safe App Logs\nNo PII · No Tokens\nNo Resume Content"]
-  end
-
-  PRESENTATION --> AUTH_LAYER
-  AUTH_LAYER --> API_LAYER
-  API_LAYER --> CAREER_MODULES
-  API_LAYER --> AI_ORCH
-  CAREER_MODULES --> JOB_AGGREGATION
-  AI_ORCH --> CAREER_MODULES
-  AI_ORCH --> APPROVAL_GW
-  CAREER_MODULES --> BG_WORKERS
-  AI_ORCH --> BG_WORKERS
-  CAREER_MODULES --> PERSISTENCE
-  AI_ORCH --> PERSISTENCE
-  JOB_AGGREGATION --> PERSISTENCE
-  BG_WORKERS --> PERSISTENCE
-  BG_WORKERS --> EXTERNAL
-  CAREER_MODULES --> EXTERNAL
-  AI_ORCH --> EXTERNAL
-  BG_WORKERS --> OBSERVABILITY
-  CAREER_MODULES --> OBSERVABILITY
-  AI_ORCH --> OBSERVABILITY
-  API_LAYER --> OBSERVABILITY
-```
-
----
-
-### Diagram 3: AI Agent Permission and Execution Flow
-*Source:* [`./agent-execution-flow.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/agent-execution-flow.mmd)
-
-```mermaid
-flowchart TD
-  classDef reqNode   fill:#1e293b,stroke:#3b82f6,color:#bfdbfe,font-weight:bold
-  classDef authNode  fill:#1e1b4b,stroke:#6366f1,color:#c7d2fe
-  classDef policyNode fill:#1c1917,stroke:#f59e0b,color:#fde68a
-  classDef readNode  fill:#14532d,stroke:#22c55e,color:#bbf7d0
-  classDef writeNode fill:#1e3a5f,stroke:#3b82f6,color:#bfdbfe
-  classDef extNode   fill:#3b1f00,stroke:#f97316,color:#fed7aa
-  classDef destNode  fill:#450a0a,stroke:#ef4444,color:#fca5a5
-  classDef auditNode fill:#0c1425,stroke:#0ea5e9,color:#bae6fd
-  classDef errorNode fill:#3b0764,stroke:#a855f7,color:#e9d5ff
-  classDef cacheNode fill:#1a2e1a,stroke:#4ade80,color:#bbf7d0
-  classDef userNode  fill:#0f2027,stroke:#06b6d4,color:#a5f3fc
-  classDef successNode fill:#052e16,stroke:#16a34a,color:#bbf7d0
-
-  USER(["👤 User / AI Agent\nTool Request"]):::userNode
-
-  AUTH{"🔐 Step 1\nAuthenticate\nJWT Validation"}:::authNode
-  AUTH_FAIL(["❌ 401 Unauthorized\nReturn Error"]):::errorNode
-
-  WS_AUTH{"🏢 Step 2\nWorkspace\nAuthorization\nScope Check"}:::authNode
-  WS_FAIL(["❌ 403 Forbidden\nWorkspace Access\nDenied"]):::errorNode
-
-  TOOL_ALLOW{"📋 Step 3\nTool Allowlist\nCheck"}:::policyNode
-  TOOL_DENY(["❌ 403 Tool Not\nPermitted"]):::errorNode
-
-  SCHEMA_VAL{"📐 Step 4\nJSON Schema\nValidation"}:::policyNode
-  SCHEMA_FAIL(["❌ 400 Invalid\nRequest Schema"]):::errorNode
-
-  RATE_CHECK{"⏱ Step 5\nRate Limit\nCheck"}:::policyNode
-  RATE_FAIL(["⏳ 429 Rate\nLimit Exceeded"]):::errorNode
-
-  PERM_ROUTER{"🔀 Step 6\nPermission\nRouter"}:::policyNode
-
-  subgraph READ_PATH["✅ READ_ONLY Path  (No side effects)"]
-    direction TB
-    READ_OPS["📖 Tools:\nget_user_profile\nget_user_preferences\nsearch_jobs\nget_job_details\nget_application_status\nget_skill_gap_report\nget_learning_tasks"]:::readNode
-    READ_CACHE{"💾 Cache\nHit?"}:::cacheNode
-    READ_DB["🗄 Query\nDatabase\n(Read replica)"]:::readNode
-    READ_CACHE_STORE["📦 Store in\nCache (TTL)"]:::cacheNode
-  end
-
-  subgraph WRITE_PATH["✏️  WRITE Path  (Controlled mutations)"]
-    direction TB
-    WRITE_OPS["📝 Tools:\ncreate_career_task\nupdate_user_preferences\nsave_job\ncreate_application_tracking_record\ncreate_resume_draft\nschedule_follow_up"]:::writeNode
-    IDEMPOTENCY{"🔑 Idempotency\nKey Present?"}:::cacheNode
-    IDEMPOTENCY_CACHED["📦 Return Cached\nResult (Replay)"]:::cacheNode
-    IDEMPOTENCY_GEN["🔑 Generate &\nStore Idem. Key\n(Redis, 24h TTL)"]:::cacheNode
-    TXN_EXEC["🔄 Execute DB\nTransaction\n(Prisma + PG)"]:::writeNode
-    TXN_FAIL(["⚠️ Rollback\nTransaction\nReturn 500"]):::errorNode
-    IDEMPOTENCY_MARK["✅ Mark Idem. Key\nas COMPLETED"]:::cacheNode
-  end
-
-  subgraph EXT_PATH["🟠 EXPLICITLY APPROVED EXTERNAL Actions"]
-    direction TB
-    EXT_OPS["🌐 Tools:\nsubmit_job_application\nsend_recruiter_message\nbook_paid_mentorship"]:::extNode
-    INTENT_CHECK{"✋ User Intent\n& Consent\nValidated?"}:::extNode
-    INTENT_FAIL(["❌ Action Cancelled\nRequire Explicit\nUser Confirmation"]):::errorNode
-    APPROVAL_UI["📱 Present Approval\nRequest to User\n(Action details + consequences)"]:::extNode
-    USER_CONFIRM{"👆 User\nConfirmed?"}:::extNode
-    EXT_IDEM{"🔑 Idempotency\nKey Check\n(Prevent duplicate\nexternal calls)"}:::cacheNode
-    EXT_EXEC["🚀 Execute External\nAction via Service\n(Rate-limited, timeout)"]:::extNode
-    EXT_FAIL(["⚠️ External\nAction Failed\nNotify User"]):::errorNode
-  end
-
-  subgraph DEST_PATH["🔴 DESTRUCTIVE Path  (Explicit confirmation required)"]
-    direction TB
-    DEST_OPS["🗑 Tools:\ndelete_resume_version\nremove_saved_personal_document\ndelete_user_data"]:::destNode
-    RETENTION_CHECK{"📅 Legal\nRetention\nPolicy Check"}:::destNode
-    RETENTION_BLOCK(["🚫 Deletion Blocked\nRetention Period\nActive"]):::errorNode
-    FINAL_CONFIRM["📱 Show Final\nConfirmation Dialog\n(Non-reversible warning)"]:::destNode
-    DEST_CONFIRM{"☑️ Explicit\nUser Confirmed?"}:::destNode
-    DEST_CANCEL(["✋ Action\nCancelled"]):::errorNode
-    SOFT_DELETE["🗂 Soft-Delete\n+ Tombstone\nRecord"]:::destNode
-    HARD_DELETE_QUEUE["🗑 Queue Hard\nDelete (Async,\n30-day grace)"]:::destNode
-  end
-
-  subgraph AUDIT_LAYER["📊 Audit & Telemetry  (Every execution path)"]
-    direction LR
-    AUDIT_LOG["📋 Audit Event:\nactor · workspace · tool\noperation · outcome\ntimestamp · correlationID"]:::auditNode
-    PRIVACY_SAFE["🔒 Privacy Filter:\nNo PII · No tokens\nNo resume content\nNo secrets in logs"]:::auditNode
-    METRICS["📈 Metrics:\nlatency · error rate\ntool usage · approval rate"]:::auditNode
-    ALERT["🔔 Alert on:\nunauth attempts\nerror spikes\nsuspicious patterns"]:::auditNode
-  end
-
-  SUCCESS(["✅ Return Result\nto Caller"]):::successNode
-
-  USER --> AUTH
-  AUTH -- "Invalid Token" --> AUTH_FAIL
-  AUTH -- "Valid" --> WS_AUTH
-  WS_AUTH -- "No Access" --> WS_FAIL
-  WS_AUTH -- "Authorized" --> TOOL_ALLOW
-  TOOL_ALLOW -- "Not in Allowlist" --> TOOL_DENY
-  TOOL_ALLOW -- "Permitted" --> SCHEMA_VAL
-  SCHEMA_VAL -- "Invalid" --> SCHEMA_FAIL
-  SCHEMA_VAL -- "Valid" --> RATE_CHECK
-  RATE_CHECK -- "Exceeded" --> RATE_FAIL
-  RATE_CHECK -- "OK" --> PERM_ROUTER
-
-  PERM_ROUTER -- "READ_ONLY" --> READ_OPS
-  PERM_ROUTER -- "WRITE" --> WRITE_OPS
-  PERM_ROUTER -- "EXTERNAL" --> EXT_OPS
-  PERM_ROUTER -- "DESTRUCTIVE" --> DEST_OPS
-
-  READ_OPS --> READ_CACHE
-  READ_CACHE -- "HIT" --> SUCCESS
-  READ_CACHE -- "MISS" --> READ_DB
-  READ_DB --> READ_CACHE_STORE --> SUCCESS
-
-  WRITE_OPS --> IDEMPOTENCY
-  IDEMPOTENCY -- "Key exists\n(already processed)" --> IDEMPOTENCY_CACHED --> SUCCESS
-  IDEMPOTENCY -- "New request" --> IDEMPOTENCY_GEN
-  IDEMPOTENCY_GEN --> TXN_EXEC
-  TXN_EXEC -- "Error" --> TXN_FAIL
-  TXN_EXEC -- "Success" --> IDEMPOTENCY_MARK --> SUCCESS
-
-  EXT_OPS --> INTENT_CHECK
-  INTENT_CHECK -- "Not validated" --> INTENT_FAIL
-  INTENT_CHECK -- "Validated" --> APPROVAL_UI
-  APPROVAL_UI --> USER_CONFIRM
-  USER_CONFIRM -- "Denied / Timeout" --> DEST_CANCEL
-  USER_CONFIRM -- "Confirmed" --> EXT_IDEM
-  EXT_IDEM -- "Duplicate\n(already sent)" --> IDEMPOTENCY_CACHED
-  EXT_IDEM -- "New" --> EXT_EXEC
-  EXT_EXEC -- "Failure" --> EXT_FAIL
-  EXT_EXEC -- "Success" --> SUCCESS
-
-  DEST_OPS --> RETENTION_CHECK
-  RETENTION_CHECK -- "Retention Active" --> RETENTION_BLOCK
-  RETENTION_CHECK -- "OK to Delete" --> FINAL_CONFIRM
-  FINAL_CONFIRM --> DEST_CONFIRM
-  DEST_CONFIRM -- "Not Confirmed" --> DEST_CANCEL
-  DEST_CONFIRM -- "Confirmed" --> SOFT_DELETE
-  SOFT_DELETE --> HARD_DELETE_QUEUE --> SUCCESS
-
-  SUCCESS --> AUDIT_LOG
-  AUTH_FAIL --> AUDIT_LOG
-  WS_FAIL --> AUDIT_LOG
-  TOOL_DENY --> AUDIT_LOG
-  INTENT_FAIL --> AUDIT_LOG
-  RETENTION_BLOCK --> AUDIT_LOG
-  TXN_FAIL --> AUDIT_LOG
-  EXT_FAIL --> AUDIT_LOG
-  AUDIT_LOG --> PRIVACY_SAFE
-  PRIVACY_SAFE --> METRICS
-  METRICS --> ALERT
-```
-
----
-
-### Diagram 4: Core CA User Journey (Dual Pathways)
-*Source:* [`./user-journey.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/user-journey.mmd)
-
-```mermaid
-flowchart TD
-  classDef milestone fill:#1e293b,stroke:#3b82f6,color:#bfdbfe,font-weight:bold
-  classDef action    fill:#0f172a,stroke:#64748b,color:#94a3b8
-  classDef ai        fill:#312e81,stroke:#6366f1,color:#c7d2fe
-  classDef alt       fill:#1c1917,stroke:#d97706,color:#fde68a
-  classDef decision  fill:#1e1b4b,stroke:#8b5cf6,color:#ddd6fe
-
-  START(["🎓 CA Final Cleared\nor Newly Qualified CA"]):::milestone
-
-  ONBOARD["📋 Onboarding & Profile Setup\n• Qualification details · Articleship area\n• Preferred city · Work type\n• Role interest · Salary expectation"]:::action
-
-  CAREER_DISC["🧭 Career Intelligence\n• AI path recommendations\n• 6 domain pathway options\n• Peer cohort comparison (anonymous)"]:::ai
-
-  SKILL_GAP["📊 Skill-Gap Analysis\n• Role-specific skill inventory\n• Articleship vs. target role delta\n• Prioritised learning plan"]:::ai
-
-  PATH_CHOICE{"Which path?"}:::decision
-
-  subgraph EMPLOYMENT["💼 Employment Path"]
-    direction TB
-    JOB_MATCH["🔍 Job Matching\n• Semantic search + score\n• Freshness verified\n• Explainable match reason"]:::ai
-    RESUME_TAILOR["📄 Resume Tailoring\n• ATS-optimised per role\n• Verified claims only\n• Cover letter generation"]:::ai
-    APP_TRACK["📌 Application Tracking\n• Status per application\n• Follow-up reminders\n• Recruiter interactions"]:::action
-    INTERVIEW_PREP["🎤 Interview Preparation\n• Role-specific question bank\n• Mock interview sessions\n• Feedback & progress score"]:::ai
-    OFFER_COMPARE["💰 Offer Comparison\n• CTC breakdown\n• Fixed vs. variable analysis\n• Benefits normalisation"]:::action
-    JOB_ACCEPT["✅ Job Selection\n• Approved submission\n• Offer letter storage\n• Onboarding checklist"]:::action
-    FIRST_90["🚀 First 90 Days\n• Role-specific milestones\n• Learning tasks\n• Mentor access"]:::action
-    LONG_TERM["📈 Long-Term Growth\n• Skill upgrades\n• Role re-assessment\n• Community & alumni"]:::action
-  end
-
-  subgraph PRACTICE["🏢 Independent Practice Path"]
-    direction TB
-    POST_QUAL["📋 Post-Qualification Checklist\n• ICAI membership steps\n• COP application guidance\n• Official resource links"]:::alt
-    PRACTICE_SETUP["⚙️ Practice Setup\n• Office, branding, tools\n• GST, Income Tax registrations\n• Professional indemnity"]:::alt
-    CLIENT_CRM["👥 Client Onboarding\n• Engagement letters\n• KYC & document requests\n• Task & deadline reminders"]:::alt
-    PRACTICE_GROW["📊 Practice Growth\n• Service expansion planning\n• Staff & partner onboarding\n• Compliance calendar"]:::alt
-  end
-
-  START --> ONBOARD
-  ONBOARD --> CAREER_DISC
-  CAREER_DISC --> SKILL_GAP
-  SKILL_GAP --> PATH_CHOICE
-
-  PATH_CHOICE -- "Employment" --> JOB_MATCH
-  JOB_MATCH --> RESUME_TAILOR
-  RESUME_TAILOR --> APP_TRACK
-  APP_TRACK --> INTERVIEW_PREP
-  INTERVIEW_PREP --> OFFER_COMPARE
-  OFFER_COMPARE --> JOB_ACCEPT
-  JOB_ACCEPT --> FIRST_90
-  FIRST_90 --> LONG_TERM
-  LONG_TERM -- "Career pivot\nor advancement" --> CAREER_DISC
-
-  PATH_CHOICE -- "Independent Practice" --> POST_QUAL
-  POST_QUAL --> PRACTICE_SETUP
-  PRACTICE_SETUP --> CLIENT_CRM
-  CLIENT_CRM --> PRACTICE_GROW
-  PRACTICE_GROW -- "Add employment\noption later" --> PATH_CHOICE
-
-  AI_AGENT["🤖 AI Career Agent\nAvailable at every stage\nREAD · WRITE · Approved external\nNever acts without permission"]:::ai
-  AI_AGENT -.->|"assists"| CAREER_DISC
-  AI_AGENT -.->|"assists"| SKILL_GAP
-  AI_AGENT -.->|"assists"| JOB_MATCH
-  AI_AGENT -.->|"assists"| RESUME_TAILOR
-  AI_AGENT -.->|"assists"| INTERVIEW_PREP
-  AI_AGENT -.->|"assists"| OFFER_COMPARE
-  AI_AGENT -.->|"assists"| FIRST_90
-```
-
----
-
-### Diagram 5: Job Application Workflow State Machine
-*Source:* [`./job-application-workflow.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/job-application-workflow.mmd)
-
-```mermaid
-stateDiagram-v2
-  [*] --> JobDiscovered : Job ingested from source
-
-  state JobDiscovered {
-    [*] --> Normalising
-    Normalising --> Deduplicating
-    Deduplicating --> FreshnessVerified
-    FreshnessVerified --> Indexed
-    Indexed --> [*]
-  }
-
-  JobDiscovered --> Available : Passes quality checks
-
-  state Available {
-    direction LR
-    [*] --> Searchable
-    Searchable --> SavedByCandidate : Candidate saves job
-    Searchable --> AlertSent : Matches job alert
-  }
-
-  SavedByCandidate --> ResumeVersionSelected : Candidate picks resume
-  AlertSent --> ResumeVersionSelected
-
-  state ResumeVersionSelected {
-    [*] --> SelectingVersion
-    SelectingVersion --> Tailoring : Candidate requests tailoring
-    Tailoring --> TailoredDraftReady
-    TailoredDraftReady --> CandidateReviewing
-    CandidateReviewing --> ApprovedForApplication : Candidate approves
-    CandidateReviewing --> Tailoring : Revise
-  }
-
-  ApprovedForApplication --> EligibilityCheck
-
-  state EligibilityCheck {
-    [*] --> CheckingRequirements
-    CheckingRequirements --> EligibilityMet : Requirements met
-    CheckingRequirements --> EligibilityWarning : Partial match
-    CheckingRequirements --> EligibilityFailed : Hard requirement missing
-    EligibilityWarning --> CandidateProceedsAnyway : User explicitly continues
-    EligibilityFailed --> [*] : Blocked — inform candidate
-  }
-
-  EligibilityMet --> PendingExplicitApproval
-  CandidateProceedsAnyway --> PendingExplicitApproval
-
-  state PendingExplicitApproval {
-    [*] --> ShowingApprovalDialog
-    ShowingApprovalDialog --> UserConfirmed : "Submit Application" clicked
-    ShowingApprovalDialog --> UserDeclined : Cancelled or timeout
-    UserDeclined --> [*]
-  }
-
-  UserConfirmed --> IdempotencyCheck
-
-  state IdempotencyCheck {
-    [*] --> CheckingKey
-    CheckingKey --> DuplicateDetected : Key already exists
-    CheckingKey --> NewSubmission : First attempt
-    DuplicateDetected --> ReplayingResult
-    ReplayingResult --> [*]
-  }
-
-  NewSubmission --> ApplicationSubmitted : External action via service
-
-  ApplicationSubmitted --> Tracking
-
-  state Tracking {
-    direction LR
-    [*] --> Applied
-    Applied --> AcknowledgedByEmployer : Employer viewed
-    Applied --> NoResponse
-    AcknowledgedByEmployer --> InterviewInvited
-    AcknowledgedByEmployer --> Rejected
-    InterviewInvited --> InterviewPrepStarted
-    InterviewPrepStarted --> InterviewCompleted
-    InterviewCompleted --> OfferReceived
-    InterviewCompleted --> Rejected
-    NoResponse --> FollowUpSent : Reminder triggered
-    FollowUpSent --> AcknowledgedByEmployer
-    FollowUpSent --> NoResponseFinal
-  }
-
-  OfferReceived --> OfferComparison
-  Rejected --> PostMortemFeedback
-  NoResponseFinal --> Archived
-
-  state OfferComparison {
-    [*] --> CTCAnalysis
-    CTCAnalysis --> BenefitsNormalisation
-    BenefitsNormalisation --> ComparisonReady
-  }
-
-  OfferComparison --> Accepted : Candidate accepts
-  OfferComparison --> Declined : Candidate declines
-
-  Accepted --> OfferLetterStored
-  Declined --> Archived
-  PostMortemFeedback --> Archived
-
-  OfferLetterStored --> [*]
-  Archived --> [*]
-```
-
----
-
-### Diagram 6: Data Architecture & Entity-Relationship Model
-*Source:* [`./data-architecture.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/data-architecture.mmd)
+The system persistence model is defined across 21 relational entities:
 
 ```mermaid
 erDiagram
-  User {
-    uuid id PK
-    string email UK
-    string hashedPassword "bcrypt, never plain"
-    string firstName
-    string lastName
-    enum role "CANDIDATE | RECRUITER | MENTOR | ORG_ADMIN | PLATFORM_ADMIN"
-    boolean emailVerified
-    timestamp createdAt
-    timestamp updatedAt
-    timestamp deletedAt "soft delete"
-  }
-
-  Workspace {
-    uuid id PK
-    enum type "PERSONAL | ORGANIZATION"
-    string name
-    string slug UK
-    uuid ownerId FK
-    jsonb settings
-    timestamp createdAt
-  }
-
-  WorkspaceMembership {
-    uuid id PK
-    uuid workspaceId FK
-    uuid userId FK
-    enum memberRole "OWNER | ADMIN | MEMBER | RECRUITER | VIEWER"
-    boolean isDefault
-    timestamp joinedAt
-  }
-
-  Subscription {
-    uuid id PK
-    uuid workspaceId FK
-    enum plan "FREE | PRO | TEAM | ENTERPRISE"
-    enum status "ACTIVE | PAST_DUE | CANCELLED | TRIALING"
-    string externalSubscriptionId "Payment gateway ref"
-    timestamp currentPeriodEnd
-    timestamp createdAt
-  }
-
-  CandidateProfile {
-    uuid id PK
-    uuid userId FK
-    uuid workspaceId FK
-    string icaiMembershipNo "Optional, user-provided"
-    date qualificationDate
-    string articleshipFirm
-    string_array articleshipAreas
-    string_array targetCities
-    enum workType "FULL_TIME | PART_TIME | CONSULTING | PRACTICE"
-    integer targetSalaryMin
-    integer targetSalaryMax
-    string summary
-    timestamp updatedAt
-  }
-
-  CareerPreference {
-    uuid id PK
-    uuid candidateProfileId FK
-    string_array preferredDomains
-    string_array preferredRoles
-    string_array preferredSectors
-    integer noticePeriodDays
-    boolean openToRelocation
-    jsonb additionalPreferences
-    timestamp updatedAt
-  }
-
-  Skill {
-    uuid id PK
-    string name UK
-    string category "domain | tool | soft"
-    string normalizedName
-  }
-
-  CandidateSkill {
-    uuid id PK
-    uuid candidateProfileId FK
-    uuid skillId FK
-    enum proficiency "BEGINNER | INTERMEDIATE | ADVANCED | EXPERT"
-    string source "articleship | self-declared | assessed"
-    boolean verified
-    timestamp addedAt
-  }
-
-  SkillGapReport {
-    uuid id PK
-    uuid candidateProfileId FK
-    string targetRole
-    jsonb gapAnalysis "required vs present skills"
-    jsonb learningPlan
-    timestamp generatedAt
-    timestamp expiresAt
-  }
-
-  Employer {
-    uuid id PK
-    uuid workspaceId FK "org workspace"
-    string name
-    string domain UK
-    boolean verified
-    enum verificationStatus "PENDING | VERIFIED | SUSPENDED"
-    string logoUrl "object storage path"
-    timestamp verifiedAt
-  }
-
-  JobSource {
-    uuid id PK
-    string name UK
-    string type "DIRECT_API | EMPLOYER_FEED | PLATFORM"
-    string baseUrl
-    boolean active
-    jsonb integrationCapabilityCheck "documented at setup time"
-    timestamp lastFetchedAt
-  }
-
-  Job {
-    uuid id PK
-    uuid employerId FK
-    uuid jobSourceId FK
-    string externalId "source-specific ID"
-    string title
-    string normalizedTitle
-    text description
-    string_array requiredSkills
-    string_array preferredSkills
-    string location
-    enum workMode "ON_SITE | HYBRID | REMOTE"
-    integer salaryMin
-    integer salaryMax
-    string currency "INR"
-    enum status "ACTIVE | EXPIRED | FILLED | REMOVED"
-    timestamp postedAt
-    timestamp expiresAt
-    timestamp lastVerifiedAt
-    vector embedding "pgvector 1536-dim"
-    timestamp createdAt
-  }
-
-  JobMatch {
-    uuid id PK
-    uuid jobId FK
-    uuid candidateProfileId FK
-    float matchScore "0.0–1.0"
-    jsonb matchReasons "explainable factors"
-    boolean shownToCandidate
-    timestamp calculatedAt
-  }
-
-  Resume {
-    uuid id PK
-    uuid candidateProfileId FK
-    uuid workspaceId FK
-    string title
-    boolean isDefault
-    timestamp createdAt
-  }
-
-  ResumeVersion {
-    uuid id PK
-    uuid resumeId FK
-    integer versionNumber
-    string objectStoragePath "S3 path — access-controlled"
-    enum format "PDF | DOCX"
-    boolean isTailored
-    uuid tailoredForJobId FK "nullable"
-    string atsScore "provider-generated, nullable"
-    enum status "DRAFT | APPROVED | ARCHIVED | DELETED"
-    timestamp createdAt
-    timestamp deletedAt "soft delete"
-  }
-
-  Application {
-    uuid id PK
-    uuid candidateProfileId FK
-    uuid jobId FK
-    uuid resumeVersionId FK
-    enum status "SAVED | APPLIED | ACKNOWLEDGED | INTERVIEWING | OFFERED | ACCEPTED | REJECTED | WITHDRAWN | ARCHIVED"
-    string appliedVia "platform | direct"
-    boolean submittedByPlatform
-    timestamp appliedAt
-    timestamp statusUpdatedAt
-    timestamp followUpAt
-    text notes "candidate personal notes"
-  }
-
-  ApprovalRequest {
-    uuid id PK
-    uuid userId FK
-    uuid workspaceId FK
-    string toolName "submit_job_application | send_recruiter_message | book_paid_mentorship"
-    jsonb actionPayload
-    enum status "PENDING | APPROVED | DENIED | EXPIRED"
-    string correlationId
-    timestamp requestedAt
-    timestamp resolvedAt
-    timestamp expiresAt
-  }
-
-  InterviewSession {
-    uuid id PK
-    uuid candidateProfileId FK
-    uuid jobId FK "nullable — may be general practice"
-    string domain
-    enum mode "TEXT | VOICE"
-    enum status "IN_PROGRESS | COMPLETED | ABANDONED"
-    integer durationSeconds
-    timestamp startedAt
-    timestamp endedAt
-  }
-
-  InterviewFeedback {
-    uuid id PK
-    uuid sessionId FK
-    jsonb questionAnswerPairs "synthetic/licensed data only"
-    jsonb scores "technical | communication | structure"
-    text overallFeedback
-    string_array improvementAreas
-    timestamp generatedAt
-  }
-
-  LearningTask {
-    uuid id PK
-    uuid candidateProfileId FK
-    uuid skillGapReportId FK "nullable"
-    string title
-    text description
-    string resourceUrl "licensed or official source"
-    enum status "TODO | IN_PROGRESS | COMPLETED | SKIPPED"
-    timestamp dueDate
-    timestamp completedAt
-  }
-
-  MentorBooking {
-    uuid id PK
-    uuid mentorUserId FK
-    uuid candidateUserId FK
-    enum status "PENDING | CONFIRMED | COMPLETED | CANCELLED"
-    timestamp scheduledAt
-    integer durationMinutes
-    string meetingLink "nullable"
-    boolean isPaid
-    string paymentRef "external payment ref, nullable"
-    timestamp createdAt
-  }
-
-  AIConversation {
-    uuid id PK
-    uuid userId FK
-    uuid workspaceId FK
-    string title
-    jsonb metadata "model used, token counts"
-    timestamp startedAt
-    timestamp lastActiveAt
-  }
-
-  AgentToolExecution {
-    uuid id PK
-    uuid conversationId FK
-    uuid approvalRequestId FK "nullable"
-    string toolName
-    enum permissionLevel "READ_ONLY | WRITE | EXTERNAL | DESTRUCTIVE"
-    enum status "PENDING | COMPLETED | FAILED | REJECTED | REPLAYED"
-    string idempotencyKey
-    jsonb inputHash "hashed — no PII in logs"
-    jsonb outputSummary "non-sensitive summary only"
-    integer durationMs
-    string correlationId
-    timestamp executedAt
-  }
-
-  IdempotencyRecord {
-    uuid id PK
-    string key UK "SHA-256 of operation signature"
-    string toolName
-    enum status "PROCESSING | COMPLETED | FAILED"
-    jsonb cachedResult "sanitised response"
-    timestamp createdAt
-    timestamp expiresAt
-  }
-
-  AuditEvent {
-    uuid id PK
-    uuid actorId FK "userId or system"
-    uuid workspaceId FK
-    string operation
-    string resourceType
-    uuid resourceId
-    enum outcome "SUCCESS | FAILURE | DENIED | CANCELLED"
-    jsonb metadata "no PII, no secrets"
-    string correlationId
-    inet ipAddress "hashed in logs"
-    string userAgent
-    timestamp occurredAt
-  }
-
   User ||--o{ WorkspaceMembership : "belongs to"
   Workspace ||--o{ WorkspaceMembership : "has members"
   Workspace ||--o| Subscription : "has"
@@ -1172,10 +483,55 @@ erDiagram
   User ||--o{ AuditEvent : "generates"
 ```
 
+*The complete schema definition including column types, constraints, and indexes is maintained in [`data-architecture.mmd`](data-architecture.mmd).*
+
 ---
 
-### Diagram 7: Security Boundaries and Trust Zones
-*Source:* [`./security-boundaries.mmd`](file:///home/vishal/Downloads/CA%20Carrer%20OS/docs/architecture/security-boundaries.mmd)
+## 11. API Contracts, Protocols & Error Handling
+
+### Standard Response Envelope
+```json
+{
+  "success": true,
+  "data": { ... },
+  "meta": {
+    "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "timestamp": "2026-10-19T13:00:00Z"
+  }
+}
+```
+
+### Standard Error Envelope
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "The request payload failed schema validation.",
+    "details": [
+      { "field": "targetSalaryMin", "issue": "Expected number, received string" }
+    ],
+    "correlationId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "timestamp": "2026-10-19T13:00:00Z"
+  }
+}
+```
+
+---
+
+## 12. Background Workers & Scheduled Tasks
+
+| Worker Name | Trigger | Queue Name | Processing Responsibility | Concurrency & Timeout |
+| :--- | :--- | :--- | :--- | :--- |
+| `JobIngestionWorker` | Cron: Every 6h | `job-ingestion-queue` | Ingests from verified feeds, normalizes titles, deduplicates | Concurrency: 2, Timeout: 120s |
+| `EmbeddingWorker` | Event: `job.created` | `vector-embedding-queue` | Generates 1536-dim vector embeddings via model provider | Concurrency: 5, Timeout: 30s |
+| `JobFreshnessWorker` | Cron: Daily 02:00 | `job-freshness-queue` | Re-checks job sources; expires jobs older than 30 days | Concurrency: 1, Timeout: 300s |
+| `FollowUpReminderWorker`| Cron: Hourly | `reminder-queue` | Checks scheduled follow-ups; dispatches transactional email | Concurrency: 4, Timeout: 15s |
+| `AuditWriterWorker` | Event: `audit.event` | `audit-event-queue` | Writes events to immutable PostgreSQL store and SIEM | Concurrency: 10, Timeout: 5s |
+
+---
+
+## 13. Security Architecture & Threat Model
 
 ```mermaid
 flowchart TB
@@ -1264,15 +620,101 @@ flowchart TB
   SIEM --> TELEMETRY
 ```
 
+---
+
+## 14. Observability, Telemetry & Failure Recovery
+
+- **Privacy-Safe Application Logging:** Raw resume text, user phone numbers, financial CTC values, and LLM prompt dialogues are never written to log sinks. Log events contain correlation IDs and SHA-256 hashes of inputs and outputs.
+- **Metrics Emission:** Prometheus metrics for request latency, AI model latency, tool execution counts, rate-limit hits, and approval acceptance rates.
+- **Disaster Recovery:** Automated daily encrypted database backups with 30-day point-in-time recovery (PITR) in PostgreSQL. RTO target: 60 minutes; RPO target: 15 minutes.
 
 ---
 
-## 9. Architecture Glossary
+## 15. Feature-to-Pain-Point Traceability Matrix
+
+| User Problem | Target Persona | Proposed Capability | Relevant Backend Module | Important Data Dependencies | Security Considerations | Measurable Outcome | Proposed Metric Definition | Data Required to Measure It | Phase | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1. Career Path Uncertainty** | Newly qualified CA | 6-Pathway Diagnostic & 30/60/90 Roadmaps | `CareerModule`, LLM Adapter | Articleship areas, examination attempt, preferred cities | Personal workspace isolation; no sharing with current employer | Reduction in time to select career path | % of onboarded CAs who lock in a primary pathway within 7 days | Onboarding timestamp vs roadmap confirmation event | **MVP** | *Hypothesis* |
+| **2. Articleship Experience Gap** | CA Final passed / Fresh CA | Role-Specific Skill-Gap Analysis & Bridging Drills | `CareerModule`, `InterviewModule` | Target role requirements vs articleship exposure | Objective scoring; no disparagement of articleship firms | Practical skill acquisition | % of assigned bridging tasks marked complete | LearningTask status logs | **MVP** | *Planned* |
+| **3. Fragmented & Stale Jobs** | All CA job seekers | Verified Job Feed Aggregator with Hybrid Search | `JobsModule`, Ingestion Worker | Direct employer feeds, authorized partner APIs | Zero unauthorized scraping; source attribution check | Stale listing rate | % of job postings reported stale or expired | User report flags vs total active job postings | **MVP** | *Hypothesis* |
+| **4. Generic Resumes Failing ATS** | Job applicants | ATS Resume Tailor with Provenance Linking | `ResumeModule`, Prompt Guard | Candidate profile, target Job Description | **Zero-Fabrication Guard (ADR-009)**; mandatory candidate attestation | Interview shortlist conversion rate | Shortlist rate of tailored vs generic resume submissions | Application state transitions (`SAVED` to `INTERVIEWING`) | **MVP** | *Hypothesis* |
+| **5. Interview Apprehension** | Candidates facing corporate interviews | AI Mock Interview & Domain Case Simulator | `InterviewModule`, Speech-to-Text | Role question banks, Ind AS / Tax synthetic case studies | Synthetic data only; zero PII in audio storage; encrypted logs | Technical confidence uplift | Delta in scores across repeated mock interview sessions | `InterviewFeedback` score progression | **MVP** (Text), **Phase 2** (Voice) | *Planned* |
+| **6. Opaque Compensation Packages** | Candidates evaluating offers | CTC Unbundler & Offer Decision Matrix | `FinancialIntelModule` | Offer letter terms (fixed, variable, retiral benefits) | Confidential offer storage; client-side unbundling; no employer leaks | Candidate compensation comprehension | % of candidates using offer unbundler before acceptance | Offer unbundler calculation events | **MVP** | *Hypothesis* |
+| **7. Disjointed Career Tools** | Active job seekers | Unified Application Tracker & Follow-Up Automation | `JobsModule`, BullMQ Reminder Worker | Application state, follow-up dates, recruiter interactions | Idempotent updates; opt-in email notifications | Application follow-up rate | % of pending applications with scheduled follow-ups completed | `Application` status timestamps and reminder task logs | **MVP** | *Planned* |
+| **8. Independent Practice Obstacles** | CAs entering practice | Practice Setup Assistant & Lightweight Client CRM | `PracticeModule`, Compliance Calendar | Post-qualification steps, KYC checklists, deadline schemas | ICAI Code of Ethics compliance; strictly no client solicitation | Time to operational practice setup | Days elapsed from COP grant to first client onboarded | Client onboarding timestamp in CRM | **Phase 3** | *Planned* |
+
+---
+
+## 16. Architecture Decision Records & Trade-Offs
+
+The platform architecture is guided by 9 formal Architecture Decision Records documented in [`decisions.md`](decisions.md):
+
+- **[ADR-001: Modular Monolith Architecture](decisions.md#adr-001-modular-monolith-architecture-over-microservices):** Single deployable NestJS service with clean domain boundaries.
+- **[ADR-002: Technology Stack Baseline](decisions.md#adr-002-technology-stack-baseline-nextjs-nestjs-prisma-postgresql):** Next.js 15+, TypeScript, Tailwind tokens, NestJS, PostgreSQL 16+, Redis 7+, BullMQ.
+- **[ADR-003: Multi-Tenant Workspace & Data Isolation Model](decisions.md#adr-003-multi-tenant-workspace-and-data-isolation-model):** Personal Workspaces for candidates; Organization Workspaces for firms and employers.
+- **[ADR-004: Tiered Tool Permissions & Human Approval Gate](decisions.md#adr-004-tiered-tool-permissions-and-human-in-the-loop-approval-gateway):** 4 deterministic permission tiers with signed approval tokens for external actions.
+- **[ADR-005: AI Provider Abstraction & Zero Data Retention](decisions.md#adr-005-interchangeable-ai-provider-abstraction-and-zero-data-retention):** Universal provider adapter; contractual zero-retention terms to be established.
+- **[ADR-006: Hybrid Lexical + Vector Search](decisions.md#adr-006-hybrid-search-postgresql-full-text-search--pgvector-embeddings):** PostgreSQL Full-Text Search combined with `pgvector` embeddings.
+- **[ADR-007: Idempotency Keys & Distributed Locks](decisions.md#adr-007-idempotency-keys-and-distributed-lock-strategy):** SHA-256 operation signatures cached in Redis with sliding 24-hour expiration.
+- **[ADR-008: Privacy-Preserving Audit Logging](decisions.md#adr-008-privacy-preserving-audit-logging-and-zero-pii-telemetry):** Immutable WORM audit events with zero PII, credentials, or raw resume text.
+- **[ADR-009: Strict Candidate Verification & Zero AI Fabrication](decisions.md#adr-009-strict-candidate-verification-and-prohibition-of-ai-fabrication):** Programmatic guardrails prohibiting LLM hallucination of credentials or metrics.
+
+---
+
+## 17. Implementation Phases & Scope Boundaries
+
+```
++───────────────────────────────────────────────────────────────────────────────────────────+
+|                                    IMPLEMENTATION ROADMAP                                 |
++───────────────────────────────────────────────────────────────────────────────────────────+
+|  PHASE 1: MVP (Proposed Baseline)                                                         |
+|  • Candidate onboarding, articleship inventory, and career pathway diagnostic             |
+|  • Verified direct job postings and approved partner API ingestion                       |
+|  • Hybrid job search (Postgres FTS + pgvector) and explainable match scoring              |
+|  • ATS resume builder with job-specific tailoring and candidate attestation               |
+|  • Unified application tracking board with follow-up task scheduling                      |
+|  • Text-based technical mock interviews with Ind AS / Tax question banks                  |
+|  • CTC Unbundler and side-by-side offer comparison calculator                             |
+|  • AI Career Agent with 4-tier permission router and Human-in-the-Loop approval cards     |
+|  • Tamper-evident audit logging and workspace authorization guards                        |
++───────────────────────────────────────────────────────────────────────────────────────────+
+|  PHASE 2: ENHANCED INTELLIGENCE & COMMUNITY (Planned)                                     |
+|  • Real-time voice mock interviews (turn-based audio pipeline)                            |
+|  • ATS partner webhooks (Greenhouse, Lever, Darwinbox)                                    |
+|  • Practical skills simulation lab (synthetic Excel financial modeling & audit cases)     |
+|  • Mentorship marketplace with calendar scheduling and payment processing                 |
+|  • Aggregated salary intelligence engine with sample-size ($N$) indicators                |
++───────────────────────────────────────────────────────────────────────────────────────────+
+|  PHASE 3: PRACTICE MANAGEMENT & ENTERPRISE (Future)                                       |
+|  • Independent Practice Suite: Post-qualification checklist, COP guide, and client CRM    |
+|  • Employer hiring analytics and candidate matching pipeline                              |
+|  • WhatsApp Business API alerts for urgent interview invites                              |
+|  • Continuous Professional Education (CPE) credit tracker                                 |
++───────────────────────────────────────────────────────────────────────────────────────────+
+```
+
+---
+
+## 18. Visual Architecture Diagrams Catalog
+
+All diagrams are authored in pure Mermaid format to ensure GitHub-native rendering:
+
+1. [High-Level System Context](system-context.mmd)
+2. [Detailed Layered System Architecture](system-architecture.mmd)
+3. [AI Agent Permission & Execution Flow](agent-execution-flow.mmd)
+4. [Core CA User Journey](user-journey.mmd)
+5. [Job Application Lifecycle & State Machine](job-application-workflow.mmd)
+6. [Data Architecture & Entity-Relationship Model](data-architecture.mmd)
+7. [Security Boundaries & Trust Zones](security-boundaries.mmd)
+
+---
+
+## 19. Architecture Glossary
 
 - **ATS (Applicant Tracking System):** Recruitment software used by employers to parse, rank, and track resumes.
 - **Certificate of Practice (COP):** Regulatory license granted by ICAI permitting a Chartered Accountant to engage in public practice.
 - **CTC (Cost to Company):** Total gross annual expenditure incurred by an employer on an employee, including fixed pay, variable incentives, PF, gratuity, and perks.
-- **Idempotency Key:** Unique identifier attached to an API mutation to ensure an identical operation is never executed more than once.
+- **Idempotency Key:** Unique identifier attached to an API mutation ensuring an identical operation is never executed more than once.
 - **Ind AS (Indian Accounting Standards):** The accounting standards converged with IFRS notified by the Ministry of Corporate Affairs (MCA) in India.
 - **pgvector:** PostgreSQL open-source vector similarity search extension enabling embedding storage and cosine similarity queries directly inside relational tables.
 - **RAG (Retrieval-Augmented Generation):** Architectural pattern where an LLM is provided with domain-specific, verified context retrieved from a database before generating responses.
@@ -1280,9 +722,9 @@ flowchart TB
 
 ---
 
-## 10. Reference Links & Architecture Decisions
+## 20. Legal, Professional Ethics & Disclaimers
 
-- [Architecture Decision Records (ADRs)](./decisions.md)
-- [Assumptions, Risks, Constraints & Spikes](./assumptions-and-risks.md)
-- [Official ICAI Resources Reference Portal](https://www.icai.org)
-- [The Chartered Accountants Act, 1949 & Code of Ethics](https://www.icai.org/post/code-of-ethics-2020)
+This architectural document is prepared for engineering and system design purposes. Features touching upon the **Chartered Accountants Act, 1949**, and the **ICAI Code of Ethics (2020)** are designed to respect regulatory constraints:
+- The platform does not function as an advertising or client solicitation agency for members in practice.
+- Educational case studies, compliance checklists, and mock interview drills do not constitute formal legal, statutory audit, or tax advisory opinions.
+- Operational implementation requires formal legal and regulatory review prior to commercial production launch.

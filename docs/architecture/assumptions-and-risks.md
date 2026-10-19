@@ -2,6 +2,8 @@
 
 This document details the critical engineering assumptions, operational constraints, identified risks, mitigations, and unresolved architectural questions for **CA Career OS**.
 
+*Status: Architecture Blueprint — Hypotheses & Proposed Controls to Validate*
+
 ---
 
 ## 1. Architectural & Domain Assumptions
@@ -21,6 +23,7 @@ This document details the critical engineering assumptions, operational constrai
 2. **Statutory Guidance Currency:** Tax rates, GST rules, Ind AS disclosures, and Companies Act provisions change continuously via notifications and circulars:
    - Any compliance checklist or interview practice scenario must clearly display an **"As of [Date]"** stamp and link directly to official ICAI, CBDT, CBIC, or MCA source documents.
    - The system must explicitly state: *"Educational simulation only; not legal or formal professional advice."*
+3. **Legal Disclaimer:** These architectural guidelines are developed as design planning constraints. Actual operational compliance requires ongoing legal and regulatory review against current official ICAI regulations prior to production deployment.
 
 ### 1.3 LLM Capability & Limitations
 1. **Non-Determinism:** LLM outputs are inherently probabilistic. For mission-critical workflows (resume rendering, application submissions, database writes), deterministic JSON schemas, server-side validation guards, and human-in-the-loop approvals are mandatory.
@@ -73,9 +76,12 @@ This document details the critical engineering assumptions, operational constrai
 ### Risk 2: AI Fabrication of Professional Claims
 - **Vulnerability:** Generative models often embellish achievements, invent audit engagements, or hallucinate metrics to make resumes look stronger. For CAs, false representations violate statutory ethics rules.
 - **Mitigation Architecture:**
-  - The Resume Engine prompt strictly forbids inventing facts, clients, or metrics.
-  - Bullet points flag any suggested improvements as drafts requiring candidate confirmation.
-  - Final resume versions require explicit candidate attestation before export or application submission.
+  - Prompt rules explicitly forbid inventing facts, clients, or metrics.
+  - However, prompt instructions alone cannot physically guarantee 100% absence of hallucinations.
+  - The system enforces a **defense-in-depth** model:
+    1. Structural schema extraction allowing only verified profile references.
+    2. Provenance flags marking every generated bullet point as unverified until reviewed.
+    3. Mandatory candidate attestation before any resume can be saved, exported, or submitted.
 
 ### Risk 3: Accidental Exposure of Career Intent to Current Employer
 - **Vulnerability:** A candidate undergoing articleship or working at an accounting firm that also uses CA Career OS could have their job search or applications visible to firm partners.
