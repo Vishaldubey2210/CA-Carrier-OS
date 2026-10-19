@@ -173,3 +173,4 @@ The complete architectural specification is organized within `docs/architecture/
 This architecture document is designed in strict compliance with the **Chartered Accountants Act, 1949**, and the **ICAI Code of Ethics (2020)**. 
 
 All career guidance, compliance checklists, and mock interview case studies are intended solely for professional education and career preparation. The platform does not offer statutory legal, tax, or audit opinions, nor does it facilitate public commercial client solicitation for practicing members.
+# CA-Carrier-OS
