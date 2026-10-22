@@ -1,0 +1,853 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  CANDIDATE
+  RECRUITER
+  MENTOR
+  ORG_ADMIN
+  PLATFORM_ADMIN
+}
+
+enum WorkspaceType {
+  PERSONAL
+  ORGANIZATION
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+  RECRUITER
+  VIEWER
+}
+
+enum CAPathway {
+  AUDIT
+  TAX
+  FPA
+  CORP_FIN
+  IB
+  CONSULTING
+  PRACTICE
+}
+
+enum ApplicationStatus {
+  SAVED
+  PLANNED
+  TAILORED
+  APPLIED
+  ACKNOWLEDGED
+  SHORTLISTED
+  INTERVIEWING
+  OFFERED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum PermissionTier {
+  READ_ONLY
+  WRITE
+  EXPLICITLY_APPROVED_EXTERNAL
+  DESTRUCTIVE
+}
+
+model User {
+  id             String                @id @default(uuid()) @db.Uuid
+  email          String                @unique
+  hashedPassword String
+  firstName      String
+  lastName       String
+  role           UserRole              @default(CANDIDATE)
+  emailVerified  Boolean               @default(false)
+  createdAt      DateTime              @default(now()) @db.Timestamptz
+  updatedAt      DateTime              @updatedAt @db.Timestamptz
+  deletedAt      DateTime?             @db.Timestamptz
+
+  memberships    WorkspaceMembership[]
+  candidate      CandidateProfile?
+  auditEvents    AuditEvent[]
+  refreshTokens  RefreshToken[]
+
+  @@index([email])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Workspace {
+  id           String                @id @default(uuid()) @db.Uuid
+  type         WorkspaceType         @default(PERSONAL)
+  name         String
+  slug         String                @unique
+  ownerId      String                @db.Uuid
+  settings     Json                  @default("{}")
+  createdAt    DateTime              @default(now()) @db.Timestamptz
+
+  memberships  WorkspaceMembership[]
+  subscription Subscription?
+  auditEvents  AuditEvent[]
+  invitations  WorkspaceInvitation[]
+
+  @@index([slug])
+  @@map("workspaces")
+}
+
+model WorkspaceMembership {
+  id          String     @id @default(uuid()) @db.Uuid
+  workspaceId String     @db.Uuid
+  userId      String     @db.Uuid
+  memberRole  MemberRole @default(MEMBER)
+  isDefault   Boolean    @default(false)
+  joinedAt    DateTime   @default(now()) @db.Timestamptz
+
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@map("workspace_memberships")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  tokenHash String   @unique
+  familyId  String   @db.Uuid
+  revoked   Boolean  @default(false)
+  expiresAt DateTime @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
+}
+
+model WorkspaceInvitation {
+  id          String     @id @default(uuid()) @db.Uuid
+  workspaceId String     @db.Uuid
+  email       String
+  role        MemberRole @default(MEMBER)
+  invitedById String     @db.Uuid
+  token       String     @unique
+  accepted    Boolean    @default(false)
+  expiresAt   DateTime   @db.Timestamptz
+  createdAt   DateTime   @default(now()) @db.Timestamptz
+
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([email])
+  @@index([token])
+  @@map("workspace_invitations")
+}
+
+model Subscription {
+  id                     String               @id @default(uuid()) @db.Uuid
+  workspaceId            String               @unique @db.Uuid
+  planTier               String               @default("FREE_CANDIDATE") // 'FREE_CANDIDATE', 'PRO_CANDIDATE', 'TEAM_EMPLOYER', 'PRACTICE_CRM'
+  status                 String               @default("ACTIVE") // 'ACTIVE', 'PENDING_PAYMENT', 'PAST_DUE', 'GRACE_PERIOD', 'CANCELLED', 'EXPIRED'
+  currentPeriodStart     DateTime             @default(now()) @db.Timestamptz
+  currentPeriodEnd       DateTime?            @db.Timestamptz
+  validUntil             DateTime?            @db.Timestamptz
+  cancelAtPeriodEnd      Boolean              @default(false)
+  gracePeriodEnd         DateTime?            @db.Timestamptz
+  razorpayCustomerId     String?
+  razorpaySubscriptionId String?
+  createdAt              DateTime             @default(now()) @db.Timestamptz
+  updatedAt              DateTime             @updatedAt @db.Timestamptz
+
+  workspace              Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invoices               InvoiceRecord[]
+  payments               PaymentTransaction[]
+
+  @@map("subscriptions")
+}
+
+model PaymentTransaction {
+  id                String       @id @default(uuid()) @db.Uuid
+  subscriptionId    String       @db.Uuid
+  workspaceId       String       @db.Uuid
+  amountPaise       Int
+  currency          String       @default("INR")
+  paymentMethod     String       @default("UPI") // 'UPI', 'NETBANKING', 'CARD'
+  razorpayPaymentId String?      @unique
+  razorpayOrderId   String?
+  status            String       @default("PENDING") // 'PENDING', 'SUCCESS', 'FAILED', 'REFUNDED'
+  errorMessage      String?
+  idempotencyKey    String?      @unique
+  createdAt         DateTime     @default(now()) @db.Timestamptz
+
+  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([subscriptionId])
+  @@map("payment_transactions")
+}
+
+model InvoiceRecord {
+  id                 String       @id @default(uuid()) @db.Uuid
+  subscriptionId     String       @db.Uuid
+  workspaceId        String       @db.Uuid
+  invoiceNumber      String       @unique // e.g. "INV-2026-0001"
+  sacCode            String       @default("998314") // Information technology / software services SAC
+  subtotalInr        Int          // in rupees
+  gstRatePct         Int          @default(18) // 18% GST (9% CGST + 9% SGST or 18% IGST)
+  gstAmountInr       Int
+  totalAmountInr     Int
+  b2bGstin           String?
+  billingAddressJson Json         @default("{}")
+  issuedAt           DateTime     @default(now()) @db.Timestamptz
+  status             String       @default("PAID") // 'PAID', 'VOID', 'REFUNDED'
+
+  subscription       Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([subscriptionId])
+  @@map("invoice_records")
+}
+
+model WebhookEventLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  eventId     String   @unique // Razorpay event ID e.g. "evt_12345"
+  eventType   String   // 'payment.captured', 'payment.failed', 'subscription.cancelled'
+  payloadJson Json
+  processedAt DateTime @default(now()) @db.Timestamptz
+  status      String   @default("PROCESSED") // 'PROCESSED', 'FAILED', 'IGNORED'
+
+  @@index([eventId])
+  @@map("webhook_event_logs")
+}
+
+
+model CandidateProfile {
+  id                    String             @id @default(uuid()) @db.Uuid
+  userId                String             @unique @db.Uuid
+  workspaceId           String             @db.Uuid
+  icaiMembershipNo      String?
+  qualificationDate     DateTime?          @db.Date
+  caFinalStatus         String             @default("QUALIFIED")
+  attemptsCount         Int?
+  articleshipFirm       String?
+  articleshipFirmTier   String?
+  articleshipWeeks      Int                @default(156)
+  articleshipAreas      String[]
+  skills                Json               @default("[]")
+  softwareProficiencies String[]           @default([])
+  preferredPathways     String[]           @default([])
+  targetCities          String[]
+  targetSalaryMin       Int?
+  targetSalaryMax       Int?
+  summary               String?            @db.Text
+  profileCompletionPct  Int                @default(0)
+  updatedAt             DateTime           @updatedAt @db.Timestamptz
+
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumes               Resume[]
+  applications          Application[]
+  roadmaps              CareerRoadmap[]
+  savedJobs             SavedJob[]
+  portfolioEntries      PortfolioEntry[]
+  interviewSessions     InterviewSession[]
+  agentConversations    AgentConversation[]
+
+  @@index([workspaceId])
+  @@map("candidate_profiles")
+}
+
+model CareerRoadmap {
+  id                 String             @id @default(uuid()) @db.Uuid
+  candidateProfileId String             @db.Uuid
+  workspaceId        String             @db.Uuid
+  targetPathway      CAPathway
+  overallFitScore    Int
+  summary            String             @db.Text
+  generatedAt        DateTime           @default(now()) @db.Timestamptz
+  updatedAt          DateTime           @updatedAt @db.Timestamptz
+
+  candidateProfile   CandidateProfile   @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  tasks              CareerTask[]
+
+  @@index([candidateProfileId])
+  @@index([workspaceId])
+  @@map("career_roadmaps")
+}
+
+model CareerTask {
+  id          String        @id @default(uuid()) @db.Uuid
+  roadmapId   String        @db.Uuid
+  milestone   String        // 'DAY_30', 'DAY_60', 'DAY_90'
+  title       String
+  description String        @db.Text
+  category    String        // 'SKILL_UPGRADE', 'NETWORKING', 'APPLICATION_PREP', 'CERTIFICATION'
+  priority    String        @default("MEDIUM") // 'HIGH', 'MEDIUM', 'LOW'
+  status      String        @default("PENDING") // 'PENDING', 'IN_PROGRESS', 'COMPLETED'
+  completedAt DateTime?     @db.Timestamptz
+  dueDate     DateTime?     @db.Timestamptz
+  createdAt   DateTime      @default(now()) @db.Timestamptz
+
+  roadmap     CareerRoadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@index([roadmapId])
+  @@map("career_tasks")
+}
+
+model Job {
+  id                     String                 @id @default(uuid()) @db.Uuid
+  employerId             String                 @db.Uuid
+  sourceId               String?                @db.Uuid
+  title                  String
+  normalizedTitle        String
+  companyName            String
+  locationCity           String
+  workArrangement        String                 @default("HYBRID") // 'REMOTE', 'HYBRID', 'ONSITE'
+  caPathway              CAPathway
+  salaryMin              Int?
+  salaryMax              Int?
+  salaryDisclosed        Boolean                @default(false)
+  experienceMin          Int                    @default(0)
+  experienceMax          Int                    @default(3)
+  rawDescription         String                 @db.Text
+  structuredRequirements Json                   @default("{}")
+  status                 String                 @default("ACTIVE")
+  source                 String                 @default("DIRECT_EMPLOYER")
+  sourceUrl              String?
+  isVerified             Boolean                @default(true)
+  fingerprint            String                 @default("")
+  postedAt               DateTime               @default(now()) @db.Timestamptz
+  expiresAt              DateTime               @db.Timestamptz
+
+  applications           Application[]
+  savedJobs              SavedJob[]
+
+  @@index([status, expiresAt])
+  @@index([normalizedTitle])
+  @@index([locationCity])
+  @@index([caPathway])
+  @@index([fingerprint])
+  @@map("jobs")
+}
+
+model SavedJob {
+  id                 String           @id @default(uuid()) @db.Uuid
+  candidateProfileId String           @db.Uuid
+  jobId              String           @db.Uuid
+  notes              String?          @db.Text
+  createdAt          DateTime         @default(now()) @db.Timestamptz
+
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  job                Job              @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateProfileId, jobId])
+  @@index([candidateProfileId])
+  @@index([jobId])
+  @@map("saved_jobs")
+}
+
+model Application {
+  id                 String                     @id @default(uuid()) @db.Uuid
+  candidateProfileId String                     @db.Uuid
+  jobId              String                     @db.Uuid
+  resumeVersionId    String?                    @db.Uuid
+  status             ApplicationStatus          @default(SAVED)
+  coverNote          String?                    @db.Text
+  recruiterContact   Json                       @default("{}")
+  appliedAt          DateTime?                  @db.Timestamptz
+  statusUpdatedAt    DateTime                   @default(now()) @db.Timestamptz
+  nextFollowUpDate   DateTime?                  @db.Timestamptz
+
+  candidate          CandidateProfile           @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  job                Job                        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  resumeVersion      ResumeVersion?             @relation(fields: [resumeVersionId], references: [id], onDelete: SetNull)
+  statusHistory      ApplicationStatusHistory[]
+  followUps          FollowUpTask[]
+
+  @@index([candidateProfileId])
+  @@index([jobId])
+  @@index([status])
+  @@map("applications")
+}
+
+model ApplicationStatusHistory {
+  id            String             @id @default(uuid()) @db.Uuid
+  applicationId String             @db.Uuid
+  fromStatus    ApplicationStatus?
+  toStatus      ApplicationStatus
+  notes         String?            @db.Text
+  changedAt     DateTime           @default(now()) @db.Timestamptz
+
+  application   Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("application_status_history")
+}
+
+model FollowUpTask {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @db.Uuid
+  title         String
+  dueDate       DateTime?   @db.Timestamptz
+  completed     Boolean     @default(false)
+  createdAt     DateTime    @default(now()) @db.Timestamptz
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("follow_up_tasks")
+}
+
+model Resume {
+  id                 String             @id @default(uuid()) @db.Uuid
+  candidateProfileId String             @db.Uuid
+  title              String
+  targetPathway      CAPathway          @default(AUDIT)
+  isDefault          Boolean            @default(false)
+  createdAt          DateTime           @default(now()) @db.Timestamptz
+  updatedAt          DateTime           @updatedAt @db.Timestamptz
+
+  candidate          CandidateProfile   @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  versions           ResumeVersion[]
+
+  @@index([candidateProfileId])
+  @@map("resumes")
+}
+
+model ResumeVersion {
+  id                  String        @id @default(uuid()) @db.Uuid
+  resumeId            String        @db.Uuid
+  targetedJobId       String?       @db.Uuid
+  versionNumber       Int           @default(1)
+  title               String        @default("Version 1")
+  summary             String?       @db.Text
+  tailoredJobTitle    String?
+  tailoredCompanyName String?
+  matchScore          Int?
+  s3Key               String        @default("")
+  pdfUrl              String?
+  parsedContent       Json
+  claimAttestations   Json          @default("{}")
+  candidateAttested   Boolean       @default(false)
+  createdAt           DateTime      @default(now()) @db.Timestamptz
+
+  resume              Resume        @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  applications        Application[]
+
+  @@index([resumeId])
+  @@map("resume_versions")
+}
+
+model PortfolioEntry {
+  id                 String           @id @default(uuid()) @db.Uuid
+  candidateProfileId String           @db.Uuid
+  title              String
+  category           String
+  description        String           @db.Text
+  highlights         String[]         @default([])
+  linkUrl            String?
+  createdAt          DateTime         @default(now()) @db.Timestamptz
+  updatedAt          DateTime         @updatedAt @db.Timestamptz
+
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+
+  @@index([candidateProfileId])
+  @@map("portfolio_entries")
+}
+
+model InterviewSession {
+  id                 String                  @id @default(uuid()) @db.Uuid
+  candidateProfileId String                  @db.Uuid
+  workspaceId        String                  @db.Uuid
+  targetPathway      CAPathway
+  targetRole         String
+  topic              String
+  difficulty         String                  // 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'
+  status             String                  @default("CREATED") // 'CREATED', 'IN_PROGRESS', 'SUBMITTED', 'EVALUATING', 'COMPLETED', 'FAILED', 'CANCELLED'
+  overallScore       Int?
+  feedback           Json                    @default("{}")
+  createdAt          DateTime                @default(now()) @db.Timestamptz
+  completedAt        DateTime?               @db.Timestamptz
+
+  candidate          CandidateProfile        @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  questions          InterviewQuestionItem[]
+
+  @@index([candidateProfileId])
+  @@index([workspaceId])
+  @@map("interview_sessions")
+}
+
+model InterviewQuestionItem {
+  id              String           @id @default(uuid()) @db.Uuid
+  sessionId       String           @db.Uuid
+  questionText    String           @db.Text
+  domain          String
+  topic           String
+  difficulty      String
+  candidateAnswer String?          @db.Text
+  score           Int?
+  evaluation      Json?
+  orderIndex      Int              @default(0)
+
+  session         InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("interview_question_items")
+}
+
+model AgentConversation {
+  id                 String            @id @default(uuid()) @db.Uuid
+  candidateProfileId String            @db.Uuid
+  workspaceId        String            @db.Uuid
+  title              String            @default("Career Consultation")
+  createdAt          DateTime          @default(now()) @db.Timestamptz
+  updatedAt          DateTime          @updatedAt @db.Timestamptz
+
+  candidate          CandidateProfile  @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  messages           AgentMessage[]
+
+  @@index([candidateProfileId])
+  @@index([workspaceId])
+  @@map("agent_conversations")
+}
+
+model AgentMessage {
+  id             String            @id @default(uuid()) @db.Uuid
+  conversationId String            @db.Uuid
+  role           String            // 'USER', 'ASSISTANT', 'SYSTEM', 'TOOL'
+  content        String            @db.Text
+  toolCalls      Json?
+  toolResults    Json?
+  approvalId     String?           @db.Uuid
+  createdAt      DateTime          @default(now()) @db.Timestamptz
+
+  conversation   AgentConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("agent_messages")
+}
+
+model ApprovalRequest {
+  id                  String         @id @default(uuid()) @db.Uuid
+  executionId         String         @db.Uuid
+  requestedByUserId   String         @db.Uuid
+  workspaceId         String?        @db.Uuid
+  toolName            String         @default("")
+  toolParameters      Json           @default("{}")
+  actionPreview       String         @default("")
+  signedApprovalToken String         @db.Text
+  expiresAt           DateTime       @db.Timestamptz
+  decision            String         @default("PENDING") // 'PENDING', 'APPROVED', 'DECLINED', 'EXPIRED'
+  decidedAt           DateTime?      @db.Timestamptz
+
+  @@index([requestedByUserId])
+  @@index([expiresAt])
+  @@map("approval_requests")
+}
+
+model AuditEvent {
+  id            String    @id @default(uuid()) @db.Uuid
+  actorId       String    @db.Uuid
+  workspaceId   String    @db.Uuid
+  operation     String
+  resourceType  String
+  resourceId    String
+  outcome       String
+  correlationId String
+  payloadSha256 String
+  durationMs    Int
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+
+  user          User      @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Restrict)
+
+  @@index([workspaceId, createdAt])
+  @@index([correlationId])
+  @@map("audit_events")
+}
+
+// -------------------------------------------------------------
+// Phase 5: Professional Growth, Recruitment & Practice Management
+// -------------------------------------------------------------
+
+model SalaryBenchmark {
+  id                   String     @id @default(uuid()) @db.Uuid
+  pathway              CAPathway
+  roleTitle            String
+  experienceMin        Int
+  experienceMax        Int
+  locationCity         String
+  industry             String
+  medianSalary         Int
+  p25Salary            Int
+  p75Salary            Int
+  sampleSize           Int
+  collectionPeriod     String
+  dataSourceProvenance String
+  dataLimitations      String
+  createdAt            DateTime   @default(now()) @db.Timestamptz
+
+  @@index([pathway, locationCity])
+  @@index([roleTitle])
+  @@map("salary_benchmarks")
+}
+
+model OfferComparison {
+  id                   String     @id @default(uuid()) @db.Uuid
+  userId               String     @db.Uuid
+  workspaceId          String     @db.Uuid
+  title                String
+  companyName          String
+  roleTitle            String
+  baseSalary           Int
+  variablePay          Int        @default(0)
+  variableConditions   String?
+  bonus                Int        @default(0)
+  benefitsValue        Int        @default(0)
+  stockValue           Int        @default(0)
+  totalCtc             Int
+  monthlyNetEstimate   Int
+  locationCity         String
+  workArrangement      String     @default("HYBRID")
+  learningPriorityScore Int       @default(3)
+  isGuaranteed         Boolean    @default(true)
+  assumptionsJson      Json       @default("{}")
+  createdAt            DateTime   @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("offer_comparisons")
+}
+
+model EmployerProfile {
+  id                      String     @id @default(uuid()) @db.Uuid
+  organizationWorkspaceId  String     @db.Uuid
+  companyName             String
+  slug                    String     @unique
+  website                 String?
+  logoUrl                 String?
+  verifiedStatus          String     @default("UNVERIFIED") // 'UNVERIFIED', 'PENDING', 'VERIFIED', 'REJECTED', 'SUSPENDED'
+  industry                String
+  headquartersCity        String
+  firmTier                String     @default("MID_SIZE")
+  overviewText            String     @db.Text
+  verifiedAt              DateTime?  @db.Timestamptz
+  createdAt               DateTime   @default(now()) @db.Timestamptz
+  updatedAt               DateTime   @updatedAt @db.Timestamptz
+
+  verificationRequests    EmployerVerificationRequest[]
+
+  @@index([organizationWorkspaceId])
+  @@map("employer_profiles")
+}
+
+model EmployerVerificationRequest {
+  id                     String          @id @default(uuid()) @db.Uuid
+  employerProfileId      String          @db.Uuid
+  requestedByUserId      String          @db.Uuid
+  status                 String          @default("PENDING") // 'PENDING', 'APPROVED', 'REJECTED', 'MORE_INFO_REQUIRED'
+  businessRegistrationNo String
+  documentsJson          Json            @default("{}")
+  reviewerNotes          String?         @db.Text
+  reviewedByUserId       String?         @db.Uuid
+  reviewedAt             DateTime?       @db.Timestamptz
+  createdAt              DateTime        @default(now()) @db.Timestamptz
+  updatedAt              DateTime        @updatedAt @db.Timestamptz
+
+  employerProfile        EmployerProfile @relation(fields: [employerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([employerProfileId])
+  @@index([status])
+  @@map("employer_verification_requests")
+}
+
+model MentorProfile {
+  id                     String          @id @default(uuid()) @db.Uuid
+  userId                 String          @db.Uuid
+  fullName               String
+  headline               String
+  currentCompany         String
+  currentRole            String
+  yearsExperience        Int
+  verifiedCA             Boolean         @default(true)
+  icaiMembershipNo       String?
+  pathways               String[]
+  bio                    String          @db.Text
+  sessionDurationMinutes Int             @default(45)
+  hourlyRateInr          Int             @default(0)
+  isAvailable            Boolean         @default(true)
+  rating                 Float           @default(5.0)
+  totalSessionsCount     Int             @default(0)
+  createdAt              DateTime        @default(now()) @db.Timestamptz
+
+  bookings               MentorBooking[]
+
+  @@index([userId])
+  @@map("mentor_profiles")
+}
+
+model MentorBooking {
+  id                     String        @id @default(uuid()) @db.Uuid
+  mentorProfileId        String        @db.Uuid
+  candidateUserId        String        @db.Uuid
+  candidateWorkspaceId   String        @db.Uuid
+  slotStartTime          DateTime      @db.Timestamptz
+  slotEndTime            DateTime      @db.Timestamptz
+  status                 String        @default("REQUESTED") // 'REQUESTED', 'CONFIRMED', 'CANCELLED', 'COMPLETED'
+  sessionNotes           String?       @db.Text
+  feedbackRating         Int?
+  feedbackComments       String?       @db.Text
+  cancelledBy            String?
+  cancellationReason     String?
+  createdAt              DateTime      @default(now()) @db.Timestamptz
+  updatedAt              DateTime      @updatedAt @db.Timestamptz
+
+  mentor                 MentorProfile @relation(fields: [mentorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([mentorProfileId, slotStartTime])
+  @@index([candidateUserId])
+  @@map("mentor_bookings")
+}
+
+model CommunityPost {
+  id                     String           @id @default(uuid()) @db.Uuid
+  authorUserId           String           @db.Uuid
+  authorName             String
+  pathway                CAPathway
+  title                  String
+  content                String           @db.Text
+  category               String           @default("GENERAL") // 'INTERVIEW_EXPERIENCE', 'TECHNICAL_DEBATE', 'CAREER_ADVICE', 'GENERAL'
+  isAnonymous            Boolean          @default(false)
+  status                 String           @default("ACTIVE") // 'ACTIVE', 'REPORTED', 'FLAGGED_MODERATION', 'REMOVED'
+  upvotesCount           Int              @default(0)
+  repliesCount           Int              @default(0)
+  createdAt              DateTime         @default(now()) @db.Timestamptz
+  updatedAt              DateTime         @updatedAt @db.Timestamptz
+
+  replies                CommunityReply[]
+
+  @@index([pathway, category])
+  @@index([authorUserId])
+  @@map("community_posts")
+}
+
+model CommunityReply {
+  id                     String        @id @default(uuid()) @db.Uuid
+  postId                 String        @db.Uuid
+  authorUserId           String        @db.Uuid
+  authorName             String
+  content                String        @db.Text
+  isAnonymous            Boolean       @default(false)
+  status                 String        @default("ACTIVE") // 'ACTIVE', 'FLAGGED', 'REMOVED'
+  createdAt              DateTime      @default(now()) @db.Timestamptz
+
+  post                   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("community_replies")
+}
+
+model CommunityReport {
+  id                     String    @id @default(uuid()) @db.Uuid
+  reportedByUserId       String    @db.Uuid
+  resourceType           String    // 'POST', 'REPLY'
+  resourceId             String    @db.Uuid
+  reason                 String    // 'SPAM', 'HARASSMENT', 'COMMERCIAL_SOLICITATION', 'CONFIDENTIALITY_BREACH', 'MISINFORMATION'
+  status                 String    @default("PENDING_REVIEW") // 'PENDING_REVIEW', 'ACTION_TAKEN', 'DISMISSED'
+  moderatorNotes         String?   @db.Text
+  reviewedByUserId       String?   @db.Uuid
+  createdAt              DateTime  @default(now()) @db.Timestamptz
+  updatedAt              DateTime  @updatedAt @db.Timestamptz
+
+  @@index([resourceId])
+  @@index([status])
+  @@map("community_reports")
+}
+
+model PostQualificationChecklist {
+  id                     String    @id @default(uuid()) @db.Uuid
+  userId                 String    @db.Uuid
+  category               String    // 'ICAI_MEMBERSHIP_FORM_2', 'COP_FORM_6', 'CABF_BENEVOLENT_FUND', 'CAMPUS_PLACEMENT_REGISTRATION', 'PRACTICE_PREPARATION'
+  taskKey                String
+  title                  String
+  description            String    @db.Text
+  officialPortalUrl      String
+  lastVerifiedDate       String
+  isCompleted            Boolean   @default(false)
+  completedAt            DateTime? @db.Timestamptz
+  dueDate                DateTime? @db.Timestamptz
+  notes                  String?   @db.Text
+
+  @@index([userId, category])
+  @@map("post_qualification_checklists")
+}
+
+model PracticeClient {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  practiceWorkspaceId    String                   @db.Uuid
+  clientName             String
+  entityType             String                   // 'INDIVIDUAL', 'PROPRIETORSHIP', 'PARTNERSHIP', 'PVT_LTD', 'PUBLIC_LTD', 'TRUST'
+  panNumber              String?
+  gstin                  String?
+  cin                    String?
+  contactPerson          String
+  contactEmail           String
+  contactPhone           String?
+  status                 String                   @default("ACTIVE")
+  createdAt              DateTime                 @default(now()) @db.Timestamptz
+  updatedAt              DateTime                 @updatedAt @db.Timestamptz
+
+  complianceTasks        PracticeComplianceTask[]
+
+  @@index([practiceWorkspaceId])
+  @@map("practice_clients")
+}
+
+model PracticeComplianceTask {
+  id                     String         @id @default(uuid()) @db.Uuid
+  practiceWorkspaceId    String         @db.Uuid
+  clientId               String         @db.Uuid
+  title                  String
+  complianceCategory     String         // 'INCOME_TAX_ITR', 'TAX_AUDIT_44AB', 'GST_MONTHLY', 'GST_ANNUAL_9C', 'TDS_RETURN', 'ROC_ANNUAL_MGT7_AOC4'
+  statutoryDueDate       DateTime       @db.Timestamptz
+  internalDeadline       DateTime       @db.Timestamptz
+  assignedToUserId       String?        @db.Uuid
+  status                 String         @default("PENDING") // 'PENDING', 'IN_PROGRESS', 'REVIEW_PENDING', 'FILED', 'OVERDUE'
+  financialYear          String
+  assessmentYear         String
+  filedReferenceNo       String?
+  notes                  String?        @db.Text
+  createdAt              DateTime       @default(now()) @db.Timestamptz
+  updatedAt              DateTime       @updatedAt @db.Timestamptz
+
+  client                 PracticeClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([practiceWorkspaceId, statutoryDueDate])
+  @@index([clientId])
+  @@map("practice_compliance_tasks")
+}
+
+model RecruitmentApplicationReview {
+  id                      String    @id @default(uuid()) @db.Uuid
+  applicationId           String    @db.Uuid
+  recruiterUserId         String    @db.Uuid
+  organizationWorkspaceId String    @db.Uuid
+  pipelineStage           String    @default("NEW") // 'NEW', 'IN_REVIEW', 'SHORTLISTED', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'
+  internalNotes           String?   @db.Text
+  rating                  Int?      // 1-5 rating
+  interviewScheduledAt    DateTime? @db.Timestamptz
+  interviewRoundsJson     Json      @default("[]")
+  candidateNotified       Boolean   @default(false)
+  updatedAt               DateTime  @updatedAt @db.Timestamptz
+
+  @@index([applicationId])
+  @@index([organizationWorkspaceId, pipelineStage])
+  @@map("recruitment_application_reviews")
+}

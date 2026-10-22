@@ -1,0 +1,83 @@
+import { PlanDetail } from '@ca-career-os/shared';
+
+export const CURATED_PLANS: PlanDetail[] = [
+  {
+    tier: 'FREE_CANDIDATE',
+    name: 'Free Candidate Tier',
+    description: 'Foundational career discovery and verified job search forever free for all CAs.',
+    priceInrMonthly: 0,
+    priceInrAnnual: 0,
+    features: [
+      'Articleship capability inventory & profile creation',
+      'Baseline 7-pathway career fit diagnostic & 30-day roadmap',
+      'Verified job search & unlimited job bookmarking',
+      '1 Master Resume & up to 3 job-tailored resume exports per month',
+      '3 AI technical mock interview sessions per month',
+      'Standard CTC unbundler & offer comparison calculator',
+    ],
+    monthlyResumeLimit: 3,
+    monthlyInterviewLimit: 3,
+    maxActiveJobs: 0,
+    crmAccess: false,
+    supportLevel: 'COMMUNITY',
+  },
+  {
+    tier: 'PRO_CANDIDATE',
+    name: 'Pro Candidate Pass',
+    description: 'Advanced AI interview simulations, unlimited zero-fabrication resumes, and priority applications.',
+    priceInrMonthly: 999,
+    priceInrAnnual: 9990, // ~17% annual discount
+    features: [
+      'Unlimited ATS resume tailoring with Zero-Fabrication provenance tracking',
+      'Unlimited AI mock technical interviews with 4-dimension Ind AS rubrics',
+      'Closed-loop adaptive learning task injection into Career Roadmaps',
+      'Priority application tracking & follow-up reminders',
+      'In-depth salary benchmarking with sample size (N) filtering',
+      'Direct 1-on-1 mentor booking access',
+    ],
+    monthlyResumeLimit: -1, // Unlimited
+    monthlyInterviewLimit: -1, // Unlimited
+    maxActiveJobs: 0,
+    crmAccess: false,
+    supportLevel: 'PRIORITY',
+  },
+  {
+    tier: 'TEAM_EMPLOYER',
+    name: 'Employer & CA Firm Hiring Pass',
+    description: 'Direct recruitment pipeline, candidate discovery with consent, and ATS candidate management.',
+    priceInrMonthly: 4999,
+    priceInrAnnual: 49990,
+    features: [
+      'Up to 5 active verified job listings',
+      'Candidate discovery engine with articleship domain filters',
+      'Full recruitment pipeline board (NEW → IN_REVIEW → SHORTLISTED → INTERVIEW → OFFER → HIRED)',
+      'Internal confidential recruiter notes & reviewer ratings',
+      'Employer verification review queue & verified badge display',
+      'Audit logging for all recruiter operations',
+    ],
+    monthlyResumeLimit: -1,
+    monthlyInterviewLimit: -1,
+    maxActiveJobs: 5,
+    crmAccess: false,
+    supportLevel: 'DEDICATED',
+  },
+  {
+    tier: 'PRACTICE_CRM',
+    name: 'Independent Practice Management OS',
+    description: 'Confidential client CRM, statutory compliance calendar, and firm task management for CA practitioners.',
+    priceInrMonthly: 2499,
+    priceInrAnnual: 24990,
+    features: [
+      'Confidential client master repository (Strict workspace tenant isolation)',
+      'Statutory compliance calendar engine (Income Tax, GST, TDS, ROC, Tax Audit 44AB)',
+      'Filing status tracking with ARN / Acknowledgement reference logging',
+      'Personalized post-qualification regulatory checklists (ICAI Form 2 & Form 6 COP)',
+      'Automated internal deadline vs statutory due date monitoring',
+    ],
+    monthlyResumeLimit: -1,
+    monthlyInterviewLimit: -1,
+    maxActiveJobs: 0,
+    crmAccess: true,
+    supportLevel: 'PRIORITY',
+  },
+];

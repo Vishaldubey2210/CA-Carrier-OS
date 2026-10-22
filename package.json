@@ -1,0 +1,20 @@
+{
+  "name": "ca-career-os",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --filter @ca-career-os/api --filter @ca-career-os/web dev",
+    "dev:api": "pnpm --filter @ca-career-os/api dev",
+    "dev:web": "pnpm --filter @ca-career-os/web dev",
+    "build": "pnpm --filter @ca-career-os/shared build && pnpm --filter @ca-career-os/api build && pnpm --filter @ca-career-os/web build",
+    "test": "pnpm --filter @ca-career-os/shared test && pnpm --filter @ca-career-os/api test && pnpm --filter @ca-career-os/web test",
+    "test:db": "pnpm --filter @ca-career-os/api test:db",
+    "typecheck": "pnpm --filter @ca-career-os/shared typecheck && pnpm --filter @ca-career-os/api typecheck && pnpm --filter @ca-career-os/web typecheck",
+    "validate:docs": "node scripts/validate-diagrams.mjs",
+    "sync:docs": "node scripts/sync-architecture-diagrams.mjs"
+  },
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

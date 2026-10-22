@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="140" viewBox="0 0 160 140" fill="none">
+  <circle cx="80" cy="70" r="45" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <circle cx="80" cy="70" r="30" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1.5" />
+  <circle cx="80" cy="70" r="15" fill="rgba(99, 102, 241, 0.1)" stroke="rgba(99, 102, 241, 0.4)" stroke-width="1.5" />
+  <circle cx="80" cy="70" r="3" fill="#6366F1" />
+  <path d="M80 70L105 45" stroke="url(#radarBeam)" stroke-width="2" stroke-linecap="round" />
+  <defs>
+    <linearGradient id="radarBeam" x1="80" y1="70" x2="105" y2="45" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1" />
+      <stop offset="1" stop-color="#06B6D4" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+</svg>

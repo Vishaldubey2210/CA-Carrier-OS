@@ -168,6 +168,193 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobListResponse'
+    post:
+      summary: Direct recruiter or employer job publishing
+      tags: [Jobs & Recruitment]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Job posting created and published
+
+  /api/v1/jobs/ingest:
+    post:
+      summary: Multi-source job ingestion pipeline with fingerprinting and deduplication
+      tags: [Jobs & Recruitment]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Ingestion batch processed
+
+  /api/v1/jobs/saved:
+    get:
+      summary: List saved jobs for the candidate
+      tags: [Jobs & Recruitment]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Array of saved jobs
+
+  /api/v1/jobs/{id}:
+    get:
+      summary: Get job details with candidate match score
+      tags: [Jobs & Recruitment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job details
+
+  /api/v1/jobs/{id}/match:
+    get:
+      summary: Calculate explainable job match against candidate profile
+      tags: [Jobs & Recruitment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Explainable match report
+
+  /api/v1/jobs/{id}/save:
+    post:
+      summary: Save a job to personal candidate workspace
+      tags: [Jobs & Recruitment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Job saved successfully
+    delete:
+      summary: Unsave a job from candidate workspace
+      tags: [Jobs & Recruitment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Job unsaved
+
+  /api/v1/applications:
+    get:
+      summary: List candidate application tracking records (Candidate Blindfold protected)
+      tags: [Application Management]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Array of tracked applications
+    post:
+      summary: Create new application tracking record
+      tags: [Application Management]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Application tracking record created
+
+  /api/v1/applications/{id}:
+    get:
+      summary: Get application details with status history and follow-up tasks
+      tags: [Application Management]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application record with history
+
+  /api/v1/applications/{id}/status:
+    patch:
+      summary: Transition application status with validation of valid workflow state progression
+      tags: [Application Management]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application status transitioned and audit recorded
+
+  /api/v1/applications/{id}/follow-ups:
+    post:
+      summary: Create a follow-up task for an application
+      tags: [Application Management]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Follow-up task created
+
+  /api/v1/resumes:
+    get:
+      summary: List resume summaries for candidate
+      tags: [Resume & Branding]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Array of candidate resumes
+    post:
+      summary: Create master resume from candidate profile facts
+      tags: [Resume & Branding]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Master resume created
+
+  /api/v1/resumes/draft-letter:
+    post:
+      summary: Generate job-specific cover letter draft based on verified candidate profile facts
+      tags: [Resume & Branding]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Cover letter draft
+
+  /api/v1/resumes/portfolio:
+    get:
+      summary: List portfolio entries
+      tags: [Resume & Branding]
+      responses:
+        '200':
+          description: Array of portfolio entries
+    post:
+      summary: Create portfolio entry
+      tags: [Resume & Branding]
+      responses:
+        '201':
+          description: Portfolio entry created
 
   /api/v1/resumes/tailor:
     post:
@@ -265,6 +452,144 @@ paths:
               schema:
                 $ref: '#/components/schemas/InterviewSessionResponse'
 
+  /api/v1/interviews/questions:
+    get:
+      summary: Browse and filter technical question bank
+      tags: [Interview & Skills Lab]
+      parameters:
+        - name: pathway
+          in: query
+          schema:
+            type: string
+            enum: [AUDIT, TAX, FPA, CORP_FIN, IB, CONSULTING, PRACTICE]
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of filtered technical questions with rubric criteria
+
+  /api/v1/interviews/sessions/{id}:
+    get:
+      summary: Retrieve candidate mock interview session details and question states
+      tags: [Interview & Skills Lab]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Full session state including questions, answers, and scores
+
+  /api/v1/interviews/sessions/{id}/answers:
+    post:
+      summary: Submit candidate answer for rubric evaluation
+      tags: [Interview & Skills Lab]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [questionId, answer]
+              properties:
+                questionId:
+                  type: string
+                  format: uuid
+                answer:
+                  type: string
+      responses:
+        '200':
+          description: Evaluated question item with score, strengths, and improvement areas
+
+  /api/v1/interviews/sessions/{id}/evaluate:
+    post:
+      summary: Conclude interview session, aggregate overall score, and generate adaptive learning tasks
+      tags: [Interview & Skills Lab]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Completed session evaluation report with roadmap task injection
+
+  /api/v1/billing/plans:
+    get:
+      summary: List available SaaS subscription plans and entitlements
+      tags: [Billing & Subscriptions]
+      responses:
+        '200':
+          description: List of available plans
+
+  /api/v1/billing/subscription:
+    get:
+      summary: Get active workspace subscription state
+      tags: [Billing & Subscriptions]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Current subscription details
+
+  /api/v1/billing/checkout:
+    post:
+      summary: Initiate Razorpay checkout order for plan upgrade
+      tags: [Billing & Subscriptions]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Checkout session created
+
+  /api/v1/billing/webhooks/razorpay:
+    post:
+      summary: Process signature-verified Razorpay payment webhook
+      tags: [Billing & Subscriptions]
+      parameters:
+        - name: X-Razorpay-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook processed idempotently
+        '401':
+          description: Invalid webhook signature
+
+  /api/v1/billing/invoices:
+    get:
+      summary: List GST-compliant tax invoices for workspace
+      tags: [Billing & Subscriptions]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Invoices list
+
   /api/v1/financial/unbundle-ctc:
     post:
       summary: Unbundle CTC offer terms into take-home pay and tax estimates
@@ -282,6 +607,156 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnbundleCtcResponse'
+
+  /api/v1/financial/salary-benchmarks:
+    get:
+      summary: Retrieve verified salary benchmarks with provenance and limitations
+      tags: [Financial Intelligence]
+      parameters:
+        - name: pathway
+          in: query
+          schema:
+            type: string
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: industry
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of salary benchmarks
+
+  /api/v1/financial/offers:
+    get:
+      summary: List candidate private offer comparison entries
+      tags: [Financial Intelligence]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: User offer comparisons
+    post:
+      summary: Record new offer comparison entry
+      tags: [Financial Intelligence]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Offer comparison created
+
+  /api/v1/mentorship/mentors:
+    get:
+      summary: List verified senior CA mentors
+      tags: [Mentorship Marketplace]
+      parameters:
+        - name: pathway
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of mentors
+
+  /api/v1/mentorship/bookings:
+    get:
+      summary: List candidate mentor bookings
+      tags: [Mentorship Marketplace]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: List of bookings
+    post:
+      summary: Reserve mentor session slot with concurrency conflict prevention
+      tags: [Mentorship Marketplace]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Booking confirmed
+        '409':
+          description: Slot already reserved
+
+  /api/v1/community/posts:
+    get:
+      summary: List active professional community threads
+      tags: [Professional Community]
+      responses:
+        '200':
+          description: List of discussion posts
+    post:
+      summary: Create community post with ICAI Code of Ethics non-solicitation enforcement
+      tags: [Professional Community]
+      responses:
+        '201':
+          description: Post published
+        '400':
+          description: Ethics solicitation violation
+
+  /api/v1/practice/post-qualification/checklist:
+    get:
+      summary: Retrieve personalized post-qualification statutory checklist
+      tags: [Practice Management]
+      responses:
+        '200':
+          description: Post-qualification checklist items
+
+  /api/v1/practice/clients:
+    get:
+      summary: List firm clients within authorized practice workspace
+      tags: [Practice Management]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Client records
+    post:
+      summary: Add client record to firm practice directory
+      tags: [Practice Management]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Client created
+
+  /api/v1/practice/tasks:
+    get:
+      summary: List statutory compliance tasks with filing deadlines
+      tags: [Practice Management]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Compliance tasks
+    post:
+      summary: Create compliance task for client
+      tags: [Practice Management]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '201':
+          description: Compliance task created
+
+  /api/v1/recruitment/employers:
+    get:
+      summary: List verified employers and companies
+      tags: [Recruitment Operations]
+      responses:
+        '200':
+          description: Employer directory
+
+  /api/v1/recruitment/candidate-discovery:
+    get:
+      summary: Controlled candidate discovery with consent and privacy masking
+      tags: [Recruitment Operations]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdHeader'
+      responses:
+        '200':
+          description: Candidate matches
 
   /api/v1/agent/chat:
     post:
