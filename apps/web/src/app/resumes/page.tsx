@@ -576,8 +576,8 @@ Priya Sharma, ACA`;
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                    <CheckCircle2 size={20} color="var(--accent-emerald)" />
-                    <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                    <CheckCircle2 size={20} color="var(--success-text)" />
+                    <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                       Articleship Completion Extraction Confirmed
                     </h4>
                     <span className="badge badge-emerald">{docUploadResult.status}</span>
@@ -601,41 +601,42 @@ Priya Sharma, ACA`;
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
                     gap: '1rem',
-                    background: 'rgba(0, 0, 0, 0.25)',
+                    background: 'var(--surface-primary)',
+                    border: '1px solid var(--border-subtle)',
                     padding: '1rem',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     fontSize: '0.8125rem',
                   }}
                 >
                   <div>
                     <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>Training Firm:</span>
-                    <strong style={{ color: '#ffffff' }}>{docUploadResult.extractedData?.firmName}</strong>
+                    <strong style={{ color: 'var(--text-primary)' }}>{docUploadResult.extractedData?.firmName}</strong>
                   </div>
                   <div>
                     <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>Firm Registration No (FRN):</span>
-                    <strong style={{ color: 'var(--accent-cyan)', fontFamily: 'monospace' }}>
+                    <strong style={{ color: 'var(--brand-primary)', fontFamily: 'monospace' }}>
                       {docUploadResult.extractedData?.firmRegistrationNumber}
                     </strong>
                   </div>
                   <div>
                     <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>Principal CA:</span>
-                    <strong style={{ color: '#ffffff' }}>{docUploadResult.extractedData?.principalName}</strong>
+                    <strong style={{ color: 'var(--text-primary)' }}>{docUploadResult.extractedData?.principalName}</strong>
                   </div>
                   <div>
                     <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>Articleship Dates:</span>
-                    <strong style={{ color: '#ffffff' }}>
+                    <strong style={{ color: 'var(--text-primary)' }}>
                       {docUploadResult.extractedData?.articleshipStartDate} to {docUploadResult.extractedData?.articleshipEndDate}
                     </strong>
                   </div>
                   <div>
                     <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>Duration Served:</span>
-                    <strong style={{ color: 'var(--accent-emerald)' }}>
+                    <strong style={{ color: 'var(--success-text)' }}>
                       {docUploadResult.extractedData?.totalWeeksServed} Weeks (Statutory 36 Months)
                     </strong>
                   </div>
                   <div>
                     <span style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>Stipend Compliant:</span>
-                    <strong style={{ color: docUploadResult.extractedData?.stipendConfirmed ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
+                    <strong style={{ color: docUploadResult.extractedData?.stipendConfirmed ? 'var(--success-text)' : 'var(--warning-text)' }}>
                       {docUploadResult.extractedData?.stipendConfirmed ? 'Confirmed (ICAI Reg 48 Bank Disbursal)' : 'Unconfirmed'}
                     </strong>
                   </div>

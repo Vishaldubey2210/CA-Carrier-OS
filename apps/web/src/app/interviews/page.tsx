@@ -749,8 +749,8 @@ export default function InterviewPrepPage() {
                         ))}
                       </div>
 
-                      <div style={{ background: 'rgba(239, 68, 68, 0.08)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.75rem', color: '#fca5a5' }}>
-                        <span style={{ fontWeight: 700, color: '#ef4444', display: 'block', marginBottom: '0.25rem' }}>Improvement Focus:</span>
+                      <div style={{ background: 'var(--danger-surface)', border: '1px solid var(--danger-border)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--danger-text)' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--danger-text)', display: 'block', marginBottom: '0.25rem' }}>Improvement Focus:</span>
                         {questionEvaluations[activeQuestion.id].improvementAreas.map((w, i) => (
                           <div key={i}>• {w}</div>
                         ))}

@@ -660,8 +660,9 @@ export default function CareerHubPage() {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1.5rem',
-          background: 'linear-gradient(135deg, rgba(20, 27, 45, 0.9) 0%, rgba(10, 14, 25, 0.95) 100%)',
+          background: 'var(--surface-primary)',
           border: '1px solid var(--border-subtle)',
+          boxShadow: 'var(--shadow-card)',
         }}
       >
         <div>

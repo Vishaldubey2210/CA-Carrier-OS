@@ -821,47 +821,27 @@ export default function JobsPage() {
                     }}
                   >
                     <div>
-                      {/* Top Badges: Channel, Opportunity Type & Freshness Verification */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.375rem' }}>
+                      {/* Editorial Metadata Strip */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap', marginBottom: '0.375rem' }}>
                         {job.channel === 'EXTERNAL' ? (
-                          <span className="badge badge-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <Globe size={11} /> External Opportunity • Via {job.sourceProvider || 'ATS Feed'}
+                          <span className="badge badge-indigo" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
+                            <Globe size={11} /> External Mandate
                           </span>
                         ) : (
                           <span className="badge badge-cyan" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <ShieldCheck size={11} /> Native Enterprise Mandate
+                            <ShieldCheck size={11} /> Verified Mandate
                           </span>
                         )}
 
-                        {job.opportunityType === 'ARTICLESHIP' && (
-                          <span className="badge badge-cyan" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <GraduationCap size={11} /> Articleship (Form 108)
-                          </span>
-                        )}
-                        {job.opportunityType === 'INDUSTRIAL_TRAINING' && (
-                          <span className="badge badge-amber" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <Sparkles size={11} /> CA Industrial Training
-                          </span>
-                        )}
-                        {job.opportunityType === 'CA_FRESHER' && (
-                          <span className="badge badge-emerald" style={{ fontSize: '0.7rem' }}>CA Fresher</span>
-                        )}
-                        {job.opportunityType === 'QUALIFIED_CA' && (
-                          <span className="badge badge-indigo" style={{ fontSize: '0.7rem' }}>Qualified CA</span>
-                        )}
-                        {job.opportunityType === 'FINANCE_EXECUTIVE' && (
-                          <span className="badge badge-cyan" style={{ fontSize: '0.7rem' }}>FP&A / Corporate Finance</span>
-                        )}
-
-                        {job.verificationStatus === 'SOURCE_ACTIVE' ? (
-                          <span className="badge badge-emerald" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <CheckCircle2 size={11} /> Source Active
-                          </span>
-                        ) : job.verificationStatus === 'STALE' ? (
-                          <span className="badge badge-rose" style={{ fontSize: '0.7rem' }}>Stale (&gt;30d)</span>
-                        ) : (
-                          <span className="badge badge-amber" style={{ fontSize: '0.7rem' }}>Active Unconfirmed</span>
-                        )}
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                          {job.opportunityType === 'ARTICLESHIP' && 'Articleship (Form 108)'}
+                          {job.opportunityType === 'INDUSTRIAL_TRAINING' && 'Industrial Training'}
+                          {job.opportunityType === 'CA_FRESHER' && 'CA Fresher'}
+                          {job.opportunityType === 'QUALIFIED_CA' && 'Qualified CA'}
+                          {job.opportunityType === 'FINANCE_EXECUTIVE' && 'FP&A / Corporate Finance'}
+                          {job.sourceProvider ? ` • via ${job.sourceProvider}` : ''}
+                          {job.verificationStatus === 'SOURCE_ACTIVE' ? ' • Active' : job.verificationStatus === 'STALE' ? ' • Stale (>30d)' : ''}
+                        </span>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.25rem' }}>
