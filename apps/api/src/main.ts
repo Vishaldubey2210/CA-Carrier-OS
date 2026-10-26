@@ -1,58 +1,43 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module.js';
 import { env } from './common/config/env.config.js';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
+import { StructuredLoggerService } from './common/logger/structured-logger.service.js';
+import { configureApp } from './setup-app.js';
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
+  const logger = new StructuredLoggerService('Bootstrap');
   const app = await NestFactory.create(AppModule, {
+    logger,
     bufferLogs: true,
   });
 
-  // Enable CORS with strict origin validation
-  const configuredOrigins = env.CORS_ORIGIN
-    ? env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
-    : [];
-  const allowedOrigins = new Set([
-    ...configuredOrigins,
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-  ]);
+  // Apply unified CORS, filters, and interceptors
+  configureApp(app);
 
-  app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., server-to-server proxy rewrites, curl, health probes)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.has(origin)) {
-        return callback(null, true);
-      }
-      // Allow preview deployments if explicitly permitted
-      if (process.env.CORS_ALLOW_VERCEL_PREVIEWS === 'true' && /^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/.test(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, false);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'x-request-id',
-      'x-correlation-id',
-      'x-workspace-id',
-    ],
-  });
-
-  // Global filters and interceptors
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor());
-
-  // Graceful shutdown
+  // Graceful shutdown hooks
   app.enableShutdownHooks();
+
+  const handleShutdown = async (signal: string) => {
+    logger.log(`Received ${signal}. Initiating graceful shutdown...`);
+    const shutdownTimer = setTimeout(() => {
+      logger.error('Graceful shutdown timed out after 10000ms. Forcing process termination.');
+      process.exit(1);
+    }, 10000);
+    shutdownTimer.unref();
+
+    try {
+      await app.close();
+      logger.log('HTTP server and background dependencies cleanly closed.');
+      process.exit(0);
+    } catch (err: any) {
+      logger.error(`Error during graceful shutdown: ${err?.message}`);
+      process.exit(1);
+    }
+  };
+
+  process.once('SIGTERM', () => handleShutdown('SIGTERM'));
+  process.once('SIGINT', () => handleShutdown('SIGINT'));
 
   await app.listen(env.PORT, '0.0.0.0');
   logger.log(`🚀 CA Career OS API running on http://localhost:${env.PORT}`);
@@ -61,6 +46,7 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => {
-  console.error('Fatal bootstrap error:', err);
+  const bootstrapLogger = new StructuredLoggerService('Bootstrap');
+  bootstrapLogger.fatal(`Fatal bootstrap error: ${err?.message || err}`, undefined, { error: err });
   process.exit(1);
 });

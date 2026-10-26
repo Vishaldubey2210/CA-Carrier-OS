@@ -16,11 +16,14 @@ import {
   CreditCard,
   Building,
   User,
+  Settings,
+  Sparkles,
 } from 'lucide-react';
 import { WorkspaceType } from '@ca-career-os/shared';
 
 const CANDIDATE_NAV_ITEMS = [
-  { href: '/', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/onboarding', label: 'Onboarding Wizard', icon: Sparkles },
   { href: '/career', label: 'Career Pathway', icon: Compass },
   { href: '/jobs', label: 'Job Discovery', icon: Briefcase },
   { href: '/resumes', label: 'Verified Resumes', icon: FileText },
@@ -28,6 +31,7 @@ const CANDIDATE_NAV_ITEMS = [
   { href: '/growth', label: 'Growth & Mentorship', icon: TrendingUp },
   { href: '/practice', label: 'Practice OS', icon: BriefcaseBusiness },
   { href: '/billing', label: 'Billing & Plans', icon: CreditCard },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Sidebar() {
@@ -46,23 +50,23 @@ export function Sidebar() {
               width: '36px',
               height: '36px',
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)',
+              background: 'var(--brand-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
               fontWeight: 800,
               fontSize: '0.9375rem',
-              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+              boxShadow: '0 2px 4px rgba(15, 23, 42, 0.1)',
             }}
           >
             CA
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '0.9375rem', letterSpacing: '-0.02em', color: '#ffffff' }}>
+            <div style={{ fontWeight: 800, fontSize: '0.9375rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
               CA Career OS
             </div>
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.04em', fontWeight: 600 }}>
               ICAI PROFESSIONAL
             </div>
           </div>
@@ -75,12 +79,12 @@ export function Sidebar() {
           style={{
             padding: '0.625rem 0.75rem',
             borderRadius: 'var(--radius-md)',
-            background: 'rgba(255, 255, 255, 0.03)',
+            background: 'var(--surface-secondary)',
             border: '1px solid var(--border-subtle)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-            <span style={{ fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', fontWeight: 600 }}>
               Active Workspace
             </span>
             <span className={isOrg ? 'badge badge-cyan' : 'badge badge-indigo'} style={{ fontSize: '0.625rem', padding: '0.125rem 0.375rem' }}>
@@ -88,7 +92,7 @@ export function Sidebar() {
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-            {isOrg ? <Building size={12} color="var(--accent-cyan)" /> : <User size={12} color="var(--accent-indigo)" />}
+            {isOrg ? <Building size={13} color="var(--brand-teal)" /> : <User size={13} color="var(--brand-primary)" />}
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {activeWorkspace?.name || 'Personal Workspace'}
             </span>
@@ -97,7 +101,7 @@ export function Sidebar() {
       </div>
 
       {/* Main Navigation */}
-      <nav style={{ padding: '0.5rem 0.75rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <nav style={{ padding: '0.5rem 0.625rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.125rem', overflowY: 'auto' }}>
         {CANDIDATE_NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -107,8 +111,8 @@ export function Sidebar() {
               href={item.href}
               className={`nav-link ${isActive ? 'active' : ''}`}
             >
-              <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
-              <span>{item.label}</span>
+              <Icon size={16} strokeWidth={isActive ? 2.2 : 1.75} style={{ flexShrink: 0 }} />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
             </Link>
           );
         })}
@@ -119,12 +123,12 @@ export function Sidebar() {
         style={{
           padding: '1.25rem',
           borderTop: '1px solid var(--border-subtle)',
-          background: 'rgba(0, 0, 0, 0.2)',
+          background: 'var(--surface-secondary)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
-          <ShieldCheck size={16} color="var(--accent-emerald)" />
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-emerald)' }}>
+          <ShieldCheck size={16} color="var(--success-text)" />
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success-text)' }}>
             Candidate Blindfold Active
           </span>
         </div>

@@ -1,0 +1,15 @@
+{
+  "model_name": "Random Forest Regressor",
+  "features": [
+    "is_eligible",
+    "pathway_match",
+    "mandatory_skills_ratio",
+    "preferred_skills_ratio",
+    "firm_tier_match",
+    "location_match"
+  ],
+  "test_mae": 0.029686274509826686,
+  "test_r2": 0.9999570140141492,
+  "spearman_rho": 0.9999283231192857,
+  "artifact_path": "/home/vishal/Downloads/CA Carrer OS/models/ca_job_matcher_v1.pkl"
+}

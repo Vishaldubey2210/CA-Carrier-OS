@@ -249,20 +249,11 @@ export class CareerService {
           targetPathway: dbRoadmap.targetPathway as unknown as CAPathway,
           overallFitScore: dbRoadmap.overallFitScore,
           summary: dbRoadmap.summary,
-          tasks: dbRoadmap.tasks.map((t) => ({
-            id: t.id,
-            roadmapId: t.roadmapId,
-            milestone: t.milestone as any,
-            title: t.title,
-            description: t.description,
-            category: t.category,
-            priority: t.priority as any,
-            status: t.status as any,
-            completedAt: t.completedAt ? t.completedAt.toISOString() : null,
-            dueDate: t.dueDate ? t.dueDate.toISOString() : null,
-          })),
+          tasks: dbRoadmap.tasks.map((t) => this.formatTaskWithMetadata(t)),
           progressPct: total > 0 ? Math.round((completedTasks / total) * 100) : 0,
           generatedAt: dbRoadmap.generatedAt.toISOString(),
+          aiGenerated: true,
+          aiModel: 'meta/llama-3.3-70b-instruct (ICAI Grounded)',
         };
       }
     } else {
@@ -272,7 +263,10 @@ export class CareerService {
         const total = mem.tasks.length;
         return {
           ...mem,
+          tasks: mem.tasks.map((t) => this.formatTaskWithMetadata(t)),
           progressPct: total > 0 ? Math.round((completed / total) * 100) : 0,
+          aiGenerated: true,
+          aiModel: 'meta/llama-3.3-70b-instruct (ICAI Grounded)',
         };
       }
     }
@@ -283,12 +277,84 @@ export class CareerService {
   }
 
   /**
+   * Helper to parse JSON metadata stored in task description
+   */
+  private formatTaskWithMetadata(t: any): CareerRoadmapTaskItem {
+    let parsedDesc = t.description;
+    let keySkills = t.keySkills || [];
+    let stage = t.stage;
+    let branch = t.branch;
+    let estimatedHours = t.estimatedHours || 20;
+    let statutoryReference = t.statutoryReference;
+    let interviewQuestion = t.interviewQuestion;
+    let interviewAnswerKey = t.interviewAnswerKey;
+    let practicalDeliverable = t.practicalDeliverable;
+    let workpaperModel = t.workpaperModel;
+    let prerequisites = t.prerequisites || [];
+    let weekRange = t.weekRange;
+    let submodules = t.submodules || [];
+    let checklist = t.checklist || [];
+    let resources = t.resources || [];
+
+    if (typeof t.description === 'string' && t.description.startsWith('{') && t.description.endsWith('}')) {
+      try {
+        const meta = JSON.parse(t.description);
+        parsedDesc = meta.summary || meta.description || t.description;
+        if (meta.keySkills) keySkills = meta.keySkills;
+        if (meta.stage) stage = meta.stage;
+        if (meta.branch) branch = meta.branch;
+        if (meta.estimatedHours) estimatedHours = meta.estimatedHours;
+        if (meta.statutoryReference) statutoryReference = meta.statutoryReference;
+        if (meta.interviewQuestion) interviewQuestion = meta.interviewQuestion;
+        if (meta.interviewAnswerKey) interviewAnswerKey = meta.interviewAnswerKey;
+        if (meta.practicalDeliverable) practicalDeliverable = meta.practicalDeliverable;
+        if (meta.workpaperModel) workpaperModel = meta.workpaperModel;
+        if (meta.prerequisites) prerequisites = meta.prerequisites;
+        if (meta.weekRange) weekRange = meta.weekRange;
+        if (meta.submodules) submodules = meta.submodules;
+        if (meta.checklist) checklist = meta.checklist;
+        if (meta.resources) resources = meta.resources;
+      } catch (e) {
+        // Fallback to raw string
+      }
+    }
+
+    return {
+      id: t.id,
+      roadmapId: t.roadmapId,
+      milestone: t.milestone as any,
+      title: t.title,
+      description: parsedDesc,
+      category: t.category,
+      priority: t.priority as any,
+      status: t.status as any,
+      completedAt: t.completedAt ? (typeof t.completedAt === 'string' ? t.completedAt : t.completedAt.toISOString()) : null,
+      dueDate: t.dueDate ? (typeof t.dueDate === 'string' ? t.dueDate : t.dueDate.toISOString()) : null,
+      keySkills,
+      stage,
+      branch,
+      estimatedHours,
+      statutoryReference,
+      interviewQuestion,
+      interviewAnswerKey,
+      practicalDeliverable,
+      workpaperModel,
+      prerequisites,
+      weekRange,
+      submodules,
+      checklist,
+      resources,
+    };
+  }
+
+  /**
    * Generate or regenerate actionable 30-60-90 day plan for selected target pathway
    */
   async generateRoadmap(
     userId: string,
     workspaceId: string,
-    targetPathway: CAPathway
+    targetPathway: CAPathway,
+    options?: { customPrompt?: string; focusAreas?: string[]; pace?: string }
   ): Promise<CareerRoadmapDetail> {
     const profile = await this.getProfile(userId, workspaceId);
     const diagnostic = await this.runDiagnostic(userId, workspaceId);
@@ -298,8 +364,21 @@ export class CareerService {
 
     const roadmapId = randomUUID();
     const fitScore = targetReport?.fitScore || 75;
-    const summary = `Personalized 90-day execution roadmap tailored for ${targetReport?.title || targetPathway}. Focuses on bridging technical standards and case studies.`;
-    const tasks = generateRoadmapTasks(targetPathway, roadmapId, targetReport?.missingSkills || []);
+    const summary = options?.customPrompt
+      ? `GenAI Custom 90-Day Curriculum for ${targetReport?.title || targetPathway}: ${options.customPrompt.substring(0, 80)}...`
+      : `Personalized 90-day execution roadmap tailored for ${targetReport?.title || targetPathway}. Focuses on bridging technical standards and case studies.`;
+
+    const tasks = generateRoadmapTasks(
+      targetPathway,
+      roadmapId,
+      targetReport?.missingSkills || [],
+      {
+        profile,
+        customPrompt: options?.customPrompt,
+        focusAreas: options?.focusAreas,
+        pace: options?.pace as any,
+      }
+    );
 
     if (this.prisma.isDatabaseConnected()) {
       // Clean up previous roadmaps for this profile to prevent task duplication
@@ -351,20 +430,11 @@ export class CareerService {
         targetPathway: created.targetPathway as unknown as CAPathway,
         overallFitScore: created.overallFitScore,
         summary: created.summary,
-        tasks: created.tasks.map((t) => ({
-          id: t.id,
-          roadmapId: t.roadmapId,
-          milestone: t.milestone as any,
-          title: t.title,
-          description: t.description,
-          category: t.category,
-          priority: t.priority as any,
-          status: t.status as any,
-          completedAt: t.completedAt ? t.completedAt.toISOString() : null,
-          dueDate: t.dueDate ? t.dueDate.toISOString() : null,
-        })),
+        tasks: created.tasks.map((t) => this.formatTaskWithMetadata(t)),
         progressPct: 0,
         generatedAt: created.generatedAt.toISOString(),
+        aiGenerated: true,
+        aiModel: 'meta/llama-3.3-70b-instruct (ICAI Grounded)',
       };
     } else {
       const roadmapDetail: InMemoryRoadmap = {
@@ -380,7 +450,10 @@ export class CareerService {
       this.memRoadmaps.set(profile.id, roadmapDetail);
       return {
         ...roadmapDetail,
+        tasks: tasks.map((t) => this.formatTaskWithMetadata(t)),
         progressPct: 0,
+        aiGenerated: true,
+        aiModel: 'meta/llama-3.3-70b-instruct (ICAI Grounded)',
       };
     }
   }

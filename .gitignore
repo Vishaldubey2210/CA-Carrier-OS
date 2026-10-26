@@ -30,3 +30,23 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# AI / ML Datasets & Models
+data/raw/
+data/interim/
+data/processed/
+data/external/
+data/annotations/*.json
+data/annotations/*.tmp
+apps/api/data/
+models/*.bin
+models/*.pt
+models/*.onnx
+models/*.pkl
+.ipynb_checkpoints/
+*.egg-info/
+__pycache__/
+
+# Vercel Project Metadata
+.vercel/
+

@@ -365,8 +365,8 @@ Priya Sharma, ACA`;
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.375rem' }}>
-            <FileText size={24} color="var(--accent-indigo)" />
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+            <FileText size={24} color="var(--brand-primary)" />
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               AI Resume Builder & Zero-Fabrication Studio
             </h1>
           </div>
@@ -379,10 +379,10 @@ Priya Sharma, ACA`;
         <div
           style={{
             display: 'flex',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: 'var(--surface-secondary)',
             padding: '0.25rem',
             borderRadius: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid var(--border-subtle)',
             gap: '0.25rem',
           }}
         >
@@ -427,14 +427,14 @@ Priya Sharma, ACA`;
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          borderLeft: '4px solid var(--accent-emerald)',
-          background: 'rgba(16, 185, 129, 0.05)',
+          borderLeft: '4px solid var(--success-text)',
+          background: 'var(--success-surface)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <CheckCircle2 size={20} color="var(--accent-emerald)" />
+          <CheckCircle2 size={20} color="var(--success-text)" />
           <div>
-            <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#ffffff' }}>
+            <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               ICAI Articleship Verification Active — Big 4 Certified
             </h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -468,8 +468,8 @@ Priya Sharma, ACA`;
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                  <ShieldCheck size={22} color="var(--accent-emerald)" />
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
+                  <ShieldCheck size={22} color="var(--success-text)" />
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     ICAI Form 108 Document Intelligence & Articleship Verification (F-038)
                   </h3>
                 </div>
@@ -486,7 +486,7 @@ Priya Sharma, ACA`;
                   className="btn btn-secondary"
                   style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem' }}
                 >
-                  <Sparkles size={14} color="var(--accent-cyan)" />
+                  <Sparkles size={14} color="var(--brand-primary)" />
                   Load Verified Sample (Fast Test)
                 </button>
               </div>
@@ -495,20 +495,20 @@ Priya Sharma, ACA`;
             {/* Upload Zone */}
             <div
               style={{
-                border: '2px dashed rgba(255, 255, 255, 0.15)',
+                border: '2px dashed var(--border-subtle)',
                 borderRadius: '8px',
                 padding: '2rem',
                 textAlign: 'center',
-                background: 'rgba(15, 23, 42, 0.5)',
+                background: 'var(--surface-secondary)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '0.75rem',
               }}
             >
-              <Upload size={32} color="var(--accent-indigo)" />
+              <Upload size={32} color="var(--brand-primary)" />
               <div>
-                <p style={{ color: '#ffffff', fontWeight: 600, fontSize: '0.9375rem', margin: '0 0 0.25rem 0' }}>
+                <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.9375rem', margin: '0 0 0.25rem 0' }}>
                   Upload Form 108 or Articleship Completion Letter
                 </p>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0 }}>
@@ -649,7 +649,7 @@ Priya Sharma, ACA`;
         <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.25rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
                 Job-Specific Cover Letter & Recruiter Outreach
               </h3>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -673,9 +673,9 @@ Priya Sharma, ACA`;
                 value={coverJobTargetId}
                 onChange={(e) => setCoverJobTargetId(e.target.value)}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#ffffff',
+                  background: 'var(--surface-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
                   padding: '0.5rem',
                   borderRadius: '6px',
                   fontSize: '0.875rem',
@@ -695,9 +695,9 @@ Priya Sharma, ACA`;
                 value={coverTone}
                 onChange={(e) => setCoverTone(e.target.value as any)}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#ffffff',
+                  background: 'var(--surface-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
                   padding: '0.5rem',
                   borderRadius: '6px',
                   fontSize: '0.875rem',
@@ -712,11 +712,11 @@ Priya Sharma, ACA`;
 
           <div
             style={{
-              background: 'rgba(15, 23, 42, 0.7)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: 'var(--surface-secondary)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '8px',
               padding: '1.5rem',
-              color: '#e2e8f0',
+              color: 'var(--text-primary)',
               fontSize: '0.875rem',
               lineHeight: 1.7,
               whiteSpace: 'pre-wrap',
@@ -740,12 +740,12 @@ Priya Sharma, ACA`;
                 alignItems: 'flex-start',
                 flexWrap: 'wrap',
                 gap: '1rem',
-                borderLeft: activeVersionId === ver.id ? '4px solid var(--accent-cyan)' : '4px solid transparent',
+                borderLeft: activeVersionId === ver.id ? '4px solid var(--brand-primary)' : '4px solid transparent',
               }}
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.25rem' }}>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                     {ver.title}
                   </h3>
                   <span className="badge badge-indigo">v{ver.versionNumber}</span>
@@ -800,7 +800,7 @@ Priya Sharma, ACA`;
             {/* Executive Summary */}
             <div className="glass-panel" style={{ padding: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   Executive Profile Summary
                 </h3>
                 <span className="badge badge-emerald">Verified Facts</span>
@@ -822,10 +822,10 @@ Priya Sharma, ACA`;
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  background: 'rgba(15, 23, 42, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: 'var(--surface-primary)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '6px',
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                   fontSize: '0.8125rem',
                   lineHeight: 1.5,
                 }}
@@ -836,7 +836,7 @@ Priya Sharma, ACA`;
             <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                     Articleship & Practical Experience
                   </h3>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -857,12 +857,12 @@ Priya Sharma, ACA`;
                       fontSize: '0.8125rem',
                       color: 'var(--text-secondary)',
                       lineHeight: 1.5,
-                      background: 'rgba(255, 255, 255, 0.02)',
+                      background: 'var(--surface-secondary)',
                       padding: '0.5rem',
                       borderRadius: '6px',
                     }}
                   >
-                    <CheckCircle2 size={15} color="var(--accent-emerald)" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <CheckCircle2 size={15} color="var(--success-text)" style={{ marginTop: '2px', flexShrink: 0 }} />
                     <span>{h}</span>
                   </div>
                 ))}
@@ -871,7 +871,7 @@ Priya Sharma, ACA`;
 
             {/* Qualifications */}
             <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
                 Qualifications & Degrees
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -884,11 +884,12 @@ Priya Sharma, ACA`;
                       alignItems: 'center',
                       padding: '0.5rem 0.75rem',
                       borderRadius: '6px',
-                      background: 'rgba(255, 255, 255, 0.03)',
+                      background: 'var(--surface-secondary)',
+                      border: '1px solid var(--border-subtle)',
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 600, color: '#ffffff', fontSize: '0.8125rem' }}>{q.title}</div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.8125rem' }}>{q.title}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{q.institution} ({q.year})</div>
                     </div>
                     {q.scoreOrRank && <span className="badge badge-indigo">{q.scoreOrRank}</span>}
@@ -902,7 +903,7 @@ Priya Sharma, ACA`;
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Core Competencies */}
             <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 Skills & Accounting Standards
               </h3>
 
@@ -935,17 +936,17 @@ Priya Sharma, ACA`;
 
             {/* Client Audit Projects */}
             <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
                 Representative Client Engagements
               </h3>
               {activeVersion.parsedContent.projects.map((proj, i) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                  <div style={{ fontWeight: 600, color: '#ffffff', fontSize: '0.875rem' }}>{proj.title}</div>
+                  <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.875rem' }}>{proj.title}</div>
                   <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0 }}>
                     {proj.description}
                   </p>
                   {proj.impact && (
-                    <p style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', margin: 0, fontWeight: 500 }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--success-text)', margin: 0, fontWeight: 500 }}>
                       Impact: {proj.impact}
                     </p>
                   )}
@@ -955,7 +956,7 @@ Priya Sharma, ACA`;
 
             {/* Certifications */}
             <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
                 ICAI Professional Certifications
               </h3>
               <ul style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: 1.6 }}>
@@ -995,7 +996,7 @@ Priya Sharma, ACA`;
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                   Zero-Fabrication Resume Tailoring (ADR-009)
                 </h3>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -1016,9 +1017,9 @@ Priya Sharma, ACA`;
                 value={selectedTargetJobId}
                 onChange={(e) => setSelectedTargetJobId(e.target.value)}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#ffffff',
+                  background: 'var(--surface-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
                   padding: '0.5rem',
                   borderRadius: '6px',
                   fontSize: '0.875rem',
@@ -1039,9 +1040,9 @@ Priya Sharma, ACA`;
                 value={tailorEmphasis}
                 onChange={(e) => setTailorEmphasis(e.target.value)}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#ffffff',
+                  background: 'var(--surface-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
                   padding: '0.5rem',
                   borderRadius: '6px',
                   fontSize: '0.875rem',
@@ -1052,10 +1053,10 @@ Priya Sharma, ACA`;
             {/* Candidate Attestation Checkbox */}
             <div
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
+                background: 'var(--surface-secondary)',
                 padding: '0.875rem',
                 borderRadius: '6px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '1px solid var(--border-subtle)',
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '0.625rem',
@@ -1091,7 +1092,8 @@ Priya Sharma, ACA`;
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.75)',
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1110,10 +1112,11 @@ Priya Sharma, ACA`;
               display: 'flex',
               flexDirection: 'column',
               gap: '1.25rem',
+              background: 'var(--surface-primary)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 Resume Preview & Export — {activeVersion.title}
               </h3>
               <button
@@ -1126,11 +1129,11 @@ Priya Sharma, ACA`;
 
             <div
               style={{
-                background: 'rgba(15, 23, 42, 0.7)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'var(--surface-secondary)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
                 padding: '1.5rem',
-                color: '#e2e8f0',
+                color: 'var(--text-primary)',
                 fontSize: '0.8125rem',
                 lineHeight: 1.6,
                 fontFamily: 'monospace',

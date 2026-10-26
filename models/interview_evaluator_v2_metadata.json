@@ -1,0 +1,15 @@
+{
+  "model_name": "Interview_Evaluator_Technical_Rubric_v2",
+  "version": "2.0.0",
+  "dataset": "mmlu_professional_accounting_test.parquet",
+  "question_count": 282,
+  "evaluation_method": "Deterministic Multi-Factor Rubric with Concept Coverage and Anti-Hallucination Penalties",
+  "agent_safety_verified": {
+    "hitl_tokens": true,
+    "ttl_expiry_enforced": true,
+    "replay_protection_enforced": true,
+    "tamper_proofing_enforced": true
+  },
+  "artifact_path": "/home/vishal/Downloads/CA Carrer OS/models/interview_evaluator_v2.pkl",
+  "remediation_note": "Replaced 2-feature synthetic Ridge regressor with real MMLU Professional Accounting corpus, robust technical rubric, and empirically verified Agentic AI HITL security."
+}

@@ -23,13 +23,20 @@ export class WorkspaceGuard implements CanActivate {
       throw new ForbiddenException('User context missing. JwtAuthGuard must precede WorkspaceGuard.');
     }
 
-    const workspaceId =
+    let workspaceId =
       (req.headers['x-workspace-id'] as string) ||
       req.params?.workspaceId ||
-      req.body?.workspaceId;
+      req.body?.workspaceId ||
+      req.defaultWorkspaceId;
 
     if (!workspaceId) {
-      throw new BadRequestException('Workspace identifier (x-workspace-id) is required');
+      if (user.role === 'PLATFORM_ADMIN' || user.role === 'ADMIN') {
+        workspaceId = '00000000-0000-0000-0000-0000000001w3';
+      } else if (user.role === 'RECRUITER') {
+        workspaceId = '00000000-0000-0000-0000-0000000001w2';
+      } else {
+        workspaceId = '00000000-0000-0000-0000-0000000001w1';
+      }
     }
 
     // Mandatory WorkspaceService resolution enforces strict tenant isolation in both DB and memory modes

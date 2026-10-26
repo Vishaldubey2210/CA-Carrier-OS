@@ -167,8 +167,8 @@ export default function BillingPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <CreditCard size={24} color="var(--accent-indigo)" />
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+            <CreditCard size={24} color="var(--brand-primary)" />
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               Subscription Plans & Billing Management
             </h1>
           </div>
@@ -190,13 +190,13 @@ export default function BillingPage() {
       </div>
 
       {/* Current Subscription Status Panel */}
-      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderLeft: '4px solid var(--accent-indigo)' }}>
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderLeft: '4px solid var(--brand-primary)' }}>
         <div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Current Active Workspace Plan
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.25rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {plans.find((p) => p.tier === currentPlan)?.name || currentPlan}
             </h3>
             <span className={`badge ${currentPlan === 'FREE_CANDIDATE' ? 'badge-indigo' : 'badge-emerald'}`}>
@@ -266,13 +266,13 @@ export default function BillingPage() {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                border: plan.highlight ? '2px solid var(--accent-indigo)' : '1px solid var(--border-subtle)',
-                background: plan.highlight ? 'rgba(99, 102, 241, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                border: plan.highlight ? '2px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
+                background: plan.highlight ? 'var(--brand-soft)' : 'var(--surface-primary)',
               }}
             >
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff' }}>{plan.name}</h3>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{plan.name}</h3>
                   {plan.highlight && (
                     <span className="badge badge-indigo" style={{ fontSize: '0.6875rem' }}>
                       <Sparkles size={10} style={{ display: 'inline', marginRight: '2px' }} />
@@ -286,7 +286,7 @@ export default function BillingPage() {
                 </p>
 
                 <div style={{ marginBottom: '1.25rem' }}>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {billingCycle === 'MONTHLY' ? plan.priceMonthly : plan.priceAnnual}
                   </div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -321,7 +321,7 @@ export default function BillingPage() {
 
       {/* Invoices & GST Receipts Panel */}
       <div className="glass-panel" style={{ padding: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+        <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
           Tax Invoices & Payment Receipts (GST SAC: 998314)
         </h3>
         <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
@@ -330,7 +330,7 @@ export default function BillingPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {invoices.length === 0 ? (
-            <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ padding: '2rem', textAlign: 'center', background: 'var(--surface-secondary)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
               <FileText size={32} color="var(--text-muted)" style={{ margin: '0 auto 0.75rem' }} />
               <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
                 No Invoices Generated Yet
@@ -348,15 +348,15 @@ export default function BillingPage() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '0.875rem 1rem',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--surface-secondary)',
                   borderRadius: '8px',
                   border: '1px solid var(--border-subtle)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <FileText size={20} color="var(--accent-indigo)" />
+                  <FileText size={20} color="var(--brand-primary)" />
                   <div>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ffffff' }}>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {inv.invoiceNumber} — {inv.planName}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

@@ -50,12 +50,22 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() body: LoginRequest,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
+    @Req() req: Request
   ) {
     const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1';
-    const authData = await this.authService.login(body, clientIp);
+    // Returns OTP challenge. Never sets session cookie before OTP verification.
+    return await this.authService.login(body, clientIp);
+  }
 
+  @Post('demo-login')
+  @HttpCode(HttpStatus.OK)
+  async demoLogin(
+    @Body('role') role: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const authData = await this.authService.demoLogin(role || 'CANDIDATE');
+
+    // Set secure HttpOnly cookie for refresh token
     res.cookie('refreshToken', authData.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -64,7 +74,69 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // Set accessToken cookie for browser sessions
+    res.cookie('accessToken', authData.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 15 * 60 * 1000,
+    });
+
     return authData;
+  }
+
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  async verifyOtp(
+    @Body() body: any,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1';
+    const authData = await this.authService.verifyOtp(body, clientIp);
+
+    // Set secure HttpOnly cookie for refresh token after verified OTP
+    res.cookie('refreshToken', authData.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/api/v1/auth',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Set accessToken cookie for browser sessions
+    res.cookie('accessToken', authData.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return authData;
+  }
+
+  @Post('resend-otp')
+  @HttpCode(HttpStatus.OK)
+  async resendOtp(
+    @Body() body: any,
+    @Req() req: Request
+  ) {
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1';
+    return await this.authService.resendOtp(body, clientIp);
+  }
+
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmail(@Body() body: any) {
+    return await this.authService.verifyEmail(body);
+  }
+
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Body() body: any) {
+    return await this.authService.resendVerification(body);
   }
 
   @Post('refresh')
@@ -97,6 +169,14 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    res.cookie('accessToken', authData.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 15 * 60 * 1000,
+    });
+
     return authData;
   }
 
@@ -121,6 +201,9 @@ export class AuthController {
 
     res.clearCookie('refreshToken', {
       path: '/api/v1/auth',
+    });
+    res.clearCookie('accessToken', {
+      path: '/',
     });
 
     return await this.authService.logout(token || '');

@@ -69,7 +69,11 @@ export class CareerController {
     @CurrentWorkspace() workspace: WorkspaceSummary,
     @Body() body: GenerateRoadmapInput
   ) {
-    return await this.careerService.generateRoadmap(user.id, workspace.id, body.targetPathway);
+    return await this.careerService.generateRoadmap(user.id, workspace.id, body.targetPathway, {
+      customPrompt: body.customPrompt,
+      focusAreas: body.focusAreas,
+      pace: body.pace,
+    });
   }
 
   @Patch('tasks/:taskId')

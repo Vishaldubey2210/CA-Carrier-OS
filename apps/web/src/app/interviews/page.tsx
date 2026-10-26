@@ -463,8 +463,8 @@ export default function InterviewPrepPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.375rem' }}>
-            <MessageSquareCode size={26} color="var(--accent-amber)" />
-            <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>
+            <MessageSquareCode size={26} color="var(--brand-primary)" />
+            <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
               Interview Arena & AI Career Agent
             </h1>
           </div>
@@ -489,14 +489,14 @@ export default function InterviewPrepPage() {
             padding: '0.75rem 0.25rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'mock' ? '2px solid var(--accent-amber)' : '2px solid transparent',
-            color: activeTab === 'mock' ? '#ffffff' : 'var(--text-secondary)',
+            borderBottom: activeTab === 'mock' ? '2px solid var(--brand-primary)' : '2px solid transparent',
+            color: activeTab === 'mock' ? 'var(--brand-primary)' : 'var(--text-secondary)',
             fontWeight: activeTab === 'mock' ? 700 : 500,
             cursor: 'pointer',
             fontSize: '0.9375rem',
           }}
         >
-          <Play size={16} color={activeTab === 'mock' ? 'var(--accent-amber)' : 'inherit'} />
+          <Play size={16} color={activeTab === 'mock' ? 'var(--brand-primary)' : 'inherit'} />
           Live AI Mock Interview
         </button>
 
@@ -509,14 +509,14 @@ export default function InterviewPrepPage() {
             padding: '0.75rem 0.25rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'questions' ? '2px solid var(--accent-amber)' : '2px solid transparent',
-            color: activeTab === 'questions' ? '#ffffff' : 'var(--text-secondary)',
+            borderBottom: activeTab === 'questions' ? '2px solid var(--brand-primary)' : '2px solid transparent',
+            color: activeTab === 'questions' ? 'var(--brand-primary)' : 'var(--text-secondary)',
             fontWeight: activeTab === 'questions' ? 700 : 500,
             cursor: 'pointer',
             fontSize: '0.9375rem',
           }}
         >
-          <BookOpen size={16} color={activeTab === 'questions' ? 'var(--accent-amber)' : 'inherit'} />
+          <BookOpen size={16} color={activeTab === 'questions' ? 'var(--brand-primary)' : 'inherit'} />
           Question Bank ({CURATED_QUESTIONS.length})
         </button>
 
@@ -529,14 +529,14 @@ export default function InterviewPrepPage() {
             padding: '0.75rem 0.25rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'agent' ? '2px solid var(--accent-blue)' : '2px solid transparent',
-            color: activeTab === 'agent' ? '#ffffff' : 'var(--text-secondary)',
+            borderBottom: activeTab === 'agent' ? '2px solid var(--brand-primary)' : '2px solid transparent',
+            color: activeTab === 'agent' ? 'var(--brand-primary)' : 'var(--text-secondary)',
             fontWeight: activeTab === 'agent' ? 700 : 500,
             cursor: 'pointer',
             fontSize: '0.9375rem',
           }}
         >
-          <Bot size={16} color={activeTab === 'agent' ? 'var(--accent-blue)' : 'inherit'} />
+          <Bot size={16} color={activeTab === 'agent' ? 'var(--brand-primary)' : 'inherit'} />
           AI Career Agent & Approvals
         </button>
       </div>
@@ -550,7 +550,7 @@ export default function InterviewPrepPage() {
             <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <span className="badge badge-amber" style={{ marginBottom: '0.5rem' }}>Setup Simulation</span>
-                <h2 style={{ fontSize: '1.375rem', fontWeight: 700, color: '#ffffff' }}>
+                <h2 style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                   Configure Your Technical Mock Interview Session
                 </h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
@@ -629,7 +629,7 @@ export default function InterviewPrepPage() {
                 </div>
 
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#ffffff', lineHeight: 1.45 }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.45 }}>
                     {activeQuestion.question}
                   </h3>
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.625rem', flexWrap: 'wrap' }}>
@@ -712,7 +712,7 @@ export default function InterviewPrepPage() {
               {/* Rubric Feedback Drawer */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="glass-panel" style={{ padding: '1.25rem' }}>
-                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                     <Award size={16} color="var(--accent-amber)" /> Rubric Evaluation
                   </h4>
 
@@ -728,20 +728,20 @@ export default function InterviewPrepPage() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span style={{ color: 'var(--text-muted)' }}>Technical Correctness:</span>
-                          <span style={{ color: '#ffffff' }}>{questionEvaluations[activeQuestion.id].technicalCorrectness}%</span>
+                          <span style={{ color: 'var(--text-primary)' }}>{questionEvaluations[activeQuestion.id].technicalCorrectness}%</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span style={{ color: 'var(--text-muted)' }}>Completeness:</span>
-                          <span style={{ color: '#ffffff' }}>{questionEvaluations[activeQuestion.id].completeness}%</span>
+                          <span style={{ color: 'var(--text-primary)' }}>{questionEvaluations[activeQuestion.id].completeness}%</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span style={{ color: 'var(--text-muted)' }}>Reasoning & Structure:</span>
-                          <span style={{ color: '#ffffff' }}>{questionEvaluations[activeQuestion.id].reasoning}%</span>
+                          <span style={{ color: 'var(--text-primary)' }}>{questionEvaluations[activeQuestion.id].reasoning}%</span>
                         </div>
                       </div>
 
-                      <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                        <span style={{ fontWeight: 700, color: '#ffffff', display: 'block', marginBottom: '0.25rem' }}>Strengths:</span>
+                      <div style={{ background: 'var(--surface-secondary)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>Strengths:</span>
                         {questionEvaluations[activeQuestion.id].strengths.map((s, i) => (
                           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <Check size={12} color="var(--accent-emerald)" /> {s}
@@ -765,7 +765,7 @@ export default function InterviewPrepPage() {
 
                 {/* Key Competencies Guide */}
                 <div className="glass-panel" style={{ padding: '1.25rem' }}>
-                  <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ffffff', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>
+                  <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>
                     Key Competencies Tested
                   </h4>
                   <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -782,7 +782,7 @@ export default function InterviewPrepPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <span className="badge badge-emerald" style={{ marginBottom: '0.5rem' }}>Simulation Concluded</span>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     Candidate Interview Assessment Report
                   </h2>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
@@ -800,22 +800,22 @@ export default function InterviewPrepPage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-                <div style={{ background: 'rgba(34, 197, 94, 0.08)', padding: '1.25rem', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
-                  <h4 style={{ color: '#86efac', fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                <div style={{ background: 'var(--success-surface)', padding: '1.25rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                  <h4 style={{ color: 'var(--success-text)', fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem' }}>
                     Demonstrated Strengths
                   </h4>
-                  <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.8125rem', color: '#ffffff', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.8125rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                     {sessionFeedback.strengths.map((s: string, i: number) => (
                       <li key={i}>{s}</li>
                     ))}
                   </ul>
                 </div>
 
-                <div style={{ background: 'rgba(239, 68, 68, 0.08)', padding: '1.25rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                  <h4 style={{ color: '#fca5a5', fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                <div style={{ background: 'var(--danger-surface)', padding: '1.25rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                  <h4 style={{ color: 'var(--danger-text)', fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem' }}>
                     Critical Weakness Areas
                   </h4>
-                  <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.8125rem', color: '#ffffff', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.8125rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                     {sessionFeedback.criticalWeaknesses.map((w: string, i: number) => (
                       <li key={i}>{w}</li>
                     ))}
@@ -824,8 +824,8 @@ export default function InterviewPrepPage() {
               </div>
 
               {/* Adaptive Learning Recommendations */}
-              <div style={{ background: 'rgba(59, 130, 246, 0.08)', padding: '1.25rem', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
-                <h4 style={{ color: '#93c5fd', fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <div style={{ background: 'var(--brand-soft)', padding: '1.25rem', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                <h4 style={{ color: 'var(--brand-primary)', fontSize: '0.9375rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                   <Target size={16} /> Automatically Injected Learning Tasks
                 </h4>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
@@ -833,8 +833,8 @@ export default function InterviewPrepPage() {
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {sessionFeedback.recommendedLearningTasks.map((t: string, i: number) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: '#ffffff' }}>
-                      <CheckCircle2 size={16} color="var(--accent-emerald)" />
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                      <CheckCircle2 size={16} color="var(--success-text)" />
                       <span>{t}</span>
                     </div>
                   ))}
@@ -924,12 +924,12 @@ export default function InterviewPrepPage() {
                   </span>
                 </div>
 
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', lineHeight: 1.45 }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.45 }}>
                   {q.question}
                 </h3>
 
-                <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                  <strong style={{ color: '#ffffff' }}>Ideal Key Points:</strong>
+                <div style={{ background: 'var(--surface-secondary)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>Ideal Key Points:</strong>
                   <ul style={{ margin: '0.25rem 0 0 1rem', padding: 0 }}>
                     {q.idealAnswerKeyPoints.map((pt, i) => (
                       <li key={i}>{pt}</li>
@@ -940,7 +940,7 @@ export default function InterviewPrepPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
                   <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
                     {(q.keyCompetenciesTested || []).map((comp, idx) => (
-                      <span key={idx} style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'rgba(255, 255, 255, 0.05)', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>
+                      <span key={idx} style={{ fontSize: '0.7rem', color: 'var(--text-muted)', background: 'var(--surface-secondary)', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>
                         {comp}
                       </span>
                     ))}
@@ -971,8 +971,8 @@ export default function InterviewPrepPage() {
           <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', height: '640px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-subtle)', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Bot size={20} color="var(--accent-blue)" />
-                <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '1rem' }}>AI Career Agent Terminal</span>
+                <Bot size={20} color="var(--brand-primary)" />
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>AI Career Agent Terminal</span>
               </div>
               <span className="badge badge-blue">4-Tier Policy Engine Active</span>
             </div>
@@ -987,28 +987,28 @@ export default function InterviewPrepPage() {
                     maxWidth: msg.role === 'USER' ? '80%' : '90%',
                     background:
                       msg.role === 'USER'
-                        ? 'rgba(59, 130, 246, 0.2)'
+                        ? 'var(--brand-soft)'
                         : msg.role === 'SYSTEM'
-                        ? 'rgba(234, 179, 8, 0.1)'
-                        : 'rgba(255, 255, 255, 0.04)',
+                        ? 'var(--warning-surface)'
+                        : 'var(--surface-secondary)',
                     border:
                       msg.role === 'USER'
-                        ? '1px solid rgba(59, 130, 246, 0.3)'
+                        ? '1px solid var(--border-subtle)'
                         : msg.role === 'SYSTEM'
-                        ? '1px solid rgba(234, 179, 8, 0.3)'
+                        ? '1px solid var(--border-subtle)'
                         : '1px solid var(--border-subtle)',
                     padding: '1rem',
                     borderRadius: '8px',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                    <span style={{ fontWeight: 700, color: msg.role === 'USER' ? '#93c5fd' : '#cbd5e1' }}>
+                    <span style={{ fontWeight: 700, color: msg.role === 'USER' ? 'var(--brand-primary)' : 'var(--text-primary)' }}>
                       {msg.role === 'USER' ? 'You' : msg.role === 'SYSTEM' ? 'Security Gateway' : 'AI Career Agent'}
                     </span>
                     <span>{msg.timestamp}</span>
                   </div>
 
-                  <div style={{ fontSize: '0.875rem', lineHeight: 1.6, color: '#e2e8f0', whiteSpace: 'pre-wrap' }}>
+                  <div style={{ fontSize: '0.875rem', lineHeight: 1.6, color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
                     {msg.content}
                   </div>
 
@@ -1025,17 +1025,17 @@ export default function InterviewPrepPage() {
 
                   {/* Interactive Approval Card (ADR-004) */}
                   {msg.approvalRequest && (
-                    <div style={{ marginTop: '1rem', background: 'rgba(234, 179, 8, 0.08)', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '1rem', borderRadius: '8px' }}>
+                    <div style={{ marginTop: '1rem', background: 'var(--warning-surface)', border: '1px solid var(--border-subtle)', padding: '1rem', borderRadius: '8px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                         <span className="badge badge-amber" style={{ fontSize: '0.7rem' }}>
                           <AlertTriangle size={11} style={{ display: 'inline', marginRight: '3px' }} /> Explicit Confirmation Required
                         </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#fde047' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--warning-text)' }}>
                           <Clock size={12} /> 15m TTL Active
                         </div>
                       </div>
 
-                      <div style={{ fontSize: '0.8125rem', color: '#ffffff', fontWeight: 600, marginBottom: '0.375rem' }}>
+                      <div style={{ fontSize: '0.8125rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.375rem' }}>
                         {msg.approvalRequest.actionPreview}
                       </div>
 
@@ -1048,7 +1048,7 @@ export default function InterviewPrepPage() {
                           <button
                             className="btn btn-primary"
                             onClick={() => handleApprovalDecision(msg.id, 'APPROVED')}
-                            style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem', background: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                            style={{ padding: '0.375rem 0.75rem', fontSize: '0.75rem', background: 'var(--success-text)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                           >
                             <Check size={14} /> Confirm & Execute
                           </button>
@@ -1061,7 +1061,7 @@ export default function InterviewPrepPage() {
                           </button>
                         </div>
                       ) : (
-                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: msg.approvalRequest.decision === 'APPROVED' ? 'var(--accent-emerald)' : '#ef4444' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: msg.approvalRequest.decision === 'APPROVED' ? 'var(--success-text)' : 'var(--danger-text)' }}>
                           Status: {msg.approvalRequest.decision}
                         </div>
                       )}
@@ -1104,8 +1104,8 @@ export default function InterviewPrepPage() {
           {/* Quick Consultation Presets & Security Panel */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="glass-panel" style={{ padding: '1.25rem' }}>
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <Sparkles size={16} color="var(--accent-blue)" /> Prompt Presets
+              <h4 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <Sparkles size={16} color="var(--brand-primary)" /> Prompt Presets
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <button
@@ -1139,8 +1139,8 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="glass-panel" style={{ padding: '1.25rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <ShieldCheck size={16} color="var(--accent-emerald)" /> Zero-Fabrication Guard (ADR-009)
+              <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <ShieldCheck size={16} color="var(--success-text)" /> Zero-Fabrication Guard (ADR-009)
               </h4>
               <p style={{ margin: 0, lineHeight: 1.5 }}>
                 The agent is restricted to facts verified in your candidate profile. External egress is blocked without signed 15-minute token authorization.

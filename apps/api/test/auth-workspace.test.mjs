@@ -49,13 +49,22 @@ describe('Phase 2: Authentication, Identity & Workspace Security Suite', () => {
     assert.ok(decoded);
     assert.equal(decoded.email, 'candidate.a@ca-career.com');
 
-    // Login Candidate A
+    // Login Candidate A (Step 1: Credentials -> OTP Challenge)
     const loginRes = await authService.login({
       email: 'candidate.a@ca-career.com',
       password: 'StrongPassword123!',
     });
-    assert.ok(loginRes.accessToken);
-    assert.equal(loginRes.user.id, candidateATokens.user.id);
+    assert.equal(loginRes.requiresOtp, true);
+    assert.ok(loginRes.challengeId);
+
+    // Step 2: Verify OTP -> Receive Tokens
+    const otpCode = authService.getLatestOtpForTesting('candidate.a@ca-career.com');
+    const verifyRes = await authService.verifyOtp({
+      challengeId: loginRes.challengeId,
+      code: otpCode,
+    });
+    assert.ok(verifyRes.accessToken);
+    assert.equal(verifyRes.user.id, candidateATokens.user.id);
 
     // Failed login with wrong password
     await assert.rejects(
@@ -319,11 +328,20 @@ describe('Phase 2: Authentication, Identity & Workspace Security Suite', () => {
     });
     assert.equal(resetRes.success, true);
 
-    // Login with new password
+    // Login with new password (Step 1: credentials -> OTP challenge)
     const loginNew = await authService.login({
       email: candidateATokens.user.email,
       password: 'BrandNewPassword123!',
     });
-    assert.ok(loginNew.accessToken);
+    assert.equal(loginNew.requiresOtp, true);
+    assert.ok(loginNew.challengeId);
+
+    // Step 2: verify OTP
+    const otp = authService.getLatestOtpForTesting(candidateATokens.user.email);
+    const verifyNew = await authService.verifyOtp({
+      challengeId: loginNew.challengeId,
+      code: otp,
+    });
+    assert.ok(verifyNew.accessToken);
   });
 });

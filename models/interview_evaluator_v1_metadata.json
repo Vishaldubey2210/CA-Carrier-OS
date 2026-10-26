@@ -1,0 +1,11 @@
+{
+  "evaluator_name": "CA_Rubric_Interview_Evaluator",
+  "rubrics_count": 5,
+  "version": "1.0.0",
+  "human_in_the_loop_gated_tools": [
+    "submit_job_application",
+    "dispatch_recruiter_email",
+    "delete_candidate_profile"
+  ],
+  "artifact_path": "/home/vishal/Downloads/CA Carrer OS/models/interview_evaluator_v1.pkl"
+}

@@ -1,0 +1,26 @@
+# Large Datasets, ML Models & Offline Experiments
+data/
+notebooks/
+models/
+scripts/
+
+# Local Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Git and CI
+.git/
+.github/
+
+# Development Caches & Logs
+*.log
+*.tmp
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Offline Documentation (Not required in runtime serverless bundle)
+docs/

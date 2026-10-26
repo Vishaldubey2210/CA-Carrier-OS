@@ -1,0 +1,21 @@
+{
+  "model_name": "CA_Regulatory_Vector_Store_v2",
+  "version": "2.0.0",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_dimension": 384,
+  "corpus_name": "ICAI_Regulatory_Statutory_Corpus_v2",
+  "document_count": 16,
+  "benchmark_query_count": 16,
+  "tfidf_recall_at_1": 0.9375,
+  "tfidf_recall_at_3": 1.0,
+  "tfidf_mrr": 0.96875,
+  "dense_recall_at_1": 0.875,
+  "dense_recall_at_3": 0.9375,
+  "dense_mrr": 0.921875,
+  "hybrid_recall_at_1": 0.875,
+  "hybrid_recall_at_3": 1.0,
+  "hybrid_mrr": 0.9375,
+  "abstention_threshold": 0.5,
+  "artifact_path": "/home/vishal/Downloads/CA Carrer OS/models/regulatory_vector_store_v2.pkl",
+  "remediation_note": "Replaced TF-IDF synthetic 5-doc fixture with authentic 16-chapter ICAI/MCA corpus and true dense Transformer embeddings (sentence-transformers/all-MiniLM-L6-v2, 384-d)."
+}

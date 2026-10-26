@@ -1,0 +1,4 @@
+# Local test suites and logs
+test/
+*.log
+*.tmp

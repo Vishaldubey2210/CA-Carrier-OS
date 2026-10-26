@@ -1,0 +1,6 @@
+# Large Datasets, Local Storage & ML Artifacts
+data/
+test/
+*.log
+*.tmp
+__pycache__/

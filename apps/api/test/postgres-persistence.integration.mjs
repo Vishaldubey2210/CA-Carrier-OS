@@ -22,6 +22,8 @@ import { CareerService } from '../dist/modules/career/career.service.js';
 import { JobsService } from '../dist/modules/jobs/jobs.service.js';
 import { ApplicationsService } from '../dist/modules/applications/applications.service.js';
 import { PracticeService } from '../dist/modules/practice/practice.service.js';
+import { SupportService } from '../dist/modules/support/support.service.js';
+import { NotificationsService } from '../dist/modules/notifications/notifications.service.js';
 import {
   UserRole,
   WorkspaceType,
@@ -82,6 +84,8 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
   let jobsService;
   let applicationsService;
   let practiceService;
+  let supportService;
+  let notificationsService;
 
   const testRunId = randomUUID().slice(0, 8);
   const jwtSecret = 'test-persistence-secret-key-at-least-32-chars';
@@ -93,6 +97,8 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
   let createdApp;
   let firmWorkspace;
   let practiceClient;
+  let createdSupportTicket;
+  let resetTestToken;
 
   before(async () => {
     prismaService = new PrismaService();
@@ -105,12 +111,17 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
     jobsService = new JobsService(prismaService);
     applicationsService = new ApplicationsService(prismaService, jobsService);
     practiceService = new PracticeService(prismaService);
+    supportService = new SupportService(prismaService);
+    notificationsService = new NotificationsService(prismaService);
   });
 
   after(async () => {
     if (!prismaService) return;
     try {
       // Clean up synthetic test records created during this run
+      if (createdSupportTicket) {
+        await prismaService.supportEnquiry.deleteMany({ where: { ticketRef: createdSupportTicket } });
+      }
       if (practiceClient) {
         await prismaService.practiceClient.deleteMany({ where: { id: practiceClient.id } });
       }
@@ -126,6 +137,8 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
       }
       const userIds = [candidateA?.user?.id, candidateB?.user?.id, recruiter?.user?.id].filter(Boolean);
       if (userIds.length > 0) {
+        await prismaService.notification.deleteMany({ where: { userId: { in: userIds } } });
+        await prismaService.passwordResetToken.deleteMany({ where: { userId: { in: userIds } } });
         await prismaService.workspaceMembership.deleteMany({ where: { userId: { in: userIds } } });
         await prismaService.workspace.deleteMany({ where: { ownerId: { in: userIds } } });
         await prismaService.auditEvent.deleteMany({ where: { actorId: { in: userIds } } });
@@ -425,5 +438,112 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
       // Reassign to prismaService for after() hook cleanup
       prismaService = freshPrismaService;
     }
+  });
+
+  test('8. Support enquiry persistence & retrieval via SupportService', async () => {
+    const enquiry = await supportService.submitEnquiry(
+      {
+        name: 'CA Rajesh Iyer',
+        email: `rajesh.iyer.${testRunId}@example.com`,
+        category: 'CAREER_SUPPORT',
+        subject: 'Articleship verification under Regulation 45',
+        message: 'Requesting clarification regarding statutory audit experience transfer approval.',
+      },
+      '192.168.1.88'
+    );
+
+    assert.equal(enquiry.success, true);
+    assert.match(enquiry.ticketRef, /^TKT-2026-[A-F0-9]{6}$/);
+    createdSupportTicket = enquiry.ticketRef;
+
+    // Verify record in PostgreSQL database directly
+    const dbRecord = await prismaService.supportEnquiry.findUnique({
+      where: { ticketRef: enquiry.ticketRef },
+    });
+    assert.ok(dbRecord, 'Support enquiry must be persisted in support_enquiries table');
+    assert.equal(dbRecord.email, `rajesh.iyer.${testRunId}@example.com`);
+    assert.equal(dbRecord.status, 'PENDING');
+
+    // Verify authorized retrieval
+    const list = await supportService.listEnquiries();
+    const found = list.find((e) => e.ticketRef === enquiry.ticketRef);
+    assert.ok(found, 'Support enquiry must be retrievable from database list');
+  });
+
+  test('9. Notification lifecycle & read status persistence via NotificationsService', async () => {
+    // 1. Fetch initial notices (triggers persistent welcome seeding in DB)
+    const notifs = await notificationsService.getNotifications(candidateA.user.id, candidateA.defaultWorkspaceId);
+    assert.ok(notifs.items.length >= 2, 'Notifications must be seeded and fetched');
+    assert.equal(notifs.unreadCount, notifs.items.length);
+
+    // 2. Verify records exist in PostgreSQL database
+    const dbNotifs = await prismaService.notification.findMany({
+      where: { userId: candidateA.user.id },
+    });
+    assert.ok(dbNotifs.length >= 2, 'Notifications must be persisted in notifications table');
+
+    // 3. Mark single notification as read
+    const firstId = notifs.items[0].id;
+    await notificationsService.markAsRead(firstId, candidateA.user.id);
+
+    const dbUpdated = await prismaService.notification.findUnique({
+      where: { id: firstId },
+    });
+    assert.equal(dbUpdated.isRead, true, 'Notification read status must persist in database');
+    assert.ok(dbUpdated.readAt, 'readAt timestamp must be recorded in database');
+
+    // 4. Mark all as read
+    await notificationsService.markAllAsRead(candidateA.user.id);
+    const afterAll = await notificationsService.getNotifications(candidateA.user.id, candidateA.defaultWorkspaceId);
+    assert.equal(afterAll.unreadCount, 0, 'Unread count must be 0 after markAllAsRead');
+  });
+
+  test('10. Secure password recovery token lifecycle, expiration & single-use invalidation', async () => {
+    // 1. Request password reset
+    const forgotRes = await authService.forgotPassword({
+      email: candidateA.user.email,
+    });
+    assert.ok(forgotRes.message);
+    assert.ok(forgotRes.resetToken, 'Reset token returned in non-production mode');
+    resetTestToken = forgotRes.resetToken;
+
+    // 2. Verify token hash persisted in database
+    const dbTokens = await prismaService.passwordResetToken.findMany({
+      where: { userId: candidateA.user.id },
+    });
+    assert.ok(dbTokens.length >= 1, 'PasswordResetToken must be persisted in database');
+    assert.equal(dbTokens[0].usedAt, null, 'New token must not be marked as used');
+
+    // 3. Execute password reset
+    const newPassword = 'BrandNewPassword123!@#$';
+    const resetRes = await authService.resetPassword({
+      token: resetTestToken,
+      newPassword,
+    });
+    assert.equal(resetRes.success, true);
+
+    // 4. Verify token is marked as used in database
+    const dbUsedToken = await prismaService.passwordResetToken.findUnique({
+      where: { id: dbTokens[0].id },
+    });
+    assert.ok(dbUsedToken.usedAt !== null, 'Token must be marked usedAt in database');
+
+    // 5. Single-use guard: reusing the token must fail
+    await assert.rejects(
+      async () => {
+        await authService.resetPassword({
+          token: resetTestToken,
+          newPassword: 'AnotherPassword123!@#$',
+        });
+      },
+      { name: 'BadRequestException' }
+    );
+
+    // 6. Verify user can now authenticate with the new password
+    const loginRes = await authService.login({
+      email: candidateA.user.email,
+      password: newPassword,
+    });
+    assert.ok(loginRes.accessToken, 'User must authenticate with new password');
   });
 });

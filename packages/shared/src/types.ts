@@ -141,6 +141,16 @@ export interface AuthResponseData {
   defaultWorkspaceId: string;
 }
 
+export interface LoginOtpChallengeResponse {
+  requiresOtp: true;
+  challengeId: string;
+  maskedEmail: string;
+  expiresInSeconds: number;
+  resendCooldownSeconds: number;
+}
+
+export type LoginResponse = LoginOtpChallengeResponse | AuthResponseData;
+
 export interface WorkspaceSummary {
   id: string;
   name: string;
@@ -233,6 +243,21 @@ export interface CareerRoadmapTaskItem {
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   completedAt?: string | null;
   dueDate?: string | null;
+  // Roadmap.sh Graph Architecture Extensions
+  keySkills?: string[];
+  stage?: 'FOUNDATION' | 'APPLICATION' | 'MASTERY';
+  branch?: 'left' | 'center' | 'right';
+  estimatedHours?: number;
+  statutoryReference?: string;
+  interviewQuestion?: string;
+  interviewAnswerKey?: string;
+  practicalDeliverable?: string;
+  workpaperModel?: string;
+  prerequisites?: string[];
+  weekRange?: string;
+  submodules?: string[];
+  checklist?: string[];
+  resources?: string[];
 }
 
 export interface CareerRoadmapDetail {
@@ -245,6 +270,8 @@ export interface CareerRoadmapDetail {
   tasks: CareerRoadmapTaskItem[];
   progressPct: number;
   generatedAt: string;
+  aiGenerated?: boolean;
+  aiModel?: string;
 }
 
 // -------------------------------------------------------------
@@ -260,6 +287,39 @@ export interface StructuredJobRequirements {
   minArticleshipMonths?: number;
   preferredFirmTiers?: string[];
   keyResponsibilities: string[];
+}
+
+export type JobOpportunityType =
+  | 'ARTICLESHIP'
+  | 'INDUSTRIAL_TRAINING'
+  | 'CA_FRESHER'
+  | 'QUALIFIED_CA'
+  | 'FINANCE_EXECUTIVE';
+
+export type JobChannel = 'ENTERPRISE' | 'EXTERNAL';
+
+export type JobVerificationStatus =
+  | 'SOURCE_ACTIVE'
+  | 'ACTIVE_UNCONFIRMED'
+  | 'STALE'
+  | 'EXPIRED'
+  | 'UNAVAILABLE'
+  | 'REVIEW_REQUIRED';
+
+export type JobSourceStatus =
+  | 'ACTIVE'
+  | 'PENDING_CREDENTIALS'
+  | 'PENDING_LICENSE'
+  | 'LINK_ONLY'
+  | 'RATE_LIMITED'
+  | 'TEMPORARILY_UNAVAILABLE'
+  | 'DISABLED';
+
+export interface ExternalSourceProvenance {
+  provider: string;
+  externalId: string;
+  url: string;
+  verifiedAt: string;
 }
 
 export interface JobDetail {
@@ -288,6 +348,25 @@ export interface JobDetail {
   expiresAt: string;
   matchScore?: number;
   isSaved?: boolean;
+
+  // Multi-Source Aggregator Fields
+  opportunityType?: JobOpportunityType;
+  channel?: JobChannel;
+  sourceProvider?: string;
+  externalJobId?: string | null;
+  canonicalUrl?: string | null;
+  applicationUrl?: string | null;
+  attribution?: string | null;
+  originalPostedAt?: string | null;
+  firstSeenAt?: string;
+  lastSeenAt?: string;
+  lastVerifiedAt?: string;
+  verificationStatus?: JobVerificationStatus;
+  duplicateClusterId?: string | null;
+  isDuplicate?: boolean;
+  duplicateOfJobId?: string | null;
+  duplicateCount?: number;
+  externalSources?: ExternalSourceProvenance[];
 }
 
 export interface JobFilterQuery {
@@ -302,6 +381,56 @@ export interface JobFilterQuery {
   page?: number;
   limit?: number;
   sortBy?: 'postedAt' | 'salary' | 'matchScore';
+  channel?: 'ALL' | 'ENTERPRISE_ONLY' | 'EXTERNAL_ONLY';
+  opportunityType?: 'ALL' | JobOpportunityType;
+  sourceProvider?: string;
+  verificationStatus?: 'ALL' | JobVerificationStatus;
+}
+
+export interface JobSourceConfigSummary {
+  id: string;
+  name: string;
+  providerType: string;
+  status: JobSourceStatus;
+  endpoint?: string | null;
+  organizationSlug?: string | null;
+  apiKeyConfigured: boolean;
+  allowedGeography: string;
+  pollingIntervalMinutes: number;
+  lastSyncAt?: string | null;
+  lastSuccessAt?: string | null;
+  lastFailureAt?: string | null;
+  lastErrorMessage?: string | null;
+  totalFetched: number;
+  totalIngested: number;
+  totalDuplicates: number;
+  totalExpired: number;
+}
+
+export interface JobSourceSyncReport {
+  sourceName: string;
+  providerType: string;
+  status: 'SUCCESS' | 'FAILED' | 'SKIPPED_CREDENTIALS' | 'SKIPPED_LINK_ONLY';
+  fetchedCount: number;
+  ingestedCount: number;
+  duplicateCount: number;
+  staleCount: number;
+  durationMs: number;
+  errorMessage?: string;
+  timestamp: string;
+}
+
+export interface AggregatorHealthReport {
+  totalSources: number;
+  activeSources: number;
+  pendingCredentialsSources: number;
+  linkOnlySources: number;
+  totalEnterpriseJobs: number;
+  totalExternalJobs: number;
+  totalArticleshipOpportunities: number;
+  totalDuplicatesSuppressed: number;
+  lastGlobalSyncAt?: string | null;
+  sources: JobSourceConfigSummary[];
 }
 
 export interface JobMatchReport {

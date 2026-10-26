@@ -6,11 +6,12 @@ function resolveApiOrigin() {
 
   if (!rawOrigin) {
     if (isVercel) {
-      throw new Error(
-        'FATAL CONFIGURATION ERROR: The API_ORIGIN environment variable is required on Vercel deployments. ' +
-        'Set API_ORIGIN in your Vercel Project Settings to your deployed Railway API origin ' +
-        '(e.g., "https://your-railway-app.up.railway.app") without a trailing /api/v1 prefix.'
+      console.warn(
+        '⚠️ WARNING: API_ORIGIN environment variable is not yet set in Vercel. ' +
+        'Remember to set API_ORIGIN in Vercel Project Settings to your deployed backend API URL ' +
+        '(e.g., "https://ca-career-os-api.vercel.app") to proxy /api/v1 requests.'
       );
+      return 'https://api-placeholder.vercel.app';
     }
     // Safe localhost fallback for local development and offline CI tests
     return 'http://127.0.0.1:4000';

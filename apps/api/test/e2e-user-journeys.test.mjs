@@ -2,6 +2,7 @@ import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../dist/app.module.js';
+import { AuthService } from '../dist/modules/auth/auth.service.js';
 import { HttpExceptionFilter } from '../dist/common/filters/http-exception.filter.js';
 import { LoggingInterceptor } from '../dist/common/interceptors/logging.interceptor.js';
 import { TransformInterceptor } from '../dist/common/interceptors/transform.interceptor.js';
@@ -73,7 +74,7 @@ describe('End-to-End Real HTTP User Journeys & Security Gates', () => {
     candidateToken = regData.accessToken;
     candidateWorkspaceId = regData.defaultWorkspaceId;
 
-    // Login with registered credentials
+    // Login with registered credentials (Step 1: initiates OTP challenge)
     const loginRes = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,7 +87,25 @@ describe('End-to-End Real HTTP User Journeys & Security Gates', () => {
     assert.equal(loginRes.status, 200, 'Login should return 200 OK');
     const rawLoginBody = await loginRes.json();
     const loginData = extractData(rawLoginBody);
-    assert.ok(loginData.accessToken, 'Login should return valid JWT accessToken');
+    assert.equal(loginData.requiresOtp, true);
+    assert.ok(loginData.challengeId);
+
+    // Step 2: Verify OTP via HTTP endpoint
+    const authServiceInstance = app.get(AuthService);
+    const otpCode = authServiceInstance.getLatestOtpForTesting(regPayload.email);
+    assert.ok(otpCode);
+
+    const verifyRes = await fetch(`${baseUrl}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        challengeId: loginData.challengeId,
+        code: otpCode,
+      }),
+    });
+    assert.equal(verifyRes.status, 200);
+    const verifyData = extractData(await verifyRes.json());
+    assert.ok(verifyData.accessToken, 'Verify OTP should return valid JWT accessToken');
 
     // Register secondary user for tenant isolation boundary tests
     const reg2Res = await fetch(`${baseUrl}/auth/register`, {

@@ -15,6 +15,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { AgentToolsRegistry, AgentExecutionContext } from './agent-tools.registry.js';
 import { ApprovalsService } from './approvals.service.js';
 import { CareerService } from '../career/career.service.js';
+import { AiInferenceService } from './ai-inference.service.js';
 
 const INJECTION_PATTERNS = [
   /ignore (all )?(previous|prior) instructions/i,
@@ -30,12 +31,15 @@ const INJECTION_PATTERNS = [
 @Injectable()
 export class AgentOrchestratorService {
   private readonly logger = new Logger(AgentOrchestratorService.name);
+  private readonly memConversations = new Map<string, any>();
+  private readonly memMessages = new Map<string, any[]>();
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly toolsRegistry: AgentToolsRegistry,
     private readonly approvalsService: ApprovalsService,
-    private readonly careerService: CareerService
+    private readonly careerService: CareerService,
+    private readonly aiInferenceService: AiInferenceService
   ) {}
 
   /**
@@ -68,10 +72,14 @@ export class AgentOrchestratorService {
     // 3. Retrieve or create conversation
     let conversation: any;
     if (input.conversationId) {
-      conversation = await this.prisma.agentConversation.findUnique({
-        where: { id: input.conversationId },
-        include: { messages: { orderBy: { createdAt: 'asc' }, take: 20 } },
-      });
+      if (this.prisma.isDatabaseConnected()) {
+        conversation = await this.prisma.agentConversation.findUnique({
+          where: { id: input.conversationId },
+          include: { messages: { orderBy: { createdAt: 'asc' }, take: 20 } },
+        });
+      } else {
+        conversation = this.memConversations.get(input.conversationId);
+      }
       if (!conversation) {
         throw new NotFoundException(`Conversation ${input.conversationId} not found.`);
       }
@@ -79,24 +87,51 @@ export class AgentOrchestratorService {
         throw new ForbiddenException('Access denied to this conversation.');
       }
     } else {
-      conversation = await this.prisma.agentConversation.create({
-        data: {
+      const convId = crypto.randomUUID();
+      const title = `Career Consultation: ${input.message.substring(0, 32)}...`;
+      if (this.prisma.isDatabaseConnected()) {
+        conversation = await this.prisma.agentConversation.create({
+          data: {
+            candidateProfileId: profile.id,
+            workspaceId: userCtx.workspaceId,
+            title,
+          },
+          include: { messages: true },
+        });
+      } else {
+        conversation = {
+          id: convId,
           candidateProfileId: profile.id,
           workspaceId: userCtx.workspaceId,
-          title: `Career Consultation: ${input.message.substring(0, 32)}...`,
-        },
-        include: { messages: true },
-      });
+          title,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          messages: [],
+        };
+        this.memConversations.set(convId, conversation);
+      }
     }
 
     // 4. Save User Message
-    await this.prisma.agentMessage.create({
-      data: {
+    if (this.prisma.isDatabaseConnected()) {
+      await this.prisma.agentMessage.create({
+        data: {
+          conversationId: conversation.id,
+          role: 'USER',
+          content: input.message,
+        },
+      });
+    } else {
+      const msgs = this.memMessages.get(conversation.id) || [];
+      msgs.push({
+        id: crypto.randomUUID(),
         conversationId: conversation.id,
         role: 'USER',
         content: input.message,
-      },
-    });
+        createdAt: new Date(),
+      });
+      this.memMessages.set(conversation.id, msgs);
+    }
 
     // 5. Interpret Intent and Determine Tools
     const { plannedTools, directResponse } = this.planToolExecutions(input.message, profile);
@@ -185,27 +220,77 @@ export class AgentOrchestratorService {
     }
 
     // 7. Synthesize Rich Assistant Response Grounded in Facts (Zero-Fabrication Guard)
-    const assistantContent = this.synthesizeResponse(
-      input.message,
-      directResponse,
-      toolResults,
-      pendingApproval,
-      profile
-    );
+    let assistantContent = directResponse;
+    let inferenceProvider = 'deterministic-grounding';
+    let inferenceModel = 'ca-career-os-grounding';
+
+    if (!assistantContent && !pendingApproval) {
+      try {
+        const systemPrompt = `You are the CA Career OS Senior Career Partner & Technical Advisor for Indian Chartered Accountants.
+Your advice is strictly grounded in:
+1. ICAI regulations, Code of Ethics, and Standards on Auditing (SAs) / Ind AS.
+2. The candidate's real profile context:
+- CA Status: ${profile.caFinalStatus || 'Qualified Chartered Accountant'}
+- Target Pathway: ${profile.preferredPathways?.[0] || 'Audit & Assurance'}
+- Articleship Areas: ${(profile.articleshipAreas || []).join(', ') || 'Statutory Audit, Tax Audit'}
+3. Tool Execution Evidence:
+${JSON.stringify(toolResults, null, 2)}
+
+Provide professional, concise, actionable advice (with Markdown formatting). Always respect ADR-009 zero-fabrication guarantees.`;
+
+        const inferenceResult = await this.aiInferenceService.generateCompletion(
+          [{ role: 'user', content: input.message }],
+          { systemPrompt, temperature: 0.3 }
+        );
+
+        if (inferenceResult.content && inferenceResult.provider !== 'deterministic-fallback') {
+          assistantContent = inferenceResult.content;
+          inferenceProvider = inferenceResult.provider;
+          inferenceModel = inferenceResult.model;
+        }
+      } catch (err: any) {
+        this.logger.warn(`AI inference invocation failed (${err?.message || err}), falling back to deterministic synthesis.`);
+      }
+    }
+
+    if (!assistantContent) {
+      assistantContent = this.synthesizeResponse(
+        input.message,
+        directResponse,
+        toolResults,
+        pendingApproval,
+        profile
+      );
+    }
 
     // 8. Save Assistant Message
-    await this.prisma.agentMessage.create({
-      data: {
+    if (this.prisma.isDatabaseConnected()) {
+      await this.prisma.agentMessage.create({
+        data: {
+          conversationId: conversation.id,
+          role: 'ASSISTANT',
+          content: assistantContent,
+          toolCalls: executedToolCalls.length > 0 ? executedToolCalls : null,
+          toolResults: toolResults.length > 0 ? toolResults : null,
+          approvalId: pendingApproval ? pendingApproval.approvalId : null,
+        },
+      });
+    } else {
+      const msgs = this.memMessages.get(conversation.id) || [];
+      msgs.push({
+        id: crypto.randomUUID(),
         conversationId: conversation.id,
         role: 'ASSISTANT',
         content: assistantContent,
         toolCalls: executedToolCalls.length > 0 ? executedToolCalls : null,
         toolResults: toolResults.length > 0 ? toolResults : null,
         approvalId: pendingApproval ? pendingApproval.approvalId : null,
-      },
-    });
+        createdAt: new Date(),
+      });
+      this.memMessages.set(conversation.id, msgs);
+      conversation.updatedAt = new Date();
+    }
 
-    const isMock = process.env.AI_PROVIDER !== 'openai' && process.env.AI_PROVIDER !== 'anthropic';
     return {
       conversationId: conversation.id,
       role: 'ASSISTANT',
@@ -214,8 +299,9 @@ export class AgentOrchestratorService {
       toolResults,
       approvalRequest: pendingApproval,
       metadata: {
-        provider: isMock ? 'deterministic-orchestrator-mock' : process.env.AI_PROVIDER,
-        isLiveInference: !isMock,
+        provider: inferenceProvider,
+        model: inferenceModel,
+        isLiveInference: inferenceProvider === 'nvidia' || inferenceProvider === 'groq',
       },
     };
   }
@@ -374,7 +460,7 @@ export class AgentOrchestratorService {
 
     // General career intelligence synthesis
     sections.push(
-      `Hello! I have reviewed your current career trajectory and profile data for **${profile.qualification}** (Pathway: **${profile.targetPathway || 'CA General'}**).`
+      `Hello! I have reviewed your current career trajectory and profile data for **${profile.caFinalStatus || 'Chartered Accountant'}** (Pathway: **${profile.preferredPathways?.[0] || 'CA General'}**).`
     );
 
     for (const res of toolResults) {
@@ -417,31 +503,52 @@ export class AgentOrchestratorService {
 
   async listConversations(userId: string, workspaceId: string) {
     const profile = await this.careerService.getProfile(userId, workspaceId);
-    return this.prisma.agentConversation.findMany({
-      where: {
-        candidateProfileId: profile.id,
-        workspaceId,
-      },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
+    if (this.prisma.isDatabaseConnected()) {
+      return this.prisma.agentConversation.findMany({
+        where: {
+          candidateProfileId: profile.id,
+          workspaceId,
         },
-      },
-      orderBy: { updatedAt: 'desc' },
-    });
+        include: {
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+        orderBy: { updatedAt: 'desc' },
+      });
+    }
+
+    return Array.from(this.memConversations.values())
+      .filter((c) => c.candidateProfileId === profile.id && c.workspaceId === workspaceId)
+      .map((c) => ({
+        ...c,
+        messages: (this.memMessages.get(c.id) || []).slice(-1),
+      }));
   }
 
   async getConversationById(id: string, userId: string, workspaceId: string) {
     const profile = await this.careerService.getProfile(userId, workspaceId);
-    const conversation = await this.prisma.agentConversation.findUnique({
-      where: { id },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' },
+    let conversation: any;
+
+    if (this.prisma.isDatabaseConnected()) {
+      conversation = await this.prisma.agentConversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' },
+          },
         },
-      },
-    });
+      });
+    } else {
+      const conv = this.memConversations.get(id);
+      if (conv) {
+        conversation = {
+          ...conv,
+          messages: this.memMessages.get(id) || [],
+        };
+      }
+    }
 
     if (!conversation) {
       throw new NotFoundException(`Conversation with ID ${id} not found.`);

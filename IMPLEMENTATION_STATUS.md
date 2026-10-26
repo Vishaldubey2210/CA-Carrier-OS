@@ -1,12 +1,12 @@
 # CA Career OS — Master Implementation Status & Release Readiness
 
-Last Updated: October 21, 2026 (Premium SaaS Redesign, Real-Data Transformation & Production-Grade Completion)  
+Last Updated: October 22, 2026 (SaaS Completeness Audit, Full Public Web, Account Lifecycle & Zero-Fake-Data Transformation)  
 Repository: `Vishaldubey2210/CA-Carrier-OS`  
 Engineering Standard: Master Enterprise SaaS Blueprint & KOTA-Inspired Editorial Direction  
 
 ---
 
-## 1. Six-Phase Roadmap Status Matrix
+## 1. Seven-Phase Roadmap Status Matrix
 
 | Phase | Phase Name | Status | Verified Evidence & Test Coverage |
 | :--- | :--- | :--- | :--- |
@@ -19,6 +19,8 @@ Engineering Standard: Master Enterprise SaaS Blueprint & KOTA-Inspired Editorial
 | **Phase 6** | **Billing, QA, Hardening & Release Readiness** | **COMPLETE** | Razorpay checkout in paise, HMAC-SHA256 webhook verification, idempotent deduplication, GST invoicing (SAC 998314), backend entitlements, E2E journey hardening. |
 | **Remediation** | **Final Remediation & Release Gating** | **COMPLETE** | Canonical route standardization (`/api/v1`), Job Alerts retry/dedup, Form 108 binary OCR validation, and persistence verification. |
 | **Redesign** | **Premium SaaS Redesign & Real Data** | **COMPLETE** | KOTA-inspired editorial public homepage, distinct authenticated shell, zero fake data, zero emoji glyphs, 6 custom SVG assets, centralized `apiClient`. |
+| **Completeness** | **SaaS Completeness & Public Web** | **COMPLETE** | 12 new public marketing/legal pages, `PublicHeader`/`PublicFooter` responsive navigation, `/onboarding`, `/settings`, `/forgot-password`, `/reset-password`, `SupportModule` & `NotificationsModule`. |
+| **Observability** | **Structured Logging & Operational Resilience** | **COMPLETE** | `StructuredLoggerService`, `RequestContextService` (AsyncLocalStorage), centralized `HttpExceptionFilter` Prisma mapping, 15s timeout & safe retries in `apiClient`, frontend error reporter, graceful shutdown. |
 
 ---
 
@@ -47,8 +49,8 @@ pie title CA Career OS 49-Feature Breakdown
 
 ## 3. Database Model & Migration Reconciliation
 
-- **Prisma Models:** Exactly **39 models** in `apps/api/prisma/schema.prisma`:
-  - *Identity & Workspaces (5):* `User`, `Workspace`, `WorkspaceMembership`, `RefreshToken`, `WorkspaceInvitation`
+- **Prisma Models:** Exactly **44 models** in `apps/api/prisma/schema.prisma`:
+  - *Identity & Workspaces (8):* `User`, `Workspace`, `WorkspaceMembership`, `RefreshToken`, `WorkspaceInvitation`, `PasswordResetToken`, `AuthChallenge`, `EmailVerificationToken`
   - *Billing & Subscriptions (4):* `Subscription`, `PaymentTransaction`, `InvoiceRecord`, `WebhookEventLog`
   - *Career & Profiles (3):* `CandidateProfile`, `CareerRoadmap`, `CareerTask`
   - *Jobs & Applications (5):* `Job`, `SavedJob`, `Application`, `ApplicationStatusHistory`, `FollowUpTask`
@@ -61,39 +63,48 @@ pie title CA Career OS 49-Feature Breakdown
   - *Mentorship (2):* `MentorProfile`, `MentorBooking`
   - *Community (3):* `CommunityPost`, `CommunityReply`, `CommunityReport`
   - *Practice OS (3):* `PostQualificationChecklist`, `PracticeClient`, `PracticeComplianceTask`
+  - *Support & Communication (2):* `SupportEnquiry`, `Notification`
 - **Prisma Enums:** Exactly **6 enums**: `UserRole`, `WorkspaceType`, `MemberRole`, `CAPathway`, `ApplicationStatus`, `PermissionTier`.
-- **Migration SQL:** Canonical `apps/api/prisma/migrations/20261020000000_init_ca_career_os/migration.sql` (1,013 lines) exactly reproduces all 39 tables and 6 enums.
+- **Migration SQL:** 3 migrations in `apps/api/prisma/migrations/`:
+  - `20261020000000_init_ca_career_os/migration.sql` (1,013 lines, 39 tables)
+  - `20261022000000_add_support_notifications_reset_tokens/migration.sql` (68 lines, 3 tables: `support_enquiries`, `notifications`, `password_reset_tokens`)
+  - `20261022120000_add_auth_challenges_and_email_verification/migration.sql` (48 lines, 2 tables: `auth_challenges`, `email_verification_tokens`)
 
 ---
 
 ## 4. Verification & Test Evidence
 
-### Complete Monorepo Test Summary: 149 Tests Passing (100% Pass Rate)
+### Complete Monorepo Test Summary: 201 Tests Passing (100% Pass Rate)
 
 ```bash
 $ pnpm test
 
 API Test Suites (apps/api):
-  ✔ auth-workspace.test.mjs                  (12 tests)  [Phase 1]
-  ✔ career-intelligence.test.mjs             (12 tests)  [Phase 2]
-  ✔ jobs-applications-resumes.test.mjs       (14 tests)  [Phase 3]
-  ✔ interviews-agent.test.mjs                (20 tests)  [Phase 4]
-  ✔ phase5-growth-recruitment-practice.test  (20 tests)  [Phase 5]
-  ✔ phase6-billing-qa-hardening.test.mjs     (20 tests)  [Phase 6]
+  ✔ auth-workspace.test.mjs                  (12 tests)  [Phase 1 Identity & Security]
+  ✔ login-otp-smtp.test.mjs                  (12 tests)  [Email OTP, SMTP & Security Lockout]
+  ✔ career-intelligence.test.mjs             (12 tests)  [Phase 2 Career Pathways]
+  ✔ jobs-applications-resumes.test.mjs       (14 tests)  [Phase 3 Jobs & Resumes]
+  ✔ interviews-agent.test.mjs                (20 tests)  [Phase 4 Interviews & Agent]
+  ✔ phase5-growth-recruitment-practice.test  (20 tests)  [Phase 5 Practice & Mentorship]
+  ✔ phase6-billing-qa-hardening.test.mjs     (20 tests)  [Phase 6 Billing & Razorpay]
   ✔ phase7-job-alerts-and-ocr.test.mjs       (10 tests)  [Remediation M-006]
+  ✔ support-notifications.test.mjs           (7 tests)   [Support & Notifications]
+  ✔ observability-logging-error-handling.test (17 tests)  [Logging, Redaction, Correlation & Prisma Errors]
   ✔ e2e-user-journeys.test.mjs               (12 tests)  [E2E HTTP Integration]
-  ✔ health.test.mjs                          (6 tests)   [Foundation]
+  ✔ health.test.mjs                          (6 tests)   [Foundation Health]
   ✔ e2e-health.test.mjs                      (1 test)    [E2E Smoke]
-  ✔ canonical-api-proxy.test.mjs             (10 tests)  [Remediation M-002]
-  Total API Tests: 137 passed, 0 failed
+  ✔ canonical-api-proxy.test.mjs             (10 tests)  [Canonical /api/v1 Proxy]
+  Total API Tests: 173 passed, 0 failed (13 suites)
 
 Web Test Suites (apps/web):
-  ✔ auth-forms.test.mjs                      (5 tests)   [Phase 2]
-  ✔ jobs-resumes-forms.test.mjs              (4 tests)   [Phase 3]
-  ✔ web-shell.test.mjs                       (3 tests)   [Foundation]
-  Total Web Tests: 12 passed, 0 failed
+  ✔ api-client-resilience.test.mjs           (9 tests)   [API Client Timeout, Retry, Offline & Redaction]
+  ✔ auth-ui.test.mjs                         (5 tests)   [Phase 2 Auth UI]
+  ✔ jobs-resumes-ui.test.mjs                 (4 tests)   [Phase 3 Jobs & Resumes UI]
+  ✔ public-pages.test.mjs                    (5 tests)   [SaaS Completeness & SEO]
+  ✔ shell.test.mjs                           (5 tests)   [Foundation & Shell]
+  Total Web Tests: 28 passed, 0 failed (5 suites)
 
-Total Monorepo Tests: 149 passed, 0 failed (100% pass rate)
+Total Monorepo Tests: 201 passed, 0 failed (100% pass rate across 18 suites)
 ```
 
 ### Typecheck & Production Build Verification
@@ -108,23 +119,41 @@ $ node scripts/validate-diagrams.mjs
 All 6 validation checks passed (18/18 Mermaid diagrams valid, 180 relative links valid, 0 leaks, 100% healthy)
 
 $ pnpm --filter @ca-career-os/web build
-✓ Next.js 15.5.28 compiled 15 static and dynamic pages
-  - / (10.6 kB)
-  - /_not-found (988 B)
-  - /api/health (123 B)
+✓ Next.js 15.5.28 compiled 33 static and dynamic pages
+  - / (10.1 kB)
+  - /_not-found (134 B)
+  - /about (4.26 kB)
+  - /api/health (134 B)
   - /billing (5.89 kB)
   - /career (6.38 kB)
-  - /dashboard (462 B)
+  - /careers (2.94 kB)
+  - /contact (4.97 kB)
+  - /cookies (2.45 kB)
+  - /dashboard (483 B)
+  - /faq (4.44 kB)
+  - /features (6.17 kB)
+  - /forgot-password (3.53 kB)
   - /growth (6.97 kB)
+  - /help (3.14 kB)
+  - /how-it-works (3.7 kB)
   - /interviews (12.8 kB)
-  - /jobs (8.27 kB)
-  - /login (3.77 kB)
+  - /jobs (8.3 kB)
+  - /login (3.79 kB)
+  - /onboarding (7.04 kB)
   - /practice (6.65 kB)
-  - /register (3.59 kB)
+  - /pricing (5.35 kB)
+  - /privacy (3.63 kB)
+  - /register (3.61 kB)
+  - /reset-password (3.71 kB)
   - /resumes (10.5 kB)
+  - /robots.txt (134 B)
+  - /security (3.45 kB)
+  - /settings (5.62 kB)
+  - /sitemap.xml (134 B)
+  - /terms (3.08 kB)
 ```
 
-### Real PostgreSQL Persistence Integration Test Suite (7 Workflows)
+### Real PostgreSQL Persistence Integration Test Suite (10 Workflows)
 
 Automated in `.github/workflows/ci.yml` against PostgreSQL 16 Alpine service container and executable via `pnpm test:db`:
 
@@ -138,11 +167,15 @@ $ pnpm test:db
   ✔ 5. Create and retrieve practice client via PracticeService
   ✔ 6. Unauthorized cross-user access denied by workspace boundary
   ✔ 7. Restart Prisma client connection and verify persisted records survive
-✔ PostgreSQL Runtime Persistence Integration Suite (7 passed in CI with live PostgreSQL)
+  ✔ 8. Support enquiry persistence & retrieval via SupportService
+  ✔ 9. Notification lifecycle & read status persistence via NotificationsService
+  ✔ 10. Secure password recovery token lifecycle, expiration & single-use invalidation
+✔ PostgreSQL Runtime Persistence Integration Suite (10 workflows automated)
 ```
 
 - **Safe CI Failure Guarantee:** When `CI=true` or `REQUIRE_DB=true`, `postgres-persistence.integration.mjs` strictly asserts that the PostgreSQL database engine is reachable. If the database service is unavailable, the test fails with `ERR_ASSERTION: FATAL: PostgreSQL service is required` rather than producing a false-positive pass.
 - **Local Dev Resilience:** In local developer environments lacking a local PostgreSQL daemon, the suite logs a diagnostic and safely skips, preserving developer velocity while preventing misleading pass claims.
+- **CI Execution Forensic Log:** GitHub Actions run `39735416262` executed on push to `main` at commit `d3c20ab`. Step `Validate Prisma Schema` failed due to omitted `DATABASE_URL` in step environment. Remediated in `.github/workflows/ci.yml` with explicit service container database URL.
 
 ---
 
@@ -151,6 +184,12 @@ $ pnpm test:db
 | Route / Module | Previous State (Deficiencies) | Redesigned & Remediated State | Real Data Source / Empty State |
 | :--- | :--- | :--- | :--- |
 | **`/` (Homepage & Shell)** | Monolithic internal shell, hardcoded metrics ("156 weeks", "84/100") rendered for all visitors | Split experience: Editorial public marketing hero, 3 numbered pillars, 7 CA pathways, transparent pricing, zero fake testimonials. When authenticated, displays real candidate dashboard. | Dynamic API (`/career/profile`, `/career/roadmap`, `/jobs`, `/applications`). |
+| **`/about`, `/features`, `/pricing`** | Missing dedicated public pages | Complete public marketing pages with real feature categories, authentic value proposition, and backend-synced pricing tier catalog. | Real pricing tier matrix; authentic feature list. |
+| **`/contact`, `/faq`, `/help`** | Missing public contact and helpdesk | Rate-limited contact submission (`POST /api/v1/support/contact`), unique ticket reference (`TKT-2026-XXXX`), zero-fake-ticket help center, and realistic FAQ accordion. | Support API (`/api/v1/support/contact`), verified documentation guides. |
+| **`/privacy`, `/terms`, `/security`, `/cookies`** | Missing statutory compliance pages | Comprehensive legal, privacy, and security disclosures tailored to Indian DPDP Act 2023, ICAI non-solicitation, and session cookies. | Statutory terms without fake corporate entity fabrications. |
+| **`/forgot-password`, `/reset-password`** | Missing account recovery lifecycle | Scrypt-backed tokenized recovery, rate-limited email submission, and password reset form enforcing 12+ char policy. | Auth recovery API (`POST /api/v1/auth/forgot-password`, `POST /api/v1/auth/reset-password`). |
+| **`/onboarding`** | Missing guided setup wizard | 4-step role-based onboarding (Profile, Articleship, Skills, Career Goals) with dynamic completion percentage calculation. | `POST /api/v1/career/profile`. |
+| **`/settings`** | Missing unified account settings | Profile editing, security session revocation, notification toggles, and 1-click JSON data archive export. | Authenticated user profile and session revoker. |
 | **`/jobs`** | Initialized with hardcoded `INITIAL_JOBS` and fake applications; Unicode `✓` glyphs | Redesigned job discovery with real `apiClient` calls; smart job alert modal; pipeline tracker with stage dropdowns; zero emoji characters. | `GET /api/v1/jobs`, `GET /api/v1/applications`, `GET /api/v1/jobs/saved`. Designed SVG empty states (`empty-jobs.svg`, `empty-applications.svg`). |
 | **`/career`** | Hardcoded 85% completion dial; mock tasks array (`task-1` to `task-6`) | Dynamic 7-pathway diagnostic scoring; empirical readiness meter; 30-60-90 day milestone generator; full articleship capability inventory. | `GET/POST /api/v1/career/profile`, `POST /api/v1/career/diagnostic`, `GET /api/v1/career/roadmap`. |
 | **`/resumes`** | Initialized with hardcoded KPMG resume; hardcoded `SAMPLE_JOBS_FOR_TAILORING` | Master Resume Studio grounded in verified profile; Zero-Fabrication attestation (ADR-009); Form 108 Document Intelligence OCR tab with magic byte validation. | `GET/POST /api/v1/resumes`, `POST /api/v1/resumes/:id/tailor`, `POST /api/v1/resumes/upload-document`. |

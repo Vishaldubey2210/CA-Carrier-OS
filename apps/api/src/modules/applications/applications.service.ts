@@ -4,8 +4,11 @@ import {
   BadRequestException,
   ForbiddenException,
   Logger,
+  OnModuleInit,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
   ApplicationRecord,
   ApplicationStatus,
@@ -75,8 +78,9 @@ const VALID_TRANSITIONS: Record<ApplicationStatus, ApplicationStatus[]> = {
 };
 
 @Injectable()
-export class ApplicationsService {
+export class ApplicationsService implements OnModuleInit {
   private readonly logger = new Logger(ApplicationsService.name);
+  private readonly storageFile = path.resolve(process.cwd(), 'data', 'applications_store.json');
 
   // In-memory fallback stores: applicationId -> ApplicationRecord
   private readonly memApplications = new Map<string, ApplicationRecord>();
@@ -84,14 +88,124 @@ export class ApplicationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jobsService: JobsService
-  ) {}
+  ) {
+    this.loadFromDisk();
+  }
+
+  async onModuleInit(): Promise<void> {
+    this.loadFromDisk();
+  }
+
+  private ensureStorageInitialized(): void {
+    try {
+      const dir = path.dirname(this.storageFile);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      if (!fs.existsSync(this.storageFile)) {
+        fs.writeFileSync(this.storageFile, JSON.stringify([], null, 2), 'utf-8');
+      }
+    } catch (err: any) {
+      this.logger.warn(`Application storage init notice: ${err.message}`);
+    }
+  }
+
+  private saveToDisk(): void {
+    try {
+      this.ensureStorageInitialized();
+      const tempPath = `${this.storageFile}.tmp.${Date.now()}`;
+      fs.writeFileSync(
+        tempPath,
+        JSON.stringify(Array.from(this.memApplications.values()), null, 2),
+        'utf-8'
+      );
+      fs.renameSync(tempPath, this.storageFile);
+    } catch (err: any) {
+      this.logger.warn(`Failed saving applications to disk: ${err.message}`);
+    }
+  }
+
+  private loadFromDisk(): void {
+    try {
+      this.ensureStorageInitialized();
+      if (fs.existsSync(this.storageFile)) {
+        const raw = fs.readFileSync(this.storageFile, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          for (const item of parsed) {
+            if (item?.id) {
+              this.memApplications.set(item.id, item);
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      this.logger.warn(`Failed loading applications from disk: ${err.message}`);
+    }
+  }
 
   /**
    * List candidate applications in authorized personal workspace.
    */
   async listApplications(userId: string, workspaceId: string): Promise<ApplicationRecord[]> {
+    if (this.prisma && this.prisma.isDatabaseConnected()) {
+      try {
+        const dbApps: any[] = await (this.prisma as any).application.findMany({
+          where: {
+            OR: [
+              { candidateProfileId: userId },
+              { candidate: { userId } },
+            ],
+          },
+          include: {
+            job: true,
+            statusHistory: { orderBy: { changedAt: 'desc' } },
+            followUps: { orderBy: { createdAt: 'desc' } },
+          },
+          orderBy: { statusUpdatedAt: 'desc' },
+        });
+
+        for (const da of dbApps) {
+          if (!this.memApplications.has(da.id)) {
+            const mappedJob: any = da.job;
+            this.memApplications.set(da.id, {
+              id: da.id,
+              candidateProfileId: userId,
+              jobId: da.jobId,
+              job: mappedJob,
+              resumeVersionId: da.resumeVersionId,
+              status: da.status as unknown as ApplicationStatus,
+              coverNote: da.coverNote,
+              recruiterContact: (da.recruiterContact as any) || {},
+              appliedAt: da.appliedAt ? da.appliedAt.toISOString() : null,
+              statusUpdatedAt: da.statusUpdatedAt.toISOString(),
+              nextFollowUpDate: da.nextFollowUpDate ? da.nextFollowUpDate.toISOString() : null,
+              history: (da.statusHistory || []).map((h: any) => ({
+                id: h.id,
+                applicationId: da.id,
+                fromStatus: h.fromStatus as any,
+                toStatus: h.toStatus as any,
+                notes: h.notes,
+                changedAt: h.changedAt ? new Date(h.changedAt).toISOString() : new Date().toISOString(),
+              })),
+              followUps: (da.followUps || []).map((f: any) => ({
+                id: f.id,
+                applicationId: da.id,
+                title: f.title,
+                dueDate: f.dueDate ? new Date(f.dueDate).toISOString() : undefined,
+                completed: f.completed,
+                createdAt: f.createdAt ? new Date(f.createdAt).toISOString() : new Date().toISOString(),
+              })),
+            });
+          }
+        }
+      } catch (err: any) {
+        this.logger.warn(`Failed reading applications from DB: ${err.message}`);
+      }
+    }
+
     const apps = Array.from(this.memApplications.values()).filter(
-      app => app.candidateProfileId === userId
+      (app) => app.candidateProfileId === userId
     );
     return apps.sort(
       (a, b) => new Date(b.statusUpdatedAt).getTime() - new Date(a.statusUpdatedAt).getTime()
@@ -133,49 +247,76 @@ export class ApplicationsService {
       });
     }
 
-    if (this.prisma.isDatabaseConnected()) {
-      let profileId = userId;
-      const dbProfile = await this.prisma.candidateProfile.findFirst({
-        where: { OR: [{ id: userId }, { userId }] },
-      });
-      if (dbProfile) profileId = dbProfile.id;
+    if (this.prisma && this.prisma.isDatabaseConnected()) {
+      try {
+        let profileId = userId;
+        let dbProfile = await this.prisma.candidateProfile.findFirst({
+          where: { OR: [{ id: userId }, { userId }] },
+        });
+        if (!dbProfile) {
+          try {
+            dbProfile = await this.prisma.candidateProfile.create({
+              data: {
+                id: userId,
+                userId: userId,
+                workspaceId: workspaceId || '00000000-0000-0000-0000-0000000001w1',
+                summary: 'Chartered Accountant Candidate',
+              },
+            });
+          } catch {
+            // Profile may already exist
+          }
+        }
+        if (dbProfile) profileId = dbProfile.id;
 
-      const dbApp = await this.prisma.application.create({
-        data: {
-          id: appId,
-          candidateProfileId: profileId,
-          jobId: input.jobId,
-          status: initialStatus as any,
-          coverNote: input.coverNote || null,
-          nextFollowUpDate: input.nextFollowUpDate ? new Date(input.nextFollowUpDate) : null,
-          appliedAt: initialStatus === ApplicationStatus.APPLIED ? new Date() : null,
-          statusHistory: {
-            create: {
-              id: randomUUID(),
-              fromStatus: null,
-              toStatus: initialStatus as any,
-              notes: 'Application tracking record created',
+        // Ensure job exists in prisma.job so foreign key constraint NEVER fails
+        const existingJob = await this.prisma.job.findUnique({ where: { id: input.jobId } });
+        if (!existingJob) {
+          await this.jobsService.getIngestionOrchestrator().persistJobToDatabase(job);
+        }
+
+        const dbApp = await this.prisma.application.create({
+          data: {
+            id: appId,
+            candidateProfileId: profileId,
+            jobId: input.jobId,
+            status: initialStatus as any,
+            coverNote: input.coverNote || null,
+            nextFollowUpDate: input.nextFollowUpDate ? new Date(input.nextFollowUpDate) : null,
+            appliedAt: initialStatus === ApplicationStatus.APPLIED ? new Date() : null,
+            statusHistory: {
+              create: {
+                id: randomUUID(),
+                fromStatus: null,
+                toStatus: initialStatus as any,
+                notes: 'Application tracking record created',
+              },
             },
           },
-        },
-      });
+        });
 
-      this.logger.log(`Created application tracking record ${dbApp.id} in DB for job ${job.title}`);
-      return {
-        id: dbApp.id,
-        candidateProfileId: dbApp.candidateProfileId,
-        jobId: dbApp.jobId,
-        job,
-        resumeVersionId: dbApp.resumeVersionId,
-        status: dbApp.status as unknown as ApplicationStatus,
-        coverNote: dbApp.coverNote,
-        recruiterContact: (dbApp.recruiterContact as any) || {},
-        appliedAt: dbApp.appliedAt ? dbApp.appliedAt.toISOString() : null,
-        statusUpdatedAt: dbApp.statusUpdatedAt.toISOString(),
-        nextFollowUpDate: dbApp.nextFollowUpDate ? dbApp.nextFollowUpDate.toISOString() : null,
-        history: [historyItem],
-        followUps,
-      };
+        this.logger.log(`Created application tracking record ${dbApp.id} in DB for job ${job.title}`);
+        const appRecord: ApplicationRecord = {
+          id: dbApp.id,
+          candidateProfileId: dbApp.candidateProfileId,
+          jobId: dbApp.jobId,
+          job,
+          resumeVersionId: dbApp.resumeVersionId,
+          status: dbApp.status as unknown as ApplicationStatus,
+          coverNote: dbApp.coverNote,
+          recruiterContact: (dbApp.recruiterContact as any) || {},
+          appliedAt: dbApp.appliedAt ? dbApp.appliedAt.toISOString() : null,
+          statusUpdatedAt: dbApp.statusUpdatedAt.toISOString(),
+          nextFollowUpDate: dbApp.nextFollowUpDate ? dbApp.nextFollowUpDate.toISOString() : null,
+          history: [historyItem],
+          followUps,
+        };
+        this.memApplications.set(appId, appRecord);
+        this.saveToDisk();
+        return appRecord;
+      } catch (dbErr: any) {
+        this.logger.warn(`Prisma create application failed: ${dbErr.message}. Falling back to memory & disk store.`);
+      }
     }
 
     const newApp: ApplicationRecord = {
@@ -195,6 +336,7 @@ export class ApplicationsService {
     };
 
     this.memApplications.set(appId, newApp);
+    this.saveToDisk();
     this.logger.log(`Created application tracking record ${appId} for job ${job.title}`);
     return newApp;
   }

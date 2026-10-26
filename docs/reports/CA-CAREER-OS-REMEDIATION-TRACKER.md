@@ -3,7 +3,7 @@
 > **Document Type:** Remediation Issue Register & Verification Log  
 > **Repository:** `Vishaldubey2210/CA-Carrier-OS`  
 > **Initial Baseline Reference:** `docs/reports/CA-CAREER-OS-COMPLETE-IMPLEMENTATION-AUDIT.md`  
-> **Current Date:** October 21, 2026  
+> **Current Date:** October 22, 2026  
 > **Lead Remediation Roles:** Principal Engineer, Full-Stack Developer, Database Engineer, AppSec & QA Lead  
 > **Remediation Status:** Complete & Verified (Release Gate Assessment Complete)
 
@@ -16,10 +16,11 @@
 | **M-001** | P0 | Git & Repository Integrity | `UNTRACKED_LOCALLY / PENDING_USER_COMMIT` | On `main` tracking `origin/main` at `f568b17`. Working tree intact. Preserved user work. |
 | **M-002** | P1 | Canonical API Route Prefix | `CLOSED` | Standardized `@Controller('api/v1/<name>')`. Bare routes return 404. Verified via `canonical-api-proxy.test.mjs` (10/10 pass). |
 | **M-003** | P1 | Real PostgreSQL Persistence | `STATIC_VERIFIED / RUNTIME_BLOCKED` | 1013-line migration SQL matches schema 100%. Runtime blocked: host lacks Docker/psql. |
-| **M-004** | P1 | Frontend-Backend Integration | `CLOSED` | Form schemas, PAN validation, agent chat, Form 108 upload, dynamic API hydration verified. Next.js build: 14 pages. |
+| **M-004** | P1 | Frontend-Backend Integration | `CLOSED` | Form schemas, PAN validation, agent chat, Form 108 upload, dynamic API hydration verified. Next.js build: 33 pages. |
 | **M-005** | P2 | Production Provider Readiness | `DEFERRED_WITH_REASON` | Production safeguards active (Razorpay live guard, mock metadata flags). Live credentials deferred. |
 | **M-006** | P2 | Email Alerts & Document OCR | `CLOSED (LOCAL ARCHITECTURE COMPLETE & VERIFIED)` | `JobAlertsService` (retry/dedup) & `DocumentIntelligenceService` (magic bytes, Form 108). 10/10 tests pass. |
-| **M-007** | P3 | Security Hardening & Gate | `CLOSED` | 137 monorepo tests passing (125 API + 12 Web). 18 Mermaid diagrams valid, 0 leaks, 0 broken links. |
+| **M-007** | P3 | Security Hardening & Gate | `CLOSED` | 163 monorepo tests passing (144 API + 19 Web). 18 Mermaid diagrams valid, 0 leaks, 0 broken links. |
+| **M-008** | P1 | SaaS Completeness & Zero-Fake-Data | `CLOSED` | 12 public pages, PublicHeader/Footer, /onboarding, /settings, auth recovery, Support & Notifications modules, 33 Next.js pages. |
 
 ---
 
@@ -165,9 +166,40 @@
 - **Related Feature ID:** N/A (Release Hardening & Regression Suite)
 - **Description:** Complete monorepo test coverage, architectural diagram validation, and zero documentation leak checks.
 - **Verification Evidence:**
-  - Monorepo automated test suite: 137 tests passing (125 API + 12 Web), 0 failures.
+  - Monorepo automated test suite: 163 tests passing (144 API + 19 Web), 0 failures.
   - Canonical proxy test suite: 10/10 tests passing.
-  - Architecture validation (`scripts/validate-diagrams.mjs`): 6/6 checks passed (18 Mermaid diagrams parsed, 178 relative links valid, 0 forbidden local path leaks, OpenAPI 3.0 valid).
+  - Architecture validation (`scripts/validate-diagrams.mjs`): 6/6 checks passed (18 Mermaid diagrams parsed, 180 relative links valid, 0 forbidden local path leaks, OpenAPI 3.0 valid).
   - TypeScript typecheck: 0 errors across `@ca-career-os/shared`, `@ca-career-os/api`, `@ca-career-os/web`.
-  - Production build: Clean Next.js 15 bundle generation across 14 pages.
+  - Production build: Clean Next.js 15 bundle generation across 33 pages.
 - **Status:** `CLOSED`
+
+---
+
+### Issue M-008 (Priority: P1)
+- **Original Audit Reference:** Section 2 & Section 3 (SaaS Completeness & Zero-Fake-Data Transformation)
+- **Related Feature ID:** F-048, F-049, Public Web Suite
+- **Description:** Complete public SaaS presence, responsive navigation, authentication lifecycle, role onboarding, account settings, support enquiry handling, notifications, and zero-fake-data compliance.
+- **Implementation Delivered:**
+  1. **Complete Public Website & Responsive Shell:**
+     - `PublicHeader.tsx`: Responsive navigation with desktop links, mobile hamburger drawer, active page states, and login/sign-up CTAs.
+     - `PublicFooter.tsx`: Product, legal, and company directory with statutory disclaimers (ICAI ethics, no job guarantee claims).
+     - `AppShell.tsx`: Dynamic route segmentation rendering `PublicHeader`/`PublicFooter` for public routes while isolating authenticated app layouts.
+     - 12 new public pages: `/about`, `/features`, `/pricing`, `/contact`, `/faq`, `/privacy`, `/terms`, `/security`, `/cookies`, `/help`, `/how-it-works`, `/careers`.
+     - SEO & Resilience: Dynamic `sitemap.ts`, `robots.ts`, custom `not-found.tsx`.
+  2. **Authentication Lifecycle & Account Onboarding:**
+     - `/forgot-password`: Rate-limited tokenized reset dispatch with account privacy protection.
+     - `/reset-password`: Scrypt-backed token verification with 12+ character password enforcement.
+     - `/onboarding`: 4-step wizard calculating dynamic completion percentages across profile, articleship, skills, and target pathways.
+     - `/settings`: Account profile, session revocation, notification toggles, and 1-click personal JSON data archive export.
+  3. **Backend Support & Notifications Modules:**
+     - `SupportModule`: IP-based rate limiting (5 req/10m), input validation, unique ticket generation (`TKT-2026-XXXX`), persistent enquiry storage (`POST /api/v1/support/contact`).
+     - `NotificationsModule`: Real-time notification fetching, unread badge counter, and single/all read state updates (`GET/PATCH /api/v1/notifications`).
+  4. **Zero-Fake-Data Enforcement:**
+     - Eliminated all fake testimonials, invented customer counts, placement rates, and fabricated employer metrics.
+     - Empty states for jobs, applications, and clients use authentic SVG illustrations and clear next-action guides.
+- **Verification Evidence:**
+  - Automated test suite: 163 tests passing (144 API + 19 Web), 0 failures.
+  - Production build: Next.js 15 compiled 33 static and dynamic pages with 0 errors.
+  - Architecture validation: All 6 checks in `scripts/validate-diagrams.mjs` pass cleanly across 43 documentation files.
+- **Status:** `CLOSED`
+

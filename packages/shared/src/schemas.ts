@@ -123,6 +123,27 @@ export const ResetPasswordRequestSchema = z.object({
 });
 export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequestSchema>;
 
+export const VerifyOtpRequestSchema = z.object({
+  challengeId: z.string().uuid({ message: 'Valid challenge ID is required' }),
+  code: z.string().regex(/^\d{6}$/, { message: 'OTP must be exactly 6 digits' }),
+});
+export type VerifyOtpRequest = z.infer<typeof VerifyOtpRequestSchema>;
+
+export const ResendOtpRequestSchema = z.object({
+  challengeId: z.string().uuid({ message: 'Valid challenge ID is required' }),
+});
+export type ResendOtpRequest = z.infer<typeof ResendOtpRequestSchema>;
+
+export const VerifyEmailRequestSchema = z.object({
+  token: z.string().min(1, { message: 'Verification token is required' }),
+});
+export type VerifyEmailRequest = z.infer<typeof VerifyEmailRequestSchema>;
+
+export const ResendVerificationRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email({ message: 'A valid email address is required' }),
+});
+export type ResendVerificationRequest = z.infer<typeof ResendVerificationRequestSchema>;
+
 export const CreateWorkspaceSchema = z.object({
   name: z.string().trim().min(2, { message: 'Workspace name must be at least 2 characters' }).max(100),
   type: z.nativeEnum(WorkspaceType).default(WorkspaceType.ORGANIZATION),
@@ -168,6 +189,9 @@ export type CandidateProfileInput = z.infer<typeof CandidateProfileInputSchema>;
 
 export const GenerateRoadmapInputSchema = z.object({
   targetPathway: z.nativeEnum(CAPathway),
+  customPrompt: z.string().optional(),
+  focusAreas: z.array(z.string()).default([]).optional(),
+  pace: z.enum(['ACCELERATED', 'BALANCED', 'INTENSIVE']).default('BALANCED').optional(),
 });
 export type GenerateRoadmapInput = z.infer<typeof GenerateRoadmapInputSchema>;
 
@@ -192,6 +216,10 @@ export const JobFilterQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
   sortBy: z.enum(['postedAt', 'salary', 'matchScore']).default('postedAt'),
+  channel: z.enum(['ALL', 'ENTERPRISE', 'EXTERNAL', 'ENTERPRISE_ONLY', 'EXTERNAL_ONLY']).default('ALL').optional(),
+  opportunityType: z.enum(['ALL', 'ARTICLESHIP', 'INDUSTRIAL_TRAINING', 'CA_FRESHER', 'QUALIFIED_CA', 'FINANCE_EXECUTIVE']).default('ALL').optional(),
+  sourceProvider: z.string().trim().optional(),
+  verificationStatus: z.enum(['ALL', 'SOURCE_ACTIVE', 'ACTIVE_UNCONFIRMED', 'STALE', 'EXPIRED', 'UNAVAILABLE', 'REVIEW_REQUIRED']).default('ALL').optional(),
 });
 export type JobFilterQueryInput = z.infer<typeof JobFilterQuerySchema>;
 
@@ -215,13 +243,31 @@ export const CreateJobSchema = z.object({
   keyResponsibilities: z.array(z.string()).default([]),
   source: z.string().default('DIRECT_EMPLOYER'),
   sourceUrl: z.string().url().optional().or(z.literal('')),
+  // Multi-Source Aggregator Fields
+  opportunityType: z.enum(['ARTICLESHIP', 'INDUSTRIAL_TRAINING', 'CA_FRESHER', 'QUALIFIED_CA', 'FINANCE_EXECUTIVE']).default('QUALIFIED_CA'),
+  channel: z.enum(['ENTERPRISE', 'EXTERNAL']).default('ENTERPRISE'),
+  sourceProvider: z.string().default('DIRECT_EMPLOYER'),
+  externalJobId: z.string().optional(),
+  canonicalUrl: z.string().url().optional().or(z.literal('')),
+  applicationUrl: z.string().url().optional().or(z.literal('')),
+  attribution: z.string().optional(),
+  originalPostedAt: z.string().optional(),
+  verificationStatus: z.enum(['SOURCE_ACTIVE', 'ACTIVE_UNCONFIRMED', 'STALE', 'EXPIRED', 'UNAVAILABLE', 'REVIEW_REQUIRED']).default('SOURCE_ACTIVE'),
 });
 export type CreateJobInput = z.infer<typeof CreateJobSchema>;
 
 export const JobIngestSchema = z.object({
   jobs: z.array(CreateJobSchema).min(1, { message: 'At least one job is required for ingestion' }),
+  sourceId: z.string().optional().default('PARTNER_ATS'),
 });
 export type JobIngestInputType = z.infer<typeof JobIngestSchema>;
+
+export const ReportJobSchema = z.object({
+  jobId: z.string().uuid({ message: 'Valid Job UUID is required' }),
+  reason: z.enum(['EXPIRED_LINK', 'SCAM_SUSPICION', 'INCORRECT_DETAILS', 'DUPLICATE_POSTING', 'OTHER']),
+  comments: z.string().trim().max(1000).optional(),
+});
+export type ReportJobInput = z.infer<typeof ReportJobSchema>;
 
 export const SaveJobNoteSchema = z.object({
   notes: z.string().max(1000).optional(),

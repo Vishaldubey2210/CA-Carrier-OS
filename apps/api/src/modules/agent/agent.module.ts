@@ -3,6 +3,7 @@ import { AgentController } from './agent.controller.js';
 import { AgentOrchestratorService } from './agent-orchestrator.service.js';
 import { ApprovalsService } from './approvals.service.js';
 import { AgentToolsRegistry } from './agent-tools.registry.js';
+import { AiInferenceService } from './ai-inference.service.js';
 import { CareerModule } from '../career/career.module.js';
 import { JobsModule } from '../jobs/jobs.module.js';
 import { ApplicationsModule } from '../applications/applications.module.js';
@@ -22,11 +23,13 @@ import { InterviewsModule } from '../interviews/interviews.module.js';
     AgentToolsRegistry,
     ApprovalsService,
     AgentOrchestratorService,
+    AiInferenceService,
   ],
   exports: [
     AgentToolsRegistry,
     ApprovalsService,
     AgentOrchestratorService,
+    AiInferenceService,
   ],
 })
 export class AgentModule {}

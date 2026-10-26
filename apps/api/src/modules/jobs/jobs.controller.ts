@@ -17,6 +17,7 @@ import {
   JobFilterQuerySchema,
   JobIngestInputType,
   JobIngestSchema,
+  ReportJobSchema,
   SaveJobNoteSchema,
   createSuccessResponse,
 } from '@ca-career-os/shared';
@@ -152,6 +153,34 @@ export class JobsController {
   }
 
   /**
+   * List configured aggregator sources and statuses
+   */
+  @Get('sources')
+  async listSources() {
+    const sources = this.jobsService.getSourceRegistry();
+    return createSuccessResponse(sources);
+  }
+
+  /**
+   * Get aggregator operational health and monitoring report
+   */
+  @Get('sources/health')
+  async getAggregatorHealth() {
+    const health = this.jobsService.getAggregatorHealth();
+    return createSuccessResponse(health);
+  }
+
+  /**
+   * Trigger on-demand synchronization across external sources (Authorized)
+   */
+  @Post('sources/sync')
+  @UseGuards(JwtAuthGuard, WorkspaceGuard)
+  async triggerSourceSync(@Query('providerId') providerId?: string) {
+    const result = await this.jobsService.triggerSourceSync(providerId);
+    return createSuccessResponse(result);
+  }
+
+  /**
    * Get job by ID with candidate match score
    */
   @Get(':id')
@@ -216,6 +245,40 @@ export class JobsController {
     @CurrentUser() user: any
   ) {
     const result = await this.jobsService.unsaveJob(id, user.id);
+    return createSuccessResponse(result);
+  }
+
+  /**
+   * Candidate report job for moderation review
+   */
+  @Post(':id/report')
+  async reportJob(
+    @Param('id') id: string,
+    @Body() body: unknown,
+    @Req() req: any
+  ) {
+    const parseResult = ReportJobSchema.safeParse(body);
+    if (!parseResult.success) {
+      throw new BadRequestException({
+        message: 'Invalid job report payload',
+        errors: parseResult.error.errors,
+      });
+    }
+    const result = await this.jobsService.reportJob(
+      id,
+      parseResult.data.reason,
+      parseResult.data.comments,
+      req.user?.id
+    );
+    return createSuccessResponse(result);
+  }
+
+  /**
+   * Revalidate freshness of a specific listing
+   */
+  @Post(':id/revalidate')
+  async revalidateJob(@Param('id') id: string) {
+    const result = await this.jobsService.revalidateJob(id);
     return createSuccessResponse(result);
   }
 }

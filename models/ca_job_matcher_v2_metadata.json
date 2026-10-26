@@ -1,0 +1,8 @@
+{
+  "model_name": "Deterministic_Explainable_Job_Match_Engine_v2",
+  "version": "2.0.0",
+  "mean_ndcg_at_5": 0.9999999999999999,
+  "mean_precision_at_3": 1.0,
+  "artifact_path": "/home/vishal/Downloads/CA Carrer OS/models/ca_job_matcher_v2.pkl",
+  "remediation_note": "Replaced circular synthetic formula with real EMSCAD job requirements and explicit ranking evaluation."
+}

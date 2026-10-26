@@ -251,8 +251,8 @@ export default function PracticeOSPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <BriefcaseBusiness size={24} color="var(--accent-purple)" />
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+            <BriefcaseBusiness size={24} color="var(--brand-primary)" />
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               CA Independent Practice Operating System
             </h1>
           </div>
@@ -307,17 +307,17 @@ export default function PracticeOSPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: 'rgba(99, 102, 241, 0.08)',
-              borderColor: 'rgba(99, 102, 241, 0.25)',
+              background: 'var(--brand-soft)',
+              borderColor: 'var(--border-subtle)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <AlertCircle size={20} color="var(--accent-indigo)" />
+              <AlertCircle size={20} color="var(--brand-primary)" />
               <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                 Official ICAI regulatory references verified up to date. Workflows provide informational guidance and do not constitute formal legal opinions.
               </div>
             </div>
-            <span style={{ fontSize: '0.8125rem', color: 'var(--accent-indigo)', fontWeight: 600 }}>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--brand-primary)', fontWeight: 600 }}>
               Completed:{' '}
               {checklist.filter((c) => c.isCompleted).length} / {checklist.length}
             </span>
@@ -334,7 +334,7 @@ export default function PracticeOSPage() {
                   alignItems: 'flex-start',
                   justifyContent: 'space-between',
                   gap: '1rem',
-                  borderLeft: item.isCompleted ? '4px solid #10b981' : '4px solid rgba(255, 255, 255, 0.1)',
+                  borderLeft: item.isCompleted ? '4px solid var(--success-text)' : '4px solid var(--border-subtle)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flex: 1 }}>
@@ -350,7 +350,7 @@ export default function PracticeOSPage() {
                     title={item.isCompleted ? 'Mark Incomplete' : 'Mark Completed'}
                   >
                     {item.isCompleted ? (
-                      <CheckCircle2 size={22} color="#10b981" />
+                      <CheckCircle2 size={22} color="var(--success-text)" />
                     ) : (
                       <Circle size={22} color="var(--text-muted)" />
                     )}
@@ -362,7 +362,7 @@ export default function PracticeOSPage() {
                         style={{
                           fontSize: '1rem',
                           fontWeight: 700,
-                          color: item.isCompleted ? '#94a3b8' : '#ffffff',
+                          color: item.isCompleted ? 'var(--text-muted)' : 'var(--text-primary)',
                           textDecoration: item.isCompleted ? 'line-through' : 'none',
                         }}
                       >
@@ -378,7 +378,7 @@ export default function PracticeOSPage() {
                     </p>
 
                     {item.notes && (
-                      <div style={{ fontSize: '0.75rem', color: '#10b981', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--success-text)', fontStyle: 'italic' }}>
                         Note: {item.notes}
                       </div>
                     )}
@@ -406,7 +406,7 @@ export default function PracticeOSPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 Practice Client Directory ({clients.length})
               </h2>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -424,8 +424,8 @@ export default function PracticeOSPage() {
           </div>
 
           {showAddClient && (
-            <div className="glass-panel" style={{ padding: '1.5rem', background: 'rgba(30, 41, 59, 0.9)' }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '1rem' }}>
+            <div className="glass-panel" style={{ padding: '1.5rem', background: 'var(--surface-primary)', border: '1px solid var(--border-subtle)' }}>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem' }}>
                 Create New Practice Client
               </h3>
               {clientFormError && (
@@ -556,7 +556,7 @@ export default function PracticeOSPage() {
               {clients.map((client) => (
                 <div key={client.id} className="glass-panel" style={{ padding: '1.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>{client.clientName}</h3>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{client.clientName}</h3>
                     <span className="badge badge-emerald">{client.status}</span>
                   </div>
 
@@ -591,7 +591,7 @@ export default function PracticeOSPage() {
       {activeTab === 'compliance' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               Statutory Compliance Calendar ({complianceTasks.length} Tracked Filings)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -621,7 +621,7 @@ export default function PracticeOSPage() {
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>{t.title}</h4>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t.title}</h4>
                     <span
                       className={`badge ${
                         t.status === 'FILED'

@@ -72,8 +72,10 @@ export default function RegisterPage() {
           padding: '2.5rem 2rem',
           position: 'relative',
           overflow: 'hidden',
-          background: 'rgba(15, 23, 42, 0.85)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
+          background: 'var(--surface-primary)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-md)',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
@@ -82,7 +84,7 @@ export default function RegisterPage() {
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
+              background: 'var(--brand-primary)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -90,12 +92,12 @@ export default function RegisterPage() {
               fontWeight: 800,
               fontSize: '1.25rem',
               marginBottom: '0.75rem',
-              boxShadow: '0 4px 16px rgba(99, 102, 241, 0.4)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             CA
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
             Create Your Account
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
@@ -111,7 +113,7 @@ export default function RegisterPage() {
             gap: '0.5rem',
             padding: '0.25rem',
             borderRadius: 'var(--radius-md)',
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: 'var(--surface-secondary)',
             border: '1px solid var(--border-subtle)',
             marginBottom: '1.5rem',
           }}
@@ -127,7 +129,7 @@ export default function RegisterPage() {
               fontWeight: 600,
               fontSize: '0.8125rem',
               transition: 'all 0.2s ease',
-              background: role === UserRole.CANDIDATE ? 'var(--accent-indigo)' : 'transparent',
+              background: role === UserRole.CANDIDATE ? 'var(--brand-primary)' : 'transparent',
               color: role === UserRole.CANDIDATE ? '#ffffff' : 'var(--text-secondary)',
             }}
           >
@@ -144,7 +146,7 @@ export default function RegisterPage() {
               fontWeight: 600,
               fontSize: '0.8125rem',
               transition: 'all 0.2s ease',
-              background: role === UserRole.RECRUITER ? 'var(--accent-indigo)' : 'transparent',
+              background: role === UserRole.RECRUITER ? 'var(--brand-primary)' : 'transparent',
               color: role === UserRole.RECRUITER ? '#ffffff' : 'var(--text-secondary)',
             }}
           >
@@ -188,9 +190,9 @@ export default function RegisterPage() {
                   width: '100%',
                   padding: '0.625rem 0.875rem',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--surface-secondary)',
                   border: '1px solid var(--border-subtle)',
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                   fontSize: '0.875rem',
                   outline: 'none',
                 }}
@@ -210,9 +212,9 @@ export default function RegisterPage() {
                   width: '100%',
                   padding: '0.625rem 0.875rem',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--surface-secondary)',
                   border: '1px solid var(--border-subtle)',
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                   fontSize: '0.875rem',
                   outline: 'none',
                 }}
@@ -234,9 +236,9 @@ export default function RegisterPage() {
                 width: '100%',
                 padding: '0.625rem 0.875rem',
                 borderRadius: 'var(--radius-md)',
-                background: 'rgba(255, 255, 255, 0.04)',
+                background: 'var(--surface-secondary)',
                 border: '1px solid var(--border-subtle)',
-                color: '#ffffff',
+                color: 'var(--text-primary)',
                 fontSize: '0.875rem',
                 outline: 'none',
               }}
@@ -258,9 +260,9 @@ export default function RegisterPage() {
                   width: '100%',
                   padding: '0.625rem 0.875rem',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--surface-secondary)',
                   border: '1px solid var(--border-subtle)',
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                   fontSize: '0.875rem',
                   outline: 'none',
                 }}
@@ -282,9 +284,9 @@ export default function RegisterPage() {
                 width: '100%',
                 padding: '0.625rem 0.875rem',
                 borderRadius: 'var(--radius-md)',
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: password.length > 0 && password.length < 12 ? '1px solid #f87171' : '1px solid var(--border-subtle)',
-                color: '#ffffff',
+                background: 'var(--surface-secondary)',
+                border: password.length > 0 && password.length < 12 ? '1px solid var(--accent-rose)' : '1px solid var(--border-subtle)',
+                color: 'var(--text-primary)',
                 fontSize: '0.875rem',
                 outline: 'none',
               }}
@@ -317,7 +319,7 @@ export default function RegisterPage() {
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
           Already have an account?{' '}
-          <Link href="/login" style={{ color: 'var(--text-accent)', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href="/login" style={{ color: 'var(--brand-primary)', fontWeight: 600, textDecoration: 'none' }}>
             Sign in
           </Link>
         </div>

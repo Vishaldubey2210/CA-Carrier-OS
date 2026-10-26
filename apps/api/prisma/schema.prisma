@@ -1,6 +1,7 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -75,6 +76,10 @@ model User {
   candidate      CandidateProfile?
   auditEvents    AuditEvent[]
   refreshTokens  RefreshToken[]
+  notifications  Notification[]
+  passwordResetTokens PasswordResetToken[]
+  authChallenges AuthChallenge[]
+  emailVerificationTokens EmailVerificationToken[]
 
   @@index([email])
   @@index([deletedAt])
@@ -94,6 +99,7 @@ model Workspace {
   subscription Subscription?
   auditEvents  AuditEvent[]
   invitations  WorkspaceInvitation[]
+  notifications Notification[]
 
   @@index([slug])
   @@map("workspaces")
@@ -326,6 +332,23 @@ model Job {
   postedAt               DateTime               @default(now()) @db.Timestamptz
   expiresAt              DateTime               @db.Timestamptz
 
+  // Multi-Source Aggregator Additive Fields
+  opportunityType        String                 @default("QUALIFIED_CA") // ARTICLESHIP, INDUSTRIAL_TRAINING, CA_FRESHER, QUALIFIED_CA, FINANCE_EXECUTIVE
+  channel                String                 @default("ENTERPRISE") // ENTERPRISE, EXTERNAL
+  sourceProvider         String                 @default("DIRECT_EMPLOYER") // GREENHOUSE, LEVER, ASHBY, ADZUNA, JOOBLE, DIRECT_EMPLOYER, ICAI_PORTAL
+  externalJobId          String?
+  canonicalUrl           String?
+  applicationUrl         String?
+  attribution            String?
+  originalPostedAt       DateTime?              @db.Timestamptz
+  firstSeenAt            DateTime               @default(now()) @db.Timestamptz
+  lastSeenAt             DateTime               @default(now()) @db.Timestamptz
+  lastVerifiedAt         DateTime               @default(now()) @db.Timestamptz
+  verificationStatus     String                 @default("SOURCE_ACTIVE") // SOURCE_ACTIVE, ACTIVE_UNCONFIRMED, STALE, EXPIRED, UNAVAILABLE, REVIEW_REQUIRED
+  duplicateClusterId     String?                @db.Uuid
+  isDuplicate            Boolean                @default(false)
+  duplicateOfJobId       String?                @db.Uuid
+
   applications           Application[]
   savedJobs              SavedJob[]
 
@@ -334,7 +357,59 @@ model Job {
   @@index([locationCity])
   @@index([caPathway])
   @@index([fingerprint])
+  @@index([opportunityType])
+  @@index([channel])
+  @@index([sourceProvider])
+  @@index([verificationStatus])
+  @@index([externalJobId])
   @@map("jobs")
+}
+
+model JobSourceConfig {
+  id                     String         @id @default(uuid()) @db.Uuid
+  name                   String         @unique
+  providerType           String         // GREENHOUSE, LEVER, ASHBY, ADZUNA, JOOBLE, ICAI_PORTAL
+  status                 String         @default("ACTIVE") // ACTIVE, PENDING_CREDENTIALS, PENDING_LICENSE, LINK_ONLY, RATE_LIMITED, TEMPORARILY_UNAVAILABLE, DISABLED
+  endpoint               String?
+  organizationSlug       String?
+  apiKeyConfigured       Boolean        @default(false)
+  allowedGeography       String         @default("IN")
+  pollingIntervalMinutes Int            @default(60)
+  lastSyncAt             DateTime?      @db.Timestamptz
+  lastSuccessAt          DateTime?      @db.Timestamptz
+  lastFailureAt          DateTime?      @db.Timestamptz
+  lastErrorMessage       String?        @db.Text
+  totalFetched           Int            @default(0)
+  totalIngested          Int            @default(0)
+  totalDuplicates        Int            @default(0)
+  totalExpired           Int            @default(0)
+  createdAt              DateTime       @default(now()) @db.Timestamptz
+  updatedAt              DateTime       @default(now()) @db.Timestamptz
+
+  syncRecords            JobSyncAudit[]
+
+  @@map("job_source_configs")
+}
+
+model JobSyncAudit {
+  id                     String          @id @default(uuid()) @db.Uuid
+  sourceConfigId         String          @db.Uuid
+  triggerType            String          @default("SCHEDULED") // MANUAL, SCHEDULED, WEBHOOK
+  status                 String          @default("RUNNING") // RUNNING, SUCCESS, FAILED, RATE_LIMITED
+  fetchedCount           Int             @default(0)
+  ingestedCount          Int             @default(0)
+  duplicateCount         Int             @default(0)
+  staleCount             Int             @default(0)
+  errorMessage           String?         @db.Text
+  durationMs             Int             @default(0)
+  startedAt              DateTime        @default(now()) @db.Timestamptz
+  completedAt            DateTime?       @db.Timestamptz
+
+  sourceConfig           JobSourceConfig @relation(fields: [sourceConfigId], references: [id], onDelete: Cascade)
+
+  @@index([sourceConfigId])
+  @@index([startedAt])
+  @@map("job_sync_audits")
 }
 
 model SavedJob {
@@ -851,3 +926,115 @@ model RecruitmentApplicationReview {
   @@index([organizationWorkspaceId, pipelineStage])
   @@map("recruitment_application_reviews")
 }
+
+model SupportEnquiry {
+  id              String    @id @default(uuid()) @db.Uuid
+  ticketRef       String    @unique
+  name            String
+  email           String
+  category        String
+  subject         String
+  message         String    @db.Text
+  status          String    @default("PENDING") // PENDING, IN_REVIEW, RESOLVED, DISMISSED
+  clientIp        String?
+  emailDispatched Boolean   @default(false)
+  adminNotes      String?   @db.Text
+  resolvedAt      DateTime? @db.Timestamptz
+  createdAt       DateTime  @default(now()) @db.Timestamptz
+  updatedAt       DateTime  @updatedAt @db.Timestamptz
+
+  @@index([ticketRef])
+  @@index([email])
+  @@index([status])
+  @@map("support_enquiries")
+}
+
+model Notification {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  workspaceId String    @db.Uuid
+  title       String
+  message     String    @db.Text
+  category    String    @default("SYSTEM")
+  linkUrl     String?
+  isRead      Boolean   @default(false)
+  readAt      DateTime? @db.Timestamptz
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([workspaceId])
+  @@map("notifications")
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  tokenHash  String    @unique
+  userId     String    @db.Uuid
+  expiresAt  DateTime  @db.Timestamptz
+  usedAt     DateTime? @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("password_reset_tokens")
+}
+
+model AuthChallenge {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  purpose     String    @default("LOGIN_OTP")
+  codeHash    String
+  salt        String
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5)
+  expiresAt   DateTime  @db.Timestamptz
+  resendAfter DateTime  @db.Timestamptz
+  verifiedAt  DateTime? @db.Timestamptz
+  clientIp    String?
+  userAgent   String?
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("auth_challenges")
+}
+
+model EmailVerificationToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  tokenHash  String    @unique
+  userId     String    @db.Uuid
+  expiresAt  DateTime  @db.Timestamptz
+  usedAt     DateTime? @db.Timestamptz
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("email_verification_tokens")
+}
+
+model Annotation {
+  id                String   @id
+  taskType          String   @map("task_type")
+  reviewStatus      String   @default("PENDING_REVIEW") @map("review_status")
+  annotatorId       String   @map("annotator_id")
+  annotatorName     String   @map("annotator_name")
+  guidelinesVersion String   @default("v2.0.0") @map("guidelines_version")
+  data              Json     @map("data")
+  auditLog          Json     @default("[]") @map("audit_log")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([taskType])
+  @@index([reviewStatus])
+  @@map("annotations")
+}
+
