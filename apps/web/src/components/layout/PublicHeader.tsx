@@ -150,7 +150,6 @@ export function PublicHeader() {
             color: 'var(--text-primary)',
             cursor: 'pointer',
             padding: '0.375rem',
-            display: 'none',
           }}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -241,17 +240,6 @@ export function PublicHeader() {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @media (max-width: 820px) {
-          :global(.desktop-nav) {
-            display: none !important;
-          }
-          :global(.mobile-toggle) {
-            display: block !important;
-          }
-        }
-      `}</style>
     </header>
   );
 }

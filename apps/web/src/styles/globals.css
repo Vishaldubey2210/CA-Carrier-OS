@@ -901,6 +901,14 @@ textarea:focus-visible {
   }
 }
 
+/* Public Header Navigation */
+.desktop-nav {
+  display: flex;
+}
+.mobile-toggle {
+  display: none;
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
   .app-sidebar {
@@ -908,6 +916,12 @@ textarea:focus-visible {
   }
   .mobile-menu-trigger {
     display: flex;
+  }
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-toggle {
+    display: flex !important;
   }
   .app-content {
     padding: 1.25rem;
