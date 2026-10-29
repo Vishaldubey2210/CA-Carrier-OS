@@ -1617,14 +1617,14 @@ textarea:focus-visible {
   font-size: 0.8125rem;
   font-weight: 700;
   color: #000000;
-  text-align: center;
+  text-align: left;
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: 1.5px 1.5px 0px #000000;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
   width: 100%;
 }
 

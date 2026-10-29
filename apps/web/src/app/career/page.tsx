@@ -52,6 +52,7 @@ import {
   PathwayFitReport,
 } from '@ca-career-os/shared';
 import { apiClient } from '@/lib/api-client';
+import { getDetailedFallbackTasks } from '@/lib/detailed-roadmap-curriculum';
 
 const ARTICLESHIP_DOMAINS = [
   { id: 'STATUTORY_AUDIT', label: 'Statutory Audit (Ind AS / IFRS)' },
@@ -370,180 +371,8 @@ export default function CareerHubPage() {
       console.warn('Backend roadmap generate call failed, deploying local GenAI graph synthesizer:', err);
     }
 
-    // High-quality GenAI Visual Graph Fallback
-    const fallbackTasks: RoadmapTask[] = [
-      {
-        id: `task-${selectedPathway.toLowerCase()}-1`,
-        milestone: 'DAY_30',
-        stage: 'FOUNDATION',
-        branch: 'center',
-        title: `Master ${
-          selectedPathway === 'AUDIT'
-            ? 'Ind AS 115 & 116 Financial Reporting'
-            : selectedPathway === 'TAX'
-            ? 'Section 92C Transfer Pricing & Form 3CD'
-            : selectedPathway === 'FPA'
-            ? '12-Month Rolling P&L Forecasts & PVM Variance'
-            : selectedPathway === 'CORP_FIN'
-            ? 'IVS 301 DCF Valuation & WACC Modeling'
-            : selectedPathway === 'IB'
-            ? 'FDD Quality of Earnings & Normalized EBITDA'
-            : selectedPathway === 'CONSULTING'
-            ? 'Finance Target Operating Model & Chart of Accounts'
-            : 'Statutory UDIN, ACK & MCA V3 Portal Filings'
-        }`,
-        description: `Complete deep-dive technical reviews and practical workpaper documentation aligned with Big 4 practice expectations for ${selectedPathway}.`,
-        category: 'SKILL_UPGRADE',
-        priority: 'HIGH',
-        status: 'PENDING',
-        keySkills: [
-          selectedPathway === 'AUDIT' ? 'Ind AS 115 Revenue' : selectedPathway === 'TAX' ? 'Transfer Pricing Sec 92C' : 'Core Technical Modeling',
-          selectedPathway === 'AUDIT' ? 'Ind AS 116 Leases' : selectedPathway === 'TAX' ? 'Form 3CD Tax Audit' : 'Valuation Standards',
-          'Materiality Thresholds',
-        ],
-        estimatedHours: 24,
-        statutoryReference: 'Companies Act 2013 Section 134(5)(e) & ICAI Standards on Auditing',
-        interviewQuestion: 'How do you test variable consideration constraint under Ind AS 115 with return rights?',
-        practicalDeliverable: 'Technical workpaper memorandum on revenue cut-off and lease discount rate curves.',
-        prerequisites: [],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-2`,
-        milestone: 'DAY_30',
-        stage: 'FOUNDATION',
-        branch: 'left',
-        title: 'Structure & Audit Certified Form 108 Articleship Log',
-        description: 'Quantify audit cycle impact, internal controls tested (IFCoFR), and regulatory sign-offs under ICAI Form 108 standards.',
-        category: 'APPLICATION_PREP',
-        priority: 'HIGH',
-        status: 'IN_PROGRESS',
-        keySkills: ['Form 108 Evidence', 'Client Turnover Logs', 'ICAI Attestation'],
-        estimatedHours: 16,
-        statutoryReference: 'ICAI Chartered Accountants Regulations 1988 (Reg 46)',
-        interviewQuestion: 'What statutory audit procedures did you independently lead during your 3-year articleship?',
-        practicalDeliverable: 'Attested Articleship Capability Log with quantifiable turnover metrics.',
-        prerequisites: [],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-3`,
-        milestone: 'DAY_30',
-        stage: 'FOUNDATION',
-        branch: 'right',
-        title: 'CARO 2020 Statutory Reporting Diagnostic',
-        description: 'Exhaustive verification of 21 clauses with special emphasis on Clause 3(i) Title Deeds, 3(ix) Debt Defaults, and 3(xxi) Group Audit Qualifications.',
-        category: 'STATUTORY_COMPLIANCE',
-        priority: 'MEDIUM',
-        status: 'PENDING',
-        keySkills: ['CARO 2020 Clauses', 'Auditor Adverse Remarks', 'Whistleblower Disclosures'],
-        estimatedHours: 18,
-        statutoryReference: 'Companies (Auditor’s Report) Order 2020',
-        interviewQuestion: 'When must an auditor include qualifications in CARO 2020 Clause 3(xxi) for group audit consolidation?',
-        practicalDeliverable: 'Consolidated CARO audit checklist with model reporting paragraphs.',
-        prerequisites: [],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-4`,
-        milestone: 'DAY_60',
-        stage: 'APPLICATION',
-        branch: 'center',
-        title: 'Internal Financial Controls (IFCoFR) RACM Simulation',
-        description: 'Execute end-to-end Risk and Control Matrix (RACM) design, control walkthroughs, and operating effectiveness testing in ERP systems.',
-        category: 'CASE_SIMULATION',
-        priority: 'HIGH',
-        status: 'PENDING',
-        keySkills: ['IFCoFR Testing', 'RACM Matrix', 'Design vs Operating Effectiveness'],
-        estimatedHours: 28,
-        statutoryReference: 'Companies Act Sec 143(3)(i) & ICAI IFCoFR Guidance Note',
-        interviewQuestion: 'Walk me through testing automated IT application controls (ITAC) in SAP S/4HANA.',
-        practicalDeliverable: 'Complete Order-to-Cash (O2C) RACM workpaper pack with sample deficiency matrix.',
-        prerequisites: ['Stage 1 Foundations'],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-5`,
-        milestone: 'DAY_60',
-        stage: 'APPLICATION',
-        branch: 'left',
-        title: 'Practical Case Study: Group Audit Consolidation',
-        description: 'Simulate high-stakes group audit consolidation case evaluating subsidiary qualification impacts and component auditor communications.',
-        category: 'SKILL_UPGRADE',
-        priority: 'HIGH',
-        status: 'PENDING',
-        keySkills: ['SA 600 Component Audit', 'Group Consolidation', 'Audit Committee Memo'],
-        estimatedHours: 22,
-        statutoryReference: 'SA 600 Using the Work of Another Auditor & SA 705',
-        interviewQuestion: 'How do you communicate with component auditors when dealing with modified subsidiary accounts?',
-        practicalDeliverable: 'Audit Committee Briefing Memorandum detailing consolidation adjustments.',
-        prerequisites: ['Stage 1 Foundations'],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-6`,
-        milestone: 'DAY_60',
-        stage: 'APPLICATION',
-        branch: 'right',
-        title: 'Big 4 Practice Networking & Mentor Outreach',
-        description: `Connect with 5 Senior Managers and Partners currently hiring for ${selectedPathway} practices across major financial hubs.`,
-        category: 'NETWORKING',
-        priority: 'MEDIUM',
-        status: 'PENDING',
-        keySkills: ['Executive Presence', 'Partner Pitch', 'Assurance Practice Trends'],
-        estimatedHours: 12,
-        statutoryReference: 'Big 4 & Top 10 Indian Assurance Hiring Benchmarks',
-        interviewQuestion: 'Why do you choose statutory audit assurance over advisory or FP&A corporate finance?',
-        practicalDeliverable: 'Scheduled advisory calls with 3 verified CA mentors in tier-1 assurance firms.',
-        prerequisites: [],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-7`,
-        milestone: 'DAY_90',
-        stage: 'MASTERY',
-        branch: 'center',
-        title: 'Execute Big 4 Technical Partner Round Mock Simulation',
-        description: 'Interactive 8-turn technical mock evaluating Ind AS judgments, audit skepticism, fraud risk procedures, and client handling under pressure.',
-        category: 'PARTNER_ROUND',
-        priority: 'HIGH',
-        status: 'PENDING',
-        keySkills: ['8-Turn Partner Drill', 'Professional Skepticism', 'Audit Opinion Formulation'],
-        estimatedHours: 20,
-        statutoryReference: 'SA 700 / SA 705 / SA 706 Audit Opinion Standards',
-        interviewQuestion: 'Client management refuses to book impairment on overseas plant. What opinion do you formulate?',
-        practicalDeliverable: 'Scored STAR evaluation report with rubric accuracy >= 85%.',
-        prerequisites: ['Stage 2 Simulations'],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-8`,
-        milestone: 'DAY_90',
-        stage: 'MASTERY',
-        branch: 'left',
-        title: 'Finalize Zero-Fabrication Audited Resume (ADR-009)',
-        description: `Lock and export verified resume variant tailored specifically for ${selectedPathway} roles with ADR-009 attestations.`,
-        category: 'APPLICATION_PREP',
-        priority: 'HIGH',
-        status: 'PENDING',
-        keySkills: ['ADR-009 Attestation', 'Quantified Audit Highlights', 'Non-Solicitation Grounding'],
-        estimatedHours: 10,
-        statutoryReference: 'ICAI Code of Ethics Clauses 6 & 7 of First Schedule',
-        interviewQuestion: 'Verify every transaction number and client industry cited on page 1 of your CV.',
-        practicalDeliverable: 'Cryptographically locked PDF resume signed with candidate attestation.',
-        prerequisites: ['Stage 2 Foundations'],
-      },
-      {
-        id: `task-${selectedPathway.toLowerCase()}-9`,
-        milestone: 'DAY_90',
-        stage: 'MASTERY',
-        branch: 'right',
-        title: 'CTC Unbundling & Blindfolded Partner Offer Negotiation',
-        description: 'Analyze compensation proposals under Section 115BAC New Tax Regime, separating guaranteed cash take-home from variable bonuses.',
-        category: 'CAREER_MOBILITY',
-        priority: 'MEDIUM',
-        status: 'PENDING',
-        keySkills: ['Sec 115BAC New Tax Regime', 'Statutory PF & Gratuity', 'Blindfolded Job Mobility'],
-        estimatedHours: 8,
-        statutoryReference: 'Income Tax Act 1961 Section 115BAC & Indian Labour Code',
-        interviewQuestion: 'What is your net monthly take-home expectation after EPF and slab deductions?',
-        practicalDeliverable: 'Comparative Offer Assessment Model analyzing corporate vs firm compensations.',
-        prerequisites: [],
-      },
-    ];
+    // High-quality GenAI Visual Graph Fallback with 40 ultra-detailed practical modules
+    const fallbackTasks: RoadmapTask[] = getDetailedFallbackTasks(selectedPathway, activePrompt);
 
     setTasks(fallbackTasks);
     setActiveTab('roadmap');
@@ -1421,7 +1250,7 @@ export default function CareerHubPage() {
                       <div
                         style={{
                           display: 'grid',
-                          gridTemplateColumns: 'minmax(280px, 360px) 1fr minmax(280px, 360px)',
+                          gridTemplateColumns: 'minmax(320px, 440px) 1fr minmax(320px, 440px)',
                           alignItems: 'center',
                           gap: '0',
                           position: 'relative',
@@ -1483,7 +1312,16 @@ export default function CareerHubPage() {
                                       {task.title}
                                     </span>
                                     {task.estimatedHours && (
-                                      <span style={{ fontSize: '0.6875rem', opacity: 0.8, flexShrink: 0 }}>
+                                      <span
+                                        style={{
+                                          fontSize: '0.6875rem',
+                                          fontWeight: 800,
+                                          background: 'rgba(0,0,0,0.08)',
+                                          borderRadius: '4px',
+                                          padding: '1px 5px',
+                                          flexShrink: 0,
+                                        }}
+                                      >
                                         {task.estimatedHours}h
                                       </span>
                                     )}
@@ -1566,7 +1404,16 @@ export default function CareerHubPage() {
                                       {task.title}
                                     </span>
                                     {task.estimatedHours && (
-                                      <span style={{ fontSize: '0.6875rem', opacity: 0.8, flexShrink: 0 }}>
+                                      <span
+                                        style={{
+                                          fontSize: '0.6875rem',
+                                          fontWeight: 800,
+                                          background: 'rgba(0,0,0,0.08)',
+                                          borderRadius: '4px',
+                                          padding: '1px 5px',
+                                          flexShrink: 0,
+                                        }}
+                                      >
                                         {task.estimatedHours}h
                                       </span>
                                     )}

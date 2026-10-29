@@ -239,7 +239,7 @@ export class CareerService {
         include: { tasks: { orderBy: { createdAt: 'asc' } } },
       });
 
-      if (dbRoadmap) {
+      if (dbRoadmap && dbRoadmap.tasks.length >= 20) {
         const completedTasks = dbRoadmap.tasks.filter((t) => t.status === 'COMPLETED').length;
         const total = dbRoadmap.tasks.length;
         return {
@@ -255,10 +255,12 @@ export class CareerService {
           aiGenerated: true,
           aiModel: 'meta/llama-3.3-70b-instruct (ICAI Grounded)',
         };
+      } else if (dbRoadmap) {
+        return await this.generateRoadmap(userId, workspaceId, dbRoadmap.targetPathway as unknown as CAPathway);
       }
     } else {
       const mem = this.memRoadmaps.get(profile.id);
-      if (mem) {
+      if (mem && mem.tasks.length >= 20) {
         const completed = mem.tasks.filter((t) => t.status === 'COMPLETED').length;
         const total = mem.tasks.length;
         return {
@@ -268,6 +270,8 @@ export class CareerService {
           aiGenerated: true,
           aiModel: 'meta/llama-3.3-70b-instruct (ICAI Grounded)',
         };
+      } else if (mem) {
+        return await this.generateRoadmap(userId, workspaceId, mem.targetPathway);
       }
     }
 
