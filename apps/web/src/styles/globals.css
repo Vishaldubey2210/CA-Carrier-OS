@@ -90,13 +90,13 @@
 
   /* Stacking Cards sticky deck tokens */
   --stack-base-top: 72px;
-  --stack-step: 22px;
+  --stack-step: 48px;
 }
 
 @media (max-width: 640px) {
   :root {
     --stack-base-top: 60px;
-    --stack-step: 12px;
+    --stack-step: 36px;
   }
 }
 
@@ -156,7 +156,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip;
   line-height: 1.55;
   letter-spacing: -0.005em;
 }
