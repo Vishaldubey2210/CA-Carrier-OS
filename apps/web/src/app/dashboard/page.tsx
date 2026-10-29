@@ -117,9 +117,7 @@ export default function CandidateDashboardPage() {
             Welcome back, {candidateName}
           </h1>
 
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', lineHeight: 1.6, marginBottom: '1.5rem', maxWidth: '640px' }}>
-            Your CA career command centre connects career milestones, professional opportunities, resume progress and application tracking in one place.
-          </p>
+
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
             <Link
@@ -206,27 +204,27 @@ export default function CandidateDashboardPage() {
 
         {/* Right side asymmetric highlight */}
         <div className="asymmetric-focus-right">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
-            <span style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
               STATUTORY STATUS
             </span>
-            <span className="badge badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <span className="badge badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontWeight: 700 }}>
               <span className="status-dot status-dot-emerald" />
               Verified
             </span>
           </div>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.375rem' }}>
+          <h3 style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
             {profile?.qualificationStatus || 'Qualified Chartered Accountant'}
           </h3>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
-            Form 108 articleship provenance active. All credentials cryptographically verifiable via ADR-009 zero-fabrication guard.
+          <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.45, marginBottom: '1rem' }}>
+            Form 108 articleship provenance validated. Professional credentials active.
           </p>
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-            <Link href="/resumes" className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8125rem', padding: '0.5rem 0.75rem' }}>
+            <Link href="/resumes" className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8125rem', padding: '0.45rem 0.65rem', fontWeight: 600 }}>
               <FileText size={14} />
               <span>Resume Studio</span>
             </Link>
-            <Link href="/practice" className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8125rem', padding: '0.5rem 0.75rem' }}>
+            <Link href="/practice" className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8125rem', padding: '0.45rem 0.65rem', fontWeight: 600 }}>
               <Sparkles size={14} />
               <span>Practice OS</span>
             </Link>

@@ -72,6 +72,16 @@ const FIRM_TIERS = [
   { id: 'SMALL', label: 'Proprietorship / Boutique Audit Practice' },
 ];
 
+const PATHWAY_LABELS: Record<string, string> = {
+  AUDIT: 'Statutory Audit & Assurance',
+  TAX: 'Direct & Corporate Taxation',
+  FPA: 'FP&A & Strategic Finance',
+  CORP_FIN: 'Corporate Finance & Treasury',
+  IB: 'Investment Banking & M&A',
+  CONSULTING: 'Forensic & Management Consulting',
+  PRACTICE: 'Independent CA Practice OS',
+};
+
 interface RoadmapTask {
   id: string;
   milestone: 'DAY_30' | 'DAY_60' | 'DAY_90';
@@ -666,50 +676,54 @@ export default function CareerHubPage() {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
-            <span className="badge badge-indigo">
-              <ShieldCheck size={12} style={{ display: 'inline', marginRight: '4px' }} />
-              Deterministic Diagnostic Engine
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <span className="badge badge-indigo" style={{ fontWeight: 700, fontSize: '0.75rem' }}>
+              <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} />
+              ICAI Competency Framework
             </span>
-            <span className="badge badge-cyan">Zero AI Hallucination</span>
+            <span className="badge badge-emerald" style={{ fontWeight: 700, fontSize: '0.75rem' }}>
+              Verified Provenance
+            </span>
           </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.375rem' }}>
-            CA Career Pathways & Capability Diagnostic
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em', marginBottom: '0.375rem' }}>
+            Career Pathways &amp; Execution Roadmap
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '720px', lineHeight: 1.5 }}>
-            Empirical skills mapping against 7 specialized chartered accountancy pathways, diagnostic fit scoring, and actionable 30-60-90 day execution milestones.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '640px', lineHeight: 1.5, margin: 0 }}>
+            Objective articleship skills diagnostic mapped to 7 CA horizons with roadmap.sh-style visual milestone trees.
           </p>
         </div>
 
-        {/* Real Profile Completion Meter */}
+        {/* Clean Profile Completion Meter */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '1.25rem',
-            padding: '1rem 1.5rem',
+            gap: '1rem',
+            padding: '0.875rem 1.25rem',
             borderRadius: 'var(--radius-lg)',
-            background: 'var(--bg-card)',
+            background: 'var(--surface-secondary)',
             border: '1px solid var(--border-subtle)',
           }}
         >
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
-              Verified Profile Readiness
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Profile Readiness
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: profileCompletionPct >= 70 ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
-              {profileCompletionPct}%
-            </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              {profileCompletionPct >= 80 ? 'Application Ready' : 'Complete details to boost fit'}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 800, color: profileCompletionPct >= 70 ? 'var(--accent-emerald)' : 'var(--brand-primary)' }}>
+                {profileCompletionPct}%
+              </span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                {profileCompletionPct >= 80 ? 'Application Ready' : 'Articleship Documented'}
+              </span>
             </div>
           </div>
           <div
             style={{
-              width: '52px',
-              height: '52px',
+              width: '44px',
+              height: '44px',
               borderRadius: '50%',
-              background: `conic-gradient(var(--accent-emerald) ${profileCompletionPct}%, rgba(255, 255, 255, 0.08) 0%)`,
+              background: `conic-gradient(var(--accent-emerald) ${profileCompletionPct}%, var(--border-subtle) 0%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -717,18 +731,17 @@ export default function CareerHubPage() {
           >
             <div
               style={{
-                width: '40px',
-                height: '40px',
+                width: '34px',
+                height: '34px',
                 borderRadius: '50%',
-                background: 'var(--bg-surface)',
+                background: 'var(--surface-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '0.75rem',
-                fontWeight: 700,
+                color: 'var(--accent-emerald)',
               }}
             >
-              {profileCompletionPct}%
+              <Target size={16} />
             </div>
           </div>
         </div>
@@ -1161,356 +1174,413 @@ export default function CareerHubPage() {
           ) : viewMode === 'MAP' ? (
             /* ROADMAP.SH INTERACTIVE VISUAL GRAPH VIEW */
             <div
-              className="roadmap-sh-canvas animate-fade-in-up"
+              className="roadmap-sh-board animate-fade-in-up"
               style={{
                 transform: `scale(${zoomLevel})`,
                 transformOrigin: 'top center',
               }}
             >
-              {/* Branch Column Guide Header */}
+              {/* Continuous Blue Vertical Center Spine */}
+              <div className="roadmap-sh-spine-line" />
+
+              {/* 1. Canvas Top Header matching roadmap.sh layout */}
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1.15fr 1fr',
+                  gridTemplateColumns: 'minmax(260px, 320px) 1fr minmax(260px, 320px)',
                   gap: '1.5rem',
-                  marginBottom: '2rem',
-                  textAlign: 'center',
+                  marginBottom: '3rem',
+                  alignItems: 'flex-start',
+                  position: 'relative',
+                  zIndex: 3,
                 }}
               >
-                <div
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: 'var(--radius-pill)',
-                    background: 'var(--surface-secondary)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: 'var(--text-secondary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.375rem',
-                  }}
-                >
-                  <FileText size={13} color="var(--accent-cyan)" />
-                  <span>Articleship & Workpaper Evidence</span>
+                {/* Left Top Cards: Pre-requisites & Related */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                  {/* Pre-requisites */}
+                  <div className="roadmap-sh-box-white" style={{ padding: '0.875rem 1rem' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, textAlign: 'center', marginBottom: '0.625rem', color: '#0F172A' }}>
+                      Pre-requisites (One of these)
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.375rem' }}>
+                      {['Articleship', 'ICAI Final', 'Workpapers'].map((req) => (
+                        <div
+                          key={req}
+                          style={{
+                            background: '#E2E8F0',
+                            border: '1.5px solid #000000',
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.25rem',
+                            fontSize: '0.6875rem',
+                            fontWeight: 700,
+                            color: '#0F172A',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {req}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Verified Curriculum Notice */}
+                  <div
+                    style={{
+                      background: '#FFFFFF',
+                      border: '2px solid #000000',
+                      borderRadius: '12px',
+                      padding: '0.875rem 1rem',
+                      boxShadow: '2px 2px 0px #000000',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.625rem',
+                    }}
+                  >
+                    <p style={{ margin: 0, fontSize: '0.75rem', lineHeight: 1.4, color: '#334155', fontWeight: 600 }}>
+                      CA Career OS provides 100% ICAI curriculum &amp; Big 4 benchmark-aligned execution paths.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('pathways')}
+                      style={{
+                        background: '#4F46E5',
+                        color: '#FFFFFF',
+                        border: '2px solid #000000',
+                        borderRadius: '8px',
+                        padding: '0.5rem 0.75rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        boxShadow: '2px 2px 0px #000000',
+                      }}
+                    >
+                      ICAI Verified Pathway Guide
+                    </button>
+                  </div>
+
+                  {/* Related Roadmaps */}
+                  <div className="roadmap-sh-box-white" style={{ padding: '0.875rem 1rem' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.625rem', color: '#0F172A' }}>
+                      Related Roadmaps
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      {[
+                        { id: CAPathway.AUDIT, label: 'Statutory Audit & Assurance' },
+                        { id: CAPathway.TAX, label: 'Corporate Tax & Transfer Pricing' },
+                        { id: CAPathway.FPA, label: 'FP&A & Strategic Finance' },
+                        { id: CAPathway.IB, label: 'Investment Banking & M&A' },
+                        { id: CAPathway.CONSULTING, label: 'Management & Forensic Consulting' },
+                      ].map((rm) => (
+                        <button
+                          key={rm.id}
+                          type="button"
+                          onClick={() => setSelectedPathway(rm.id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            background: 'transparent',
+                            border: 'none',
+                            padding: '0.2rem 0',
+                            cursor: 'pointer',
+                            fontSize: '0.71875rem',
+                            fontWeight: selectedPathway === rm.id ? 800 : 600,
+                            color: selectedPathway === rm.id ? '#2563EB' : '#475569',
+                            textAlign: 'left',
+                          }}
+                        >
+                          <CheckCircle2
+                            size={13}
+                            color={selectedPathway === rm.id ? '#2563EB' : '#94A3B8'}
+                            fill={selectedPathway === rm.id ? '#DBEAFE' : 'transparent'}
+                          />
+                          <span>{rm.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: 'var(--radius-pill)',
-                    background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(14, 165, 233, 0.2) 100%)',
-                    border: '1.5px solid var(--brand-primary)',
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    color: 'var(--brand-primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.375rem',
-                  }}
-                >
-                  <Target size={13} />
-                  <span>Core Statutory & Technical Trunk</span>
+
+                {/* Center Pathway Title */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <div
+                    style={{
+                      width: '2px',
+                      height: '36px',
+                      borderLeft: '3px dotted #3B82F6',
+                      marginBottom: '0.75rem',
+                    }}
+                  />
+                  <h2
+                    style={{
+                      fontSize: '1.875rem',
+                      fontWeight: 900,
+                      color: '#0F172A',
+                      letterSpacing: '-0.025em',
+                      margin: '0 0 0.35rem',
+                    }}
+                  >
+                    {PATHWAY_LABELS[selectedPathway] || selectedPathway}
+                  </h2>
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      color: '#64748B',
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    CA Career Execution Roadmap
+                  </span>
                 </div>
-                <div
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: 'var(--radius-pill)',
-                    background: 'var(--surface-secondary)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: 'var(--text-secondary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.375rem',
-                  }}
-                >
-                  <Briefcase size={13} color="var(--accent-emerald)" />
-                  <span>Compliance, Networking & Mobility</span>
+
+                {/* Right Top Badge */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <div
+                    className="roadmap-sh-box-white"
+                    style={{
+                      maxWidth: '260px',
+                      padding: '0.75rem 1rem',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 0.5rem', fontSize: '0.6875rem', color: '#64748B', lineHeight: 1.35, fontWeight: 600 }}>
+                      Find the detailed version of this roadmap along with other frameworks on
+                    </p>
+                    <div
+                      style={{
+                        background: '#E2E8F0',
+                        border: '2px solid #000000',
+                        borderRadius: '8px',
+                        padding: '0.4rem 0.75rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        color: '#0F172A',
+                        boxShadow: '1px 1px 0px #000000',
+                      }}
+                    >
+                      roadmap.sh / CA Career OS
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* 3 Sequential Visual Stages */}
-              {STAGE_CONFIGS.filter(
-                (sc) => activeMilestone === 'ALL' || activeMilestone === sc.milestone
-              ).map((stageConfig, stageIdx, arr) => {
-                const stageTasks = stageConfig.tasks;
-                const leftTasks = stageTasks.filter((t) => t.branch === 'left');
-                const centerTasks = stageTasks.filter((t) => t.branch === 'center');
-                const rightTasks = stageTasks.filter((t) => t.branch === 'right');
+              {/* 2. Visual Stages Flow */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem', position: 'relative', zIndex: 2 }}>
+                {STAGE_CONFIGS.filter(
+                  (sc) => activeMilestone === 'ALL' || activeMilestone === sc.milestone
+                ).map((stageConfig, sIdx) => {
+                  const stageTasks = stageConfig.tasks;
+                  const leftTasks = stageTasks.filter((t) => t.branch === 'left');
+                  const centerTasks = stageTasks.filter((t) => t.branch === 'center');
+                  const rightTasks = stageTasks.filter((t) => t.branch === 'right');
 
-                // Fallback if branches aren't perfectly split
-                const finalLeft = leftTasks.length > 0 ? leftTasks : stageTasks.slice(0, 1);
-                const finalCenter = centerTasks.length > 0 ? centerTasks : stageTasks.slice(1, 2);
-                const finalRight = rightTasks.length > 0 ? rightTasks : stageTasks.slice(2);
+                  const finalLeft = leftTasks.length > 0 ? leftTasks : stageTasks.slice(0, 1);
+                  const finalCenter = centerTasks.length > 0 ? centerTasks : stageTasks.slice(1, 2);
+                  const finalRight = rightTasks.length > 0 ? rightTasks : stageTasks.slice(2);
 
-                const stageCompleted = stageTasks.filter((t) => t.status === 'COMPLETED').length;
-                const stagePct = stageTasks.length > 0 ? Math.round((stageCompleted / stageTasks.length) * 100) : 0;
-
-                const renderNodeCard = (task: RoadmapTask, isTrunk = false) => {
-                  const isDone = task.status === 'COMPLETED';
-                  const isInProg = task.status === 'IN_PROGRESS';
-                  const isSelected = selectedNode?.id === task.id;
+                  const stageCompleted = stageTasks.filter((t) => t.status === 'COMPLETED').length;
+                  const stagePct = stageTasks.length > 0 ? Math.round((stageCompleted / stageTasks.length) * 100) : 0;
 
                   return (
-                    <div
-                      key={task.id}
-                      onClick={() => setSelectedNode(task)}
-                      className={`roadmap-node-box ${isDone ? 'is-done' : ''} ${isInProg ? 'is-in-progress' : ''} ${isSelected ? 'is-selected' : ''} ${isTrunk ? 'trunk-node' : ''}`}
-                    >
-                      {/* Node Top Status Bar */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                          <button
-                            type="button"
-                            title={isDone ? 'Mark as Incomplete' : 'Mark as Done'}
-                            onClick={(e) => toggleTask(task.id, e)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              padding: 0,
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}
-                          >
-                            {isDone ? (
-                              <CheckSquare size={17} color="var(--accent-emerald)" />
-                            ) : (
-                              <Square size={17} color="var(--text-muted)" />
-                            )}
-                          </button>
-                          <span
-                            className={
-                              task.priority === 'HIGH'
-                                ? 'badge badge-rose'
-                                : 'badge badge-amber'
-                            }
-                            style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem' }}
-                          >
-                            {task.priority}
-                          </span>
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                          {task.weekRange && (
-                            <span className="badge badge-indigo" style={{ fontSize: '0.65rem', padding: '0.12rem 0.45rem' }}>
-                              📅 {task.weekRange}
-                            </span>
-                          )}
-                          {task.estimatedHours && (
-                            <span
-                              style={{
-                                fontSize: '0.7rem',
-                                fontWeight: 600,
-                                color: 'var(--text-muted)',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '3px',
-                              }}
-                            >
-                              <Clock size={11} /> {task.estimatedHours}h
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Node Title & Description */}
-                      <div>
-                        <h4
+                    <div key={stageConfig.id} style={{ position: 'relative' }}>
+                      {/* Central Spine Stage Label */}
+                      <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                        <span
                           style={{
-                            fontSize: isTrunk ? '0.9375rem' : '0.875rem',
-                            fontWeight: 700,
-                            color: isDone ? 'var(--text-muted)' : 'var(--text-primary)',
-                            textDecoration: isDone ? 'line-through' : 'none',
-                            lineHeight: 1.35,
-                            margin: '0 0 0.375rem',
+                            fontSize: '0.8125rem',
+                            fontWeight: 800,
+                            color: '#2563EB',
+                            background: '#EFF6FF',
+                            border: '1.5px solid #3B82F6',
+                            borderRadius: '20px',
+                            padding: '0.25rem 0.875rem',
+                            display: 'inline-block',
                           }}
                         >
-                          {task.title}
-                        </h4>
-                        <p
+                          {stageConfig.timeframe} • {stageCompleted}/{stageTasks.length} Done ({stagePct}%)
+                        </span>
+                      </div>
+
+                      {/* Main Yellow Milestone Node centered directly on the Spine */}
+                      <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 3, marginBottom: '1.5rem' }}>
+                        <div
+                          className="roadmap-sh-node-yellow"
                           style={{
-                            fontSize: '0.78125rem',
-                            color: 'var(--text-secondary)',
-                            lineHeight: 1.45,
-                            margin: 0,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
+                            minWidth: '240px',
+                            maxWidth: '360px',
                           }}
                         >
-                          {task.description}
-                        </p>
-                      </div>
-
-                      {/* Submodule & Checklist Indicators */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        {task.submodules && task.submodules.length > 0 && (
-                          <span
-                            style={{
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              color: 'var(--brand-primary)',
-                              background: 'var(--brand-soft)',
-                              padding: '0.15rem 0.45rem',
-                              borderRadius: '4px',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px',
-                            }}
-                          >
-                            <Target size={11} /> {task.submodules.length} Detailed Submodules
-                          </span>
-                        )}
-                        {task.checklist && task.checklist.length > 0 && (
-                          <span
-                            style={{
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              color: 'var(--accent-emerald)',
-                              background: 'var(--success-surface)',
-                              padding: '0.15rem 0.45rem',
-                              borderRadius: '4px',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px',
-                            }}
-                          >
-                            <FileCheck2 size={11} /> {task.checklist.length} Step Actions
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Skill Chips */}
-                      {task.keySkills && task.keySkills.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.375rem' }}>
-                          {task.keySkills.slice(0, 3).map((skill, sIdx) => (
-                            <span key={sIdx} className="roadmap-skill-chip">
-                              {skill}
-                            </span>
-                          ))}
+                          {stageConfig.label}
                         </div>
-                      )}
+                      </div>
 
-                      {/* Bottom Footer Hint */}
+                      {/* Branching Grid: Left Container <---> Center Spine <---> Right Container */}
                       <div
                         style={{
-                          display: 'flex',
+                          display: 'grid',
+                          gridTemplateColumns: 'minmax(280px, 360px) 1fr minmax(280px, 360px)',
                           alignItems: 'center',
-                          justifyContent: 'space-between',
-                          paddingTop: '0.5rem',
-                          borderTop: '1px dashed var(--border-subtle)',
-                          fontSize: '0.71875rem',
-                          color: 'var(--text-muted)',
+                          gap: '0',
+                          position: 'relative',
+                          zIndex: 3,
                         }}
                       >
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          <ShieldCheck size={12} color="var(--accent-cyan)" />
-                          {task.category.replace('_', ' ')}
-                        </span>
-                        <span style={{ color: 'var(--brand-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-                          Drilldown <ChevronRight size={11} />
-                        </span>
+                        {/* LEFT CONTAINER */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-end' }}>
+                          <div className="roadmap-sh-box-white" style={{ width: '100%' }}>
+                            <div
+                              style={{
+                                fontSize: '0.8125rem',
+                                fontWeight: 800,
+                                textAlign: 'center',
+                                color: '#0F172A',
+                                borderBottom: '1.5px dashed #CBD5E1',
+                                paddingBottom: '0.5rem',
+                                marginBottom: '0.75rem',
+                              }}
+                            >
+                              {sIdx === 0
+                                ? 'Articleship & Workpaper Evidence'
+                                : sIdx === 1
+                                ? 'IFCoFR Testing & Controls'
+                                : 'Partner Round Drills & Cases'}
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              {finalLeft.map((task) => {
+                                const isDone = task.status === 'COMPLETED';
+                                const isSelected = selectedNode?.id === task.id;
+                                return (
+                                  <div
+                                    key={task.id}
+                                    className={`roadmap-sh-pill-btn ${isDone ? 'is-done' : ''} ${isSelected ? 'is-active' : ''}`}
+                                    onClick={() => setSelectedNode(task)}
+                                    title="Click to view full workpaper model & interview rubric"
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={(e) => toggleTask(task.id, e)}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        padding: 0,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        flexShrink: 0,
+                                      }}
+                                    >
+                                      {isDone ? (
+                                        <CheckSquare size={16} color="#15803D" />
+                                      ) : (
+                                        <Square size={16} color="#000000" />
+                                      )}
+                                    </button>
+                                    <span style={{ flex: 1, textDecoration: isDone ? 'line-through' : 'none' }}>
+                                      {task.title}
+                                    </span>
+                                    {task.estimatedHours && (
+                                      <span style={{ fontSize: '0.6875rem', opacity: 0.8, flexShrink: 0 }}>
+                                        {task.estimatedHours}h
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* CENTER DOTTED CONNECTOR LINES TO LEFT & RIGHT */}
+                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
+                          <div className="roadmap-sh-dot-line-h" />
+                          <div
+                            style={{
+                              width: '10px',
+                              height: '10px',
+                              borderRadius: '50%',
+                              background: '#3B82F6',
+                              border: '2px solid #000000',
+                              flexShrink: 0,
+                              zIndex: 4,
+                            }}
+                          />
+                          <div className="roadmap-sh-dot-line-h" />
+                        </div>
+
+                        {/* RIGHT CONTAINER */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
+                          <div className="roadmap-sh-box-white" style={{ width: '100%' }}>
+                            <div
+                              style={{
+                                fontSize: '0.8125rem',
+                                fontWeight: 800,
+                                textAlign: 'center',
+                                color: '#0F172A',
+                                borderBottom: '1.5px dashed #CBD5E1',
+                                paddingBottom: '0.5rem',
+                                marginBottom: '0.75rem',
+                              }}
+                            >
+                              {sIdx === 0
+                                ? 'Technical Standards (Ind AS / SAs)'
+                                : sIdx === 1
+                                ? 'Statutory Reporting & Governance'
+                                : 'Verified Resume & CTC Mobility'}
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              {(finalCenter.concat(finalRight)).map((task) => {
+                                const isDone = task.status === 'COMPLETED';
+                                const isSelected = selectedNode?.id === task.id;
+                                return (
+                                  <div
+                                    key={task.id}
+                                    className={`roadmap-sh-pill-btn ${isDone ? 'is-done' : ''} ${isSelected ? 'is-active' : ''}`}
+                                    onClick={() => setSelectedNode(task)}
+                                    title="Click to view full workpaper model & interview rubric"
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={(e) => toggleTask(task.id, e)}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        padding: 0,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        flexShrink: 0,
+                                      }}
+                                    >
+                                      {isDone ? (
+                                        <CheckSquare size={16} color="#15803D" />
+                                      ) : (
+                                        <Square size={16} color="#000000" />
+                                      )}
+                                    </button>
+                                    <span style={{ flex: 1, textDecoration: isDone ? 'line-through' : 'none' }}>
+                                      {task.title}
+                                    </span>
+                                    {task.estimatedHours && (
+                                      <span style={{ fontSize: '0.6875rem', opacity: 0.8, flexShrink: 0 }}>
+                                        {task.estimatedHours}h
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
-                };
-
-                return (
-                  <div key={stageConfig.id} className="roadmap-stage-block">
-                    {/* Stage Header Banner */}
-                    <div className="roadmap-stage-badge-bar">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <span className="badge badge-indigo" style={{ fontWeight: 800 }}>
-                          {stageConfig.milestone.replace('_', ' ')}
-                        </span>
-                        <div>
-                          <strong style={{ fontSize: '0.9375rem', color: 'var(--text-primary)' }}>
-                            {stageConfig.label}
-                          </strong>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>
-                            ({stageConfig.timeframe})
-                          </span>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                          {stageCompleted} of {stageTasks.length} Done ({stagePct}%)
-                        </span>
-                        <div
-                          style={{
-                            width: '64px',
-                            height: '6px',
-                            borderRadius: '3px',
-                            background: 'var(--border-subtle)',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: `${stagePct}%`,
-                              height: '100%',
-                              background: 'var(--accent-emerald)',
-                              transition: 'width 0.3s ease',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Stage Branches Grid: Left (Articleship) | Center (Trunk) | Right (Compliance/Mobility) */}
-                    <div className="roadmap-stage-branches-grid">
-                      {/* Left Branch */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {finalLeft.map((t) => renderNodeCard(t, false))}
-                      </div>
-
-                      {/* Center Trunk */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {finalCenter.map((t) => renderNodeCard(t, true))}
-                      </div>
-
-                      {/* Right Branch */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {finalRight.map((t) => renderNodeCard(t, false))}
-                      </div>
-                    </div>
-
-                    {/* Connecting Flow Line to Next Stage */}
-                    {stageIdx < arr.length - 1 && (
-                      <div className="roadmap-connector-flow">
-                        <div
-                          style={{
-                            width: '2px',
-                            height: '40px',
-                            background: 'linear-gradient(180deg, var(--brand-primary) 0%, var(--border-subtle) 100%)',
-                            position: 'relative',
-                          }}
-                        >
-                          <div
-                            style={{
-                              position: 'absolute',
-                              bottom: '-6px',
-                              left: '-5px',
-                              width: '12px',
-                              height: '12px',
-                              borderRadius: '50%',
-                              background: 'var(--brand-primary)',
-                              boxShadow: '0 0 8px var(--brand-primary)',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                })}
+              </div>
             </div>
           ) : (
             /* LINEAR LIST VIEW */
