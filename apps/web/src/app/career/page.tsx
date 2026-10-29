@@ -2029,141 +2029,168 @@ export default function CareerHubPage() {
                 onClick={() => !isGenerating && setIsAiModalOpen(false)}
               />
               <div
-                className="glass-panel animate-scale-in"
+                className="animate-scale-in"
                 style={{
                   position: 'fixed',
                   top: '50%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
                   zIndex: 250,
-                  width: '90%',
-                  maxWidth: '620px',
+                  width: '92%',
+                  maxWidth: '600px',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
                   padding: '2rem',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '1.25rem',
-                  border: '1.5px solid var(--brand-primary)',
-                  boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.65)',
+                  background: '#FFFFFF',
+                  border: '2.5px solid #000000',
+                  borderRadius: '16px',
+                  boxShadow: '6px 6px 0px #000000',
+                  color: '#000000',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', borderBottom: '2px solid #000000', paddingBottom: '1rem' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                      <span className="badge badge-indigo">
-                        <Wand2 size={11} style={{ display: 'inline', marginRight: '3px' }} />
-                        GenAI Graph Synthesizer
-                      </span>
-                      <span className="badge badge-cyan">meta/llama-3.3-70b-instruct</span>
+                    <div style={{ display: 'inline-block', background: '#FEF08A', border: '1.5px solid #000000', borderRadius: '6px', padding: '0.2rem 0.6rem', fontSize: '0.6875rem', fontWeight: 800, color: '#000000', marginBottom: '0.375rem', boxShadow: '1px 1px 0px #000000' }}>
+                      Roadmap Customizer
                     </div>
-                    <h3 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                      Customize Your 30-60-90 Day Roadmap
+                    <h3 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#000000', margin: 0, letterSpacing: '-0.02em' }}>
+                      Customize Your Career Roadmap
                     </h3>
+                    <p style={{ fontSize: '0.8125rem', color: '#475569', margin: '0.25rem 0 0', fontWeight: 500 }}>
+                      Tailor milestones for specific accounting standards, target firm tiers, and execution pace.
+                    </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => !isGenerating && setIsAiModalOpen(false)}
                     style={{
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '50%',
-                      width: '28px',
-                      height: '28px',
+                      background: '#FEF08A',
+                      border: '2px solid #000000',
+                      borderRadius: '8px',
+                      width: '32px',
+                      height: '32px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
-                      color: 'var(--text-secondary)',
+                      color: '#000000',
+                      boxShadow: '1.5px 1.5px 0px #000000',
+                      flexShrink: 0,
                     }}
                   >
-                    <X size={15} />
+                    <X size={16} />
                   </button>
                 </div>
 
-                <p style={{ fontSize: '0.84375rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                  Prompt the ICAI-grounded AI model with specific focus standards, target firm tiers (Big 4 vs Industry), or upcoming partner round deadlines.
-                </p>
-
-                {/* Prompt Textarea */}
+                {/* Target Focus Input */}
                 <div>
-                  <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.375rem' }}>
-                    Custom Prompt / Target Focus Areas
+                  <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.375rem' }}>
+                    Target Focus Areas &amp; Standards
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="e.g. Prioritize Ind AS 115 revenue cut-off, CARO 2020 Clause 3(xxi), and SAP RACM control walkthroughs for Big 4 Senior Associate statutory audit rounds..."
+                    placeholder="e.g. Prioritize Ind AS 115 revenue recognition, CARO 2020 Clause 3, and Big 4 partner mock interview drills..."
                     value={customAiPrompt}
                     onChange={(e) => setCustomAiPrompt(e.target.value)}
                     style={{
                       width: '100%',
-                      background: 'var(--bg-surface)',
-                      border: '1px solid var(--border-subtle)',
+                      background: '#FAF9F6',
+                      border: '2px solid #000000',
                       borderRadius: '8px',
                       padding: '0.75rem',
-                      color: 'var(--text-primary)',
-                      fontSize: '0.875rem',
+                      color: '#000000',
+                      fontSize: '0.8125rem',
+                      fontWeight: 600,
                       fontFamily: 'inherit',
                       resize: 'none',
+                      boxShadow: '2px 2px 0px #000000',
+                      outline: 'none',
                     }}
                   />
                 </div>
 
-                {/* Quick Presets */}
+                {/* Quick Presets in Roadmap.sh yellow pills */}
                 <div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.375rem' }}>
-                    Recommended CA Curriculum Presets:
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>
+                    Quick Focus Presets:
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
-                    {AI_PROMPT_PRESETS.map((preset, pIdx) => (
-                      <button
-                        key={pIdx}
-                        type="button"
-                        onClick={() => setCustomAiPrompt(preset.prompt)}
-                        className="btn-pill"
-                        style={{
-                          fontSize: '0.71875rem',
-                          padding: '0.25rem 0.625rem',
-                          background: customAiPrompt === preset.prompt ? 'var(--brand-primary)' : 'var(--surface-secondary)',
-                          color: customAiPrompt === preset.prompt ? '#ffffff' : 'var(--text-secondary)',
-                          border: '1px solid var(--border-subtle)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {preset.label}
-                      </button>
-                    ))}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {AI_PROMPT_PRESETS.map((preset, pIdx) => {
+                      const isSelected = customAiPrompt === preset.prompt;
+                      return (
+                        <button
+                          key={pIdx}
+                          type="button"
+                          onClick={() => setCustomAiPrompt(preset.prompt)}
+                          style={{
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            padding: '0.4rem 0.75rem',
+                            background: isSelected ? '#FACC15' : '#FEF08A',
+                            color: '#000000',
+                            border: '2px solid #000000',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            boxShadow: isSelected ? '0 0 0 2px #2563EB, 2px 2px 0px #000000' : '1.5px 1.5px 0px #000000',
+                            transition: 'all 0.15s ease',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          {isSelected && <Check size={12} strokeWidth={3} />}
+                          <span>{preset.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Pace Selection */}
+                {/* Study Pace in 3 cards */}
                 <div>
-                  <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.375rem' }}>
-                    Study & Execution Pace
+                  <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.5rem' }}>
+                    Study &amp; Execution Pace
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
                     {[
-                      { id: 'ACCELERATED', label: 'Accelerated', desc: '15-20 hrs/wk (Intense interview prep)' },
-                      { id: 'BALANCED', label: 'Balanced', desc: '8-12 hrs/wk (Articleship friendly)' },
-                      { id: 'INTENSIVE', label: 'Mastery', desc: '25+ hrs/wk (Comprehensive Big 4 track)' },
-                    ].map((pace) => (
-                      <div
-                        key={pace.id}
-                        onClick={() => setSelectedPace(pace.id as any)}
-                        style={{
-                          padding: '0.625rem',
-                          borderRadius: '8px',
-                          background: selectedPace === pace.id ? 'rgba(14, 165, 233, 0.12)' : 'var(--surface-secondary)',
-                          border: `1.5px solid ${selectedPace === pace.id ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: selectedPace === pace.id ? 'var(--accent-cyan)' : 'var(--text-primary)' }}>
-                          {pace.label}
+                      { id: 'ACCELERATED', label: 'Accelerated', hours: '15-20 hrs/wk', desc: 'Intense drill' },
+                      { id: 'BALANCED', label: 'Balanced', hours: '8-12 hrs/wk', desc: 'Articleship friendly' },
+                      { id: 'INTENSIVE', label: 'Mastery', hours: '25+ hrs/wk', desc: 'Comprehensive Big 4' },
+                    ].map((pace) => {
+                      const isSelected = selectedPace === pace.id;
+                      return (
+                        <div
+                          key={pace.id}
+                          onClick={() => setSelectedPace(pace.id as any)}
+                          style={{
+                            padding: '0.625rem 0.75rem',
+                            borderRadius: '8px',
+                            background: isSelected ? '#FEF08A' : '#FFFFFF',
+                            border: '2px solid #000000',
+                            cursor: 'pointer',
+                            boxShadow: isSelected ? '3px 3px 0px #000000' : '1.5px 1.5px 0px #000000',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+                            <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#000000' }}>
+                              {pace.label}
+                            </span>
+                            {isSelected && <Check size={13} strokeWidth={3} color="#000000" />}
+                          </div>
+                          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#2563EB' }}>
+                            {pace.hours}
+                          </div>
+                          <div style={{ fontSize: '0.6875rem', color: '#64748B', marginTop: '2px' }}>
+                            {pace.desc}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                          {pace.desc}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -2173,29 +2200,40 @@ export default function CareerHubPage() {
                     style={{
                       padding: '0.75rem 1rem',
                       borderRadius: '8px',
-                      background: 'rgba(30, 58, 138, 0.15)',
-                      border: '1px solid var(--brand-primary)',
+                      background: '#EFF6FF',
+                      border: '2px solid #3B82F6',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.75rem',
+                      boxShadow: '2px 2px 0px #000000',
                     }}
                   >
-                    <Loader2 size={16} className="spin" color="var(--brand-primary)" />
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <Loader2 size={16} className="spin" color="#2563EB" />
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E40AF' }}>
                       {aiGeneratingStage === 'ANALYZING'
-                        ? 'Analyzing candidate profile & ICAI Form 108 exposure...'
-                        : 'Synthesizing 3-branch visual flowchart with statutory references...'}
+                        ? 'Analyzing candidate profile & articleship exposure...'
+                        : 'Synthesizing visual roadmap graph...'}
                     </span>
                   </div>
                 )}
 
-                {/* Modal Footer */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                {/* Footer Buttons */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem', borderTop: '2px solid #000000', paddingTop: '1rem' }}>
                   <button
                     type="button"
                     onClick={() => setIsAiModalOpen(false)}
                     disabled={isGenerating}
-                    className="btn btn-secondary btn-pill"
+                    style={{
+                      background: '#FFFFFF',
+                      color: '#000000',
+                      border: '2px solid #000000',
+                      borderRadius: '8px',
+                      padding: '0.5rem 1.25rem',
+                      fontSize: '0.8125rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '2px 2px 0px #000000',
+                    }}
                   >
                     Cancel
                   </button>
@@ -2203,11 +2241,23 @@ export default function CareerHubPage() {
                     type="button"
                     onClick={() => handleGenerateRoadmap(customAiPrompt, selectedPace)}
                     disabled={isGenerating}
-                    className="btn btn-primary btn-pill"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                    style={{
+                      background: '#3B82F6',
+                      color: '#FFFFFF',
+                      border: '2px solid #000000',
+                      borderRadius: '8px',
+                      padding: '0.5rem 1.5rem',
+                      fontSize: '0.8125rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      boxShadow: '2px 2px 0px #000000',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                    }}
                   >
                     {isGenerating ? <Loader2 size={15} className="spin" /> : <Sparkles size={15} />}
-                    <span>{isGenerating ? 'Synthesizing...' : 'Synthesize Custom Curriculum'}</span>
+                    <span>{isGenerating ? 'Synthesizing...' : 'Apply & Generate Roadmap'}</span>
                   </button>
                 </div>
               </div>
