@@ -2024,10 +2024,18 @@ export default function CareerHubPage() {
           {/* GENAI ROADMAP PROMPT CUSTOMIZER MODAL */}
           {isAiModalOpen && (
             <>
+              {/* Dimmed backdrop behind the modal */}
               <div
-                className="roadmap-inspector-backdrop"
+                style={{
+                  position: 'fixed',
+                  inset: 0,
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  backdropFilter: 'blur(3px)',
+                  zIndex: 9998,
+                }}
                 onClick={() => !isGenerating && setIsAiModalOpen(false)}
               />
+              {/* Sharp, unblurred modal in front */}
               <div
                 className="animate-scale-in"
                 style={{
@@ -2035,7 +2043,7 @@ export default function CareerHubPage() {
                   top: '50%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
-                  zIndex: 250,
+                  zIndex: 9999,
                   width: '92%',
                   maxWidth: '600px',
                   maxHeight: '90vh',
