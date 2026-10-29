@@ -364,20 +364,10 @@ export function CoreCapabilities() {
           })}
         </div>
 
-        {/* Full-Page Box Stacking Stage: Only Right Arrow on the right side */}
-        <div className="relative w-full min-h-[580px] sm:min-h-[540px] flex items-center justify-center">
-          {/* Prominent Floating Right Arrow on the Right Side Only */}
-          <button
-            type="button"
-            onClick={handleNext}
-            aria-label="Next card (move stack to right)"
-            className="absolute -right-3 sm:-right-6 lg:-right-7 top-1/2 -translate-y-1/2 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white shadow-[0_12px_35px_rgba(30,58,138,0.35)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-white group/btn"
-          >
-            <ArrowRight size={24} className="group-hover/btn:translate-x-1 transition-transform" />
-          </button>
-
+        {/* Full-Page Box Stacking Stage: Box ends cleanly on the left of the arrow */}
+        <div className="w-full flex items-center justify-center gap-4 sm:gap-6 lg:gap-8">
           {/* Full-Page Box Layered Stack (Right side peeking with signature deep top-right curve) */}
-          <div className="relative w-full min-h-[580px] sm:min-h-[540px]">
+          <div className="relative flex-1 min-h-[580px] sm:min-h-[540px] max-w-[1240px]">
             {CAPABILITIES.map((cap, idx) => {
               const diff = (idx - activeIndex + total) % total;
               const Icon = cap.icon;
@@ -509,6 +499,16 @@ export function CoreCapabilities() {
               );
             })}
           </div>
+
+          {/* Prominent Right Arrow: Sits completely beside the box on the right, NOT overlapping the box */}
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Next engine (move stack to right)"
+            className="shrink-0 w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white shadow-[0_10px_25px_rgba(30,58,138,0.32)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer border-2 border-white group/btn"
+          >
+            <ArrowRight size={24} className="group-hover/btn:translate-x-1 transition-transform" />
+          </button>
         </div>
 
         {/* Bottom Progress Tracker Dots */}
