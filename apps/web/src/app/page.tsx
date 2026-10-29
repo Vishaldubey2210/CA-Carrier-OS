@@ -4,7 +4,6 @@ import React from 'react';
 import { HeroSection } from '../components/home/HeroSection';
 import { CoreCapabilities } from '../components/home/CoreCapabilities';
 import { HowItWorks } from '../components/home/HowItWorks';
-import { SevenHorizons } from '../components/home/SevenHorizons';
 import { PricingSection } from '../components/home/PricingSection';
 import { PurposeGovernance } from '../components/home/PurposeGovernance';
 import { FAQSection } from '../components/home/FAQSection';
@@ -61,13 +60,8 @@ export default function RootHomePage() {
           <HowItWorks />
         </div>
 
-        {/* 5. Seven Career Horizons (White) */}
-        <div className="bg-white">
-          <SevenHorizons />
-        </div>
-
-        {/* 6. Transparent Pricing Tiers (Soft Tint #F8FAFC) */}
-        <div className="bg-[#F8FAFC] border-y border-[#E2E8F0]">
+        {/* 5. Transparent Pricing Tiers (Soft Tint #F8FAFC) */}
+        <div className="bg-white border-b border-[#E2E8F0]">
           <PricingSection />
         </div>
 

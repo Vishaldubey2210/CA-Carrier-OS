@@ -19,7 +19,6 @@ export function PublicHeader() {
   const navLinks = [
     { href: '/#features', label: 'Capabilities', sectionId: 'features' },
     { href: '/#how-it-works', label: 'How It Works', sectionId: 'how-it-works' },
-    { href: '/#pathways', label: '7 Horizons', sectionId: 'pathways' },
     { href: '/#pricing', label: 'Pricing', sectionId: 'pricing' },
     { href: '/#about', label: 'Governance', sectionId: 'about' },
     { href: '/#faq', label: 'FAQ', sectionId: 'faq' },
