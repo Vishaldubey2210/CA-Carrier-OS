@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { HeroSection } from '../components/home/HeroSection';
-import { TrustMarquee } from '../components/home/TrustMarquee';
 import { CoreCapabilities } from '../components/home/CoreCapabilities';
 import { HowItWorks } from '../components/home/HowItWorks';
 import { SevenHorizons } from '../components/home/SevenHorizons';
@@ -52,13 +51,8 @@ export default function RootHomePage() {
           <HeroSection />
         </div>
 
-        {/* 2. Trust Marquee (Soft Off-White #F8FAFC) */}
-        <div className="bg-[#F8FAFC] border-y border-[#E2E8F0]">
-          <TrustMarquee />
-        </div>
-
-        {/* 3. Core Capabilities Bento Grid (White) */}
-        <div className="bg-white">
+        {/* 2. Core Capabilities Bento Grid (White) */}
+        <div className="bg-[#F8FAFC] border-t border-[#E2E8F0]">
           <CoreCapabilities />
         </div>
 
