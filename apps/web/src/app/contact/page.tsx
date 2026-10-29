@@ -195,12 +195,12 @@ export default function ContactPage() {
                 style={{
                   display: 'inline-block',
                   padding: '0.5rem 1rem',
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: 'var(--surface-secondary)',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--border-subtle)',
                   fontFamily: 'monospace',
                   fontSize: '1rem',
-                  color: 'var(--accent-cyan)',
+                  color: 'var(--accent-indigo)',
                   marginBottom: '1rem',
                 }}
               >
@@ -234,9 +234,9 @@ export default function ContactPage() {
                   style={{
                     padding: '0.75rem 1rem',
                     borderRadius: 'var(--radius-md)',
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                    color: '#f87171',
+                    background: 'rgba(239, 68, 68, 0.08)',
+                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                    color: '#B42332',
                     fontSize: '0.8125rem',
                     display: 'flex',
                     alignItems: 'center',
@@ -259,7 +259,7 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="input-field"
-                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'rgba(0, 0, 0, 0.25)', border: '1px solid var(--border-subtle)', color: '#ffffff', fontSize: '0.875rem' }}
+                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-primary)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)', fontSize: '0.875rem' }}
                 />
               </div>
 
@@ -274,7 +274,7 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input-field"
-                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'rgba(0, 0, 0, 0.25)', border: '1px solid var(--border-subtle)', color: '#ffffff', fontSize: '0.875rem' }}
+                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-primary)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)', fontSize: '0.875rem' }}
                 />
               </div>
 
@@ -286,7 +286,7 @@ export default function ContactPage() {
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
                   className="input-field"
-                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#ffffff', fontSize: '0.875rem' }}
+                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-primary)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)', fontSize: '0.875rem' }}
                 >
                   <option value="CAREER_SUPPORT">Career Guidance & Pathway Diagnostic</option>
                   <option value="ACCOUNT_ACCESS">Account Login & Workspace Access</option>
@@ -308,7 +308,7 @@ export default function ContactPage() {
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   className="input-field"
-                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'rgba(0, 0, 0, 0.25)', border: '1px solid var(--border-subtle)', color: '#ffffff', fontSize: '0.875rem' }}
+                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-primary)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)', fontSize: '0.875rem' }}
                 />
               </div>
 
@@ -323,7 +323,7 @@ export default function ContactPage() {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="input-field"
-                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'rgba(0, 0, 0, 0.25)', border: '1px solid var(--border-subtle)', color: '#ffffff', fontSize: '0.875rem', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-primary)', border: '1px solid var(--border-strong)', color: 'var(--text-primary)', fontSize: '0.875rem', resize: 'vertical' }}
                 />
               </div>
 

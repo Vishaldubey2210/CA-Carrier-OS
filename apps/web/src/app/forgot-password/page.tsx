@@ -115,16 +115,16 @@ export default function ForgotPasswordPage() {
                 style={{
                   padding: '1rem',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  background: 'var(--surface-secondary)',
+                  border: '1px solid var(--border-subtle)',
                   marginBottom: '1.5rem',
                   textAlign: 'left',
                 }}
               >
-                <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 600, marginBottom: '0.25rem' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--accent-indigo)', fontWeight: 600, marginBottom: '0.25rem' }}>
                   Development Token Generated:
                 </div>
-                <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', color: '#ffffff', wordBreak: 'break-all', marginBottom: '0.75rem' }}>
+                <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', color: 'var(--text-primary)', wordBreak: 'break-all', marginBottom: '0.75rem' }}>
                   {feedback.resetToken}
                 </div>
                 <Link

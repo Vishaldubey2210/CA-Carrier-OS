@@ -201,7 +201,7 @@ export default function GrowthPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <TrendingUp size={24} color="var(--accent-indigo)" />
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               Professional Growth, Compensation & Mentorship
             </h1>
           </div>
@@ -346,20 +346,20 @@ export default function GrowthPage() {
                 <div key={b.id} className="glass-panel" style={{ padding: '1.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
                     <div>
-                      <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#ffffff' }}>{b.roleTitle}</h4>
+                      <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{b.roleTitle}</h4>
                       <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
                         {b.locationCity} | Experience: {b.experience} | Pathway: {b.pathway}
                       </div>
                     </div>
 
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff' }}>{b.medianSalary}</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>{b.medianSalary}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>P25 - P75: {b.p25p75}</div>
                     </div>
                   </div>
 
-                  <div style={{ padding: '0.625rem 0.75rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '6px', fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                    <div style={{ color: 'var(--accent-cyan)' }}>
+                  <div style={{ padding: '0.625rem 0.75rem', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <div style={{ color: 'var(--accent-indigo)' }}>
                       <strong>Provenance:</strong> {b.provenance}
                     </div>
                     <div style={{ color: 'var(--text-muted)' }}>
@@ -377,7 +377,7 @@ export default function GrowthPage() {
       {activeTab === 'mentorship' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               Verified Senior CA Mentors
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -390,7 +390,7 @@ export default function GrowthPage() {
               <div key={m.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff' }}>{m.fullName}</h3>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.fullName}</h3>
                     <span className="badge badge-emerald">Verified CA</span>
                   </div>
 
@@ -413,7 +413,7 @@ export default function GrowthPage() {
 
                 <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff' }}>{m.hourlyRate}</div>
+                    <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.hourlyRate}</div>
                     <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
                       <Star size={11} fill="var(--accent-amber)" color="var(--accent-amber)" /> {m.rating} ({m.totalSessions} sessions completed)
                     </div>
@@ -474,8 +474,8 @@ export default function GrowthPage() {
               Active Career Discussion Threads
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ padding: '1rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '8px' }}>
-                <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#ffffff' }}>
+              <div style={{ padding: '1rem', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}>
+                <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                   Transitioning from Mid-Size Articleship to Big 4 Statutory Audit
                 </h4>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
@@ -496,7 +496,7 @@ export default function GrowthPage() {
       {activeTab === 'recruitment' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               Recruiter & Employer Operations
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>

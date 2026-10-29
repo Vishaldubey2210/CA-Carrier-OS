@@ -216,27 +216,28 @@ export default function AdminPortalPage() {
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2.5rem 2rem 5rem' }}>
       {/* Platform Admin Top Banner */}
       <div
+        className="glass-panel"
         style={{
-          background: 'linear-gradient(135deg, rgba(30, 41, 67, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          background: 'var(--surface-primary)',
           borderRadius: 'var(--radius-lg)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
+          border: '1px solid var(--border-subtle)',
           padding: '2.25rem',
           marginBottom: '2rem',
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)',
+          boxShadow: 'var(--shadow-card)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0.75rem', borderRadius: '9999px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.35)', marginBottom: '0.875rem' }}>
-              <ShieldCheck size={14} color="var(--accent-indigo)" />
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#818cf8', letterSpacing: '0.04em' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0.75rem', borderRadius: '9999px', background: 'var(--brand-soft)', border: '1px solid #DBEAFE', marginBottom: '0.875rem' }}>
+              <ShieldCheck size={14} color="var(--brand-primary)" />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--brand-primary)', letterSpacing: '0.04em' }}>
                 ICAI PLATFORM GOVERNANCE & SECURE CONTROLS
               </span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1.2, marginBottom: '0.5rem' }}>
+            <h1 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1.2, marginBottom: '0.5rem' }}>
               Platform Administrator Command Center
             </h1>
 
@@ -251,10 +252,10 @@ export default function AdminPortalPage() {
                 <span className="badge badge-emerald" style={{ display: 'inline-block', marginBottom: '0.35rem' }}>
                   ACTIVE ADMIN SESSION
                 </span>
-                <div style={{ fontSize: '0.8125rem', color: '#ffffff', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--text-primary)', fontWeight: 600 }}>
                   {user.firstName} {user.lastName}
                 </div>
-                <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)' }}>
+                <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
                   {user.email}
                 </div>
               </div>
@@ -417,7 +418,7 @@ export default function AdminPortalPage() {
       {activeTab === 'OVERVIEW' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="glass-panel" style={{ padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
               Microservice & Infrastructure Operational Status
             </h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
@@ -465,7 +466,7 @@ export default function AdminPortalPage() {
         <div className="glass-panel" style={{ padding: '1.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.25rem' }}>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
                 Scam-Free Employer Job Verification Pipeline
               </h3>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0 }}>
@@ -561,7 +562,7 @@ export default function AdminPortalPage() {
       {/* TAB 3: AUDIT LOGS */}
       {activeTab === 'AUDIT_LOGS' && (
         <div className="glass-panel" style={{ padding: '1.75rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Tamper-Evident SHA-256 System Audit Trail
           </h3>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
@@ -629,7 +630,7 @@ export default function AdminPortalPage() {
       {/* TAB 4: TENANT WORKSPACES */}
       {activeTab === 'WORKSPACES' && (
         <div className="glass-panel" style={{ padding: '1.75rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Multi-Tenant Boundary Isolation Matrix
           </h3>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
@@ -711,7 +712,7 @@ export default function AdminPortalPage() {
                 <span className="badge badge-emerald">3-Stage Deduplication Engine</span>
                 <span className="badge badge-purple">Zero Fabrication</span>
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
                 Multi-Source Job & Articleship Aggregation Matrix
               </h3>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', maxWidth: '720px', lineHeight: 1.5 }}>
@@ -787,7 +788,7 @@ export default function AdminPortalPage() {
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
                 Enterprise vs External
               </div>
-              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff' }}>
+              <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 {aggregatorHealth?.totalEnterpriseJobs || 5} <span style={{ fontSize: '0.875rem', color: 'var(--accent-purple)' }}>/ {aggregatorHealth?.totalExternalJobs || 18}</span>
               </div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
@@ -810,7 +811,7 @@ export default function AdminPortalPage() {
 
           {/* Sources Registry Matrix Table */}
           <div className="glass-panel" style={{ padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
               Configured Source Registry & Verification Status
             </h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>

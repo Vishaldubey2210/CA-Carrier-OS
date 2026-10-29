@@ -10,7 +10,6 @@ import {
   Cpu,
   FileCheck2,
   AlertTriangle,
-  ArrowRight,
 } from 'lucide-react';
 
 export default function SecurityArchitecturePage() {
@@ -25,13 +24,13 @@ export default function SecurityArchitecturePage() {
             gap: '0.5rem',
             padding: '0.35rem 0.85rem',
             borderRadius: '9999px',
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.25)',
+            background: 'var(--success-surface)',
+            border: '1px solid var(--success-border)',
             marginBottom: '1rem',
           }}
         >
-          <ShieldCheck size={14} color="var(--accent-emerald)" />
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-emerald)', letterSpacing: '0.04em' }}>
+          <ShieldCheck size={14} color="var(--success-text)" />
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success-text)', letterSpacing: '0.04em' }}>
             ENTERPRISE SECURITY CONTROLS
           </span>
         </div>
@@ -42,7 +41,7 @@ export default function SecurityArchitecturePage() {
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.15,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             marginBottom: '1rem',
           }}
         >
@@ -60,16 +59,16 @@ export default function SecurityArchitecturePage() {
             margin: '1.5rem auto 0',
             padding: '0.85rem 1.25rem',
             borderRadius: '8px',
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.25)',
+            background: 'var(--warning-surface)',
+            border: '1px solid var(--warning-border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0.75rem',
           }}
         >
-          <AlertTriangle size={16} color="var(--accent-amber)" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: '0.8125rem', color: '#fcd34d', textAlign: 'left', lineHeight: 1.5 }}>
+          <AlertTriangle size={16} color="var(--warning-text)" style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: '0.8125rem', color: 'var(--warning-text)', textAlign: 'left', lineHeight: 1.5 }}>
             <strong>Operating Security Disclosure:</strong> Architecture specifications describe active codebase security mechanisms (scrypt, AES-GCM, tenant boundaries). Formal SOC 2 / ISO 27001 third-party audit reports will be published post-commercial launch.
           </span>
         </div>
@@ -78,8 +77,8 @@ export default function SecurityArchitecturePage() {
       {/* Security Pillars Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem', marginBottom: '4rem' }}>
         <div className="glass-panel" style={{ padding: '2rem' }}>
-          <Lock size={26} color="var(--accent-cyan)" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <Lock size={26} color="var(--brand-primary)" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Multi-Tenant Isolation
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -88,8 +87,8 @@ export default function SecurityArchitecturePage() {
         </div>
 
         <div className="glass-panel" style={{ padding: '2rem' }}>
-          <Key size={26} color="var(--accent-indigo)" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <Key size={26} color="var(--brand-primary)" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Cryptographic Authentication
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -98,8 +97,8 @@ export default function SecurityArchitecturePage() {
         </div>
 
         <div className="glass-panel" style={{ padding: '2rem' }}>
-          <Cpu size={26} color="var(--accent-amber)" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <Cpu size={26} color="var(--warning-text)" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             AI Safety & Prompt Defense
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -108,8 +107,8 @@ export default function SecurityArchitecturePage() {
         </div>
 
         <div className="glass-panel" style={{ padding: '2rem' }}>
-          <Database size={26} color="var(--accent-emerald)" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <Database size={26} color="var(--success-text)" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Immutable Audit Logging
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -118,18 +117,18 @@ export default function SecurityArchitecturePage() {
         </div>
 
         <div className="glass-panel" style={{ padding: '2rem' }}>
-          <FileCheck2 size={26} color="var(--accent-cyan)" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <FileCheck2 size={26} color="var(--brand-teal)" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             HMAC Webhook Verification
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Payment notifications from Razorpay are verified using HMAC SHA-256 signatures with event replay defense and database idempotency logging.
+            Payment notifications from payment gateways are verified using HMAC SHA-256 signatures with event replay defense and database idempotency logging.
           </p>
         </div>
 
         <div className="glass-panel" style={{ padding: '2rem' }}>
-          <ShieldCheck size={26} color="var(--accent-emerald)" style={{ marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <ShieldCheck size={26} color="var(--success-text)" style={{ marginBottom: '1rem' }} />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Candidate Blindfold Policy
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -140,13 +139,13 @@ export default function SecurityArchitecturePage() {
 
       {/* Vulnerability Disclosure Section */}
       <div className="glass-panel" style={{ padding: '2.5rem', marginBottom: '4rem' }}>
-        <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.75rem' }}>
+        <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
           Responsible Vulnerability Disclosure
         </h2>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.5rem' }}>
           We welcome responsible disclosure from security researchers and Chartered Accountants. If you discover a potential vulnerability in our authentication, tenant boundaries, or API endpoints, please report it directly:
         </p>
-        <div style={{ display: 'inline-block', padding: '0.75rem 1.25rem', background: 'rgba(255, 255, 255, 0.04)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', fontFamily: 'monospace', color: 'var(--accent-cyan)', fontSize: '0.9375rem' }}>
+        <div style={{ display: 'inline-block', padding: '0.75rem 1.25rem', background: 'var(--surface-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', fontFamily: 'monospace', color: 'var(--brand-primary)', fontWeight: 600, fontSize: '0.9375rem' }}>
           security@cacareeros.com
         </div>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.75rem', margin: '0.75rem 0 0 0' }}>

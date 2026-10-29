@@ -202,7 +202,7 @@ export default function FeaturesPage() {
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.15,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             marginBottom: '1rem',
           }}
         >
@@ -285,7 +285,7 @@ export default function FeaturesPage() {
                   </span>
                 </div>
 
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
                   {feat.title}
                 </h3>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
@@ -317,10 +317,10 @@ export default function FeaturesPage() {
 
       {/* Bottom CTA Banner */}
       <div
+        className="glass-panel"
         style={{
           marginTop: '4rem',
           padding: '2.5rem',
-          background: 'linear-gradient(135deg, rgba(30, 41, 67, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%)',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-subtle)',
           display: 'flex',
@@ -331,7 +331,7 @@ export default function FeaturesPage() {
         }}
       >
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
             Ready to experience these capabilities?
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', margin: 0 }}>

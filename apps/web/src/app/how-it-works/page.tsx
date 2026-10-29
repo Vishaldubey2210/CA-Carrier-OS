@@ -90,7 +90,7 @@ export default function HowItWorksPage() {
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.15,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             marginBottom: '1rem',
           }}
         >
@@ -123,13 +123,13 @@ export default function HowItWorksPage() {
                   width: '56px',
                   height: '56px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%)',
-                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  border: '1px solid rgba(99, 102, 241, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  color: 'var(--accent-cyan)',
+                  color: 'var(--accent-indigo)',
                   fontWeight: 800,
                   fontSize: '1.25rem',
                 }}
@@ -139,7 +139,7 @@ export default function HowItWorksPage() {
 
               <div style={{ flex: 1, minWidth: '280px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem' }}>
-                  <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
+                  <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                     {step.title}
                   </h2>
                 </div>
@@ -149,7 +149,7 @@ export default function HowItWorksPage() {
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1rem' }}>
                   {step.description}
                 </p>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.75rem', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.04)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.75rem', borderRadius: '6px', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   <CheckCircle2 size={13} color="var(--accent-emerald)" />
                   <span>{step.detail}</span>
                 </div>
@@ -161,15 +161,15 @@ export default function HowItWorksPage() {
 
       {/* CTA Banner */}
       <div
+        className="glass-panel"
         style={{
           padding: '3rem 2rem',
-          background: 'linear-gradient(135deg, rgba(30, 41, 67, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%)',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-subtle)',
           textAlign: 'center',
         }}
       >
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
           Start Your Sovereign Career Journey Today
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '580px', margin: '0 auto 1.75rem' }}>

@@ -412,7 +412,7 @@ export function Header() {
 
             <button
               onClick={handleLogout}
-              title="Sign out of CA Career OS"
+              title="Sign out of CharteredOS"
               style={{
                 background: 'var(--danger-surface)',
                 border: '1px solid var(--danger-border)',
@@ -477,14 +477,14 @@ export function Header() {
                     fontSize: '0.875rem',
                   }}
                 >
-                  CA
+                  CO
                 </div>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
-                    CA Career OS
+                    CharteredOS
                   </div>
                   <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    ICAI PROFESSIONAL
+                    CAREER PLATFORM
                   </div>
                 </div>
               </Link>

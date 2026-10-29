@@ -132,7 +132,7 @@ export default function FaqPage() {
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.15,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             marginBottom: '1rem',
           }}
         >
@@ -155,9 +155,9 @@ export default function FaqPage() {
               width: '100%',
               padding: '0.75rem 1rem 0.75rem 2.75rem',
               borderRadius: '9999px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-subtle)',
-              color: '#ffffff',
+              background: 'var(--surface-primary)',
+              border: '1px solid var(--border-strong)',
+              color: 'var(--text-primary)',
               fontSize: '0.875rem',
             }}
           />
@@ -206,7 +206,7 @@ export default function FaqPage() {
                     <span className="badge badge-indigo" style={{ fontSize: '0.625rem' }}>
                       {faq.category}
                     </span>
-                    <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                    <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                       {faq.q}
                     </h2>
                   </div>
@@ -222,7 +222,7 @@ export default function FaqPage() {
                 </div>
 
                 {isOpen && (
-                  <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '1rem', margin: '1rem 0 0 0' }}>
+                  <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem', margin: '1rem 0 0 0' }}>
                     {faq.a}
                   </p>
                 )}
@@ -234,16 +234,16 @@ export default function FaqPage() {
 
       {/* Still have questions banner */}
       <div
+        className="glass-panel"
         style={{
           marginTop: '4rem',
           padding: '2.5rem',
-          background: 'linear-gradient(135deg, rgba(30, 41, 67, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%)',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-subtle)',
           textAlign: 'center',
         }}
       >
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
           Have a specific inquiry not listed here?
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '520px', margin: '0 auto 1.5rem' }}>

@@ -25,6 +25,7 @@ const apiOrigin = resolveApiOrigin();
 
 const nextConfig = {
   reactStrictMode: true,
+  devIndicators: false,
   transpilePackages: ['@ca-career-os/shared'],
   async rewrites() {
     return [

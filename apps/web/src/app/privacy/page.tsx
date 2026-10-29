@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.15,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             marginBottom: '0.75rem',
           }}
         >
@@ -50,7 +50,7 @@ export default function PrivacyPolicyPage() {
           padding: '1rem 1.25rem',
           borderRadius: '8px',
           background: 'rgba(245, 158, 11, 0.08)',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
           marginBottom: '2rem',
           display: 'flex',
           alignItems: 'center',
@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
         }}
       >
         <FileText size={18} color="var(--accent-amber)" style={{ flexShrink: 0 }} />
-        <span style={{ fontSize: '0.8125rem', color: '#fcd34d', lineHeight: 1.5 }}>
+        <span style={{ fontSize: '0.8125rem', color: '#9A3412', lineHeight: 1.5 }}>
           <strong>Draft for Legal Review:</strong> This document outlines the technical data architecture and privacy controls of CA Career OS. It is an operating draft prepared for product review and does not constitute statutory certification or legal counsel warranty.
         </span>
       </div>
@@ -70,13 +70,13 @@ export default function PrivacyPolicyPage() {
           padding: '2rem',
           marginBottom: '3rem',
           border: '1px solid rgba(16, 185, 129, 0.35)',
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%)',
+          background: 'rgba(16, 185, 129, 0.05)',
         }}
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
           <Lock size={24} color="var(--accent-emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
               The Candidate Blindfold Rule
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
@@ -89,7 +89,7 @@ export default function PrivacyPolicyPage() {
       {/* Detailed Legal Sections */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', color: 'var(--text-secondary)', fontSize: '0.9375rem', lineHeight: 1.7 }}>
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             1. Scope and Sovereign Commitment
           </h2>
           <p>
@@ -98,7 +98,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             2. Categories of Information Processed
           </h2>
           <p>We process only information required to provide verified career services:</p>
@@ -111,7 +111,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             3. Zero-Fabrication Rule (ADR-009) & AI Boundaries
           </h2>
           <p>
@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             4. Third-Party Service Providers
           </h2>
           <p>We work with trusted infrastructure providers under strict data-protection agreements:</p>
@@ -131,7 +131,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             5. Your Rights: Access, Export & Deletion
           </h2>
           <p>
@@ -140,11 +140,11 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Contact the Data Protection Officer
           </h2>
           <p style={{ margin: 0 }}>
-            For privacy inquiries or audit rights, please email: <span style={{ color: '#ffffff' }}>privacy@cacareeros.com</span> or submit a structured ticket through our <Link href="/contact" style={{ color: 'var(--accent-cyan)' }}>Contact Desk</Link>.
+            For privacy inquiries or audit rights, please email: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>privacy@cacareeros.com</span> or submit a structured ticket through our <Link href="/contact" style={{ color: 'var(--accent-cyan)' }}>Contact Desk</Link>.
           </p>
         </section>
       </div>

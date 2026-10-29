@@ -33,7 +33,7 @@ export default function TermsOfServicePage() {
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1.15,
-            color: '#ffffff',
+            color: 'var(--text-primary)',
             marginBottom: '0.75rem',
           }}
         >
@@ -50,7 +50,7 @@ export default function TermsOfServicePage() {
           padding: '1rem 1.25rem',
           borderRadius: '8px',
           background: 'rgba(245, 158, 11, 0.08)',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
           marginBottom: '2rem',
           display: 'flex',
           alignItems: 'center',
@@ -58,7 +58,7 @@ export default function TermsOfServicePage() {
         }}
       >
         <FileText size={18} color="var(--accent-amber)" style={{ flexShrink: 0 }} />
-        <span style={{ fontSize: '0.8125rem', color: '#fcd34d', lineHeight: 1.5 }}>
+        <span style={{ fontSize: '0.8125rem', color: '#9A3412', lineHeight: 1.5 }}>
           <strong>Draft for Legal Review:</strong> These Terms of Service represent an operating draft defining platform usage rules, non-solicitation bounds, and disclaimers. Subject to legal counsel finalization prior to commercial release.
         </span>
       </div>
@@ -66,7 +66,7 @@ export default function TermsOfServicePage() {
       {/* Terms Body */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', color: 'var(--text-secondary)', fontSize: '0.9375rem', lineHeight: 1.7 }}>
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             1. Acceptance of Terms
           </h2>
           <p>
@@ -75,7 +75,7 @@ export default function TermsOfServicePage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             2. Professional User Roles & Governance
           </h2>
           <p>The platform supports distinct role tiers with explicit responsibilities:</p>
@@ -87,7 +87,7 @@ export default function TermsOfServicePage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             3. ICAI Code of Ethics Alignment
           </h2>
           <p>
@@ -100,7 +100,7 @@ export default function TermsOfServicePage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             4. Prohibited Activities
           </h2>
           <p>Users are strictly prohibited from:</p>
@@ -113,7 +113,7 @@ export default function TermsOfServicePage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             5. Subscriptions, Payments & Invoicing
           </h2>
           <p>
@@ -122,7 +122,7 @@ export default function TermsOfServicePage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
             6. Statutory Disclaimer & Limitation of Liability
           </h2>
           <p>
@@ -131,11 +131,11 @@ export default function TermsOfServicePage() {
         </section>
 
         <section style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Legal Questions
           </h2>
           <p style={{ margin: 0 }}>
-            For legal inquiries or statutory notices, please contact: <span style={{ color: '#ffffff' }}>legal@cacareeros.com</span>.
+            For legal inquiries or statutory notices, please contact: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>legal@cacareeros.com</span>.
           </p>
         </section>
       </div>

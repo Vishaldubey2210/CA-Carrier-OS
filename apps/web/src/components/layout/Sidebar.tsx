@@ -60,14 +60,14 @@ export function Sidebar() {
               boxShadow: '0 2px 4px rgba(15, 23, 42, 0.1)',
             }}
           >
-            CA
+            CO
           </div>
           <div>
             <div style={{ fontWeight: 800, fontSize: '0.9375rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-              CA Career OS
+              CharteredOS
             </div>
             <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.04em', fontWeight: 600 }}>
-              ICAI PROFESSIONAL
+              CAREER PLATFORM
             </div>
           </div>
         </Link>

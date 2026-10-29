@@ -8,44 +8,44 @@
   /* =========================================================================
      CA Career OS — Design System 2.0 (Light-First Executive Palette)
      ========================================================================= */
-  --page-background: #F7F8FA;
-  --sidebar-background: #F9FAFB;
+  --page-background: #F8FAFC;
+  --sidebar-background: #F8FAFC;
   --surface-primary: #FFFFFF;
-  --surface-secondary: #F1F3F5;
-  --surface-hover: #EBF0F6;
+  --surface-secondary: #F1F5F9;
+  --surface-hover: #E2E8F0;
   --surface-card: #FFFFFF;
 
   /* Typography Colors (Eye-friendly, WCAG 2.2 AA compliant) */
-  --text-primary: #0F172A;       /* Deep executive slate — crisp without harsh black glare */
-  --text-secondary: #475569;     /* Softer body contrast — prevents visual fatigue */
-  --text-muted: #64748B;         /* Balanced metadata gray */
+  --text-primary: #0F172A;       /* Ink (headings) #0F172A */
+  --text-secondary: #334155;     /* Body text #334155 (comfortable reading, no glare/fatigue) */
+  --text-muted: #64748B;         /* Balanced metadata gray, never lighter than #64748B */
   --text-accent: #1E40AF;
 
   /* Executive Brand Accents */
-  --brand-primary: #173F8A;       /* Deep Brand Blue */
-  --brand-primary-hover: #123370;
-  --brand-interactive: #2457A7;   /* Interactive Blue */
-  --brand-soft: #F0F4FA;          /* Gentle Blue Surface */
-  --brand-teal: #0F766E;          /* Deep Teal */
-  --brand-teal-soft: #F0FDFA;     /* Teal 50 */
+  --brand-primary: #1E3A8A;       /* Deep Navy Primary #1E3A8A */
+  --brand-primary-hover: #1E40AF; /* Hover #1E40AF */
+  --brand-interactive: #1E40AF;
+  --brand-soft: #EEF2F6;          /* Gentle Blue/Gray Surface */
+  --brand-teal: #059669;          /* Emerald Accent #059669 */
+  --brand-teal-soft: #ECFDF5;     /* Emerald 50 */
 
   /* Borders & Dividers */
-  --border-subtle: #E1E5EA;
+  --border-subtle: #E2E8F0;       /* Border #E2E8F0 */
   --border-strong: #CBD5E1;
   --border-active: #94A3B8;
-  --border-glow: rgba(23, 63, 138, 0.12);
+  --border-glow: rgba(30, 58, 138, 0.12);
 
   /* Semantic Status Colors */
-  --success-text: #237A4B;
-  --success-surface: #E7F4EB;
-  --success-border: #C8E8D2;
-  --warning-text: #966314;
-  --warning-surface: #FEF9C3;
-  --warning-border: #FEF08A;
-  --danger-text: #B42332;
+  --success-text: #059669;
+  --success-surface: #ECFDF5;
+  --success-border: #A7F3D0;
+  --warning-text: #B45309;
+  --warning-surface: #FEF3C7;
+  --warning-border: #FDE68A;
+  --danger-text: #DC2626;
   --danger-surface: #FEE2E2;
   --danger-border: #FECACA;
-  --focus-ring: #173F8A;
+  --focus-ring: #1E3A8A;
 
   /* Aliases for Full Backward Compatibility */
   --bg-main: var(--page-background);
@@ -55,7 +55,7 @@
   --bg-glass: var(--surface-primary);
 
   --accent-indigo: #1E3A8A;
-  --accent-emerald: #10B981;
+  --accent-emerald: #059669;
   --accent-cyan: #0284C7;
   --accent-amber: #D97706;
   --accent-rose: #E11D48;
@@ -169,19 +169,9 @@ p {
 }
 
 
-/* Subtle background accent grid - clean & architectural */
+/* Full-page grid lines removed in favor of calm, clean background */
 .bg-mesh {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 0;
-  background-image: 
-    linear-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
-  background-size: 32px 32px;
+  display: none;
 }
 
 /* Clean Professional Surface Card */
@@ -991,11 +981,18 @@ textarea:focus-visible {
   display: flex;
   gap: 2rem;
   width: max-content;
-  animation: marqueeScroll 28s linear infinite;
+  animation: marqueeScroll 48s linear infinite;
 }
 
 .marquee-container:hover .marquee-track {
   animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    overflow-x: auto;
+  }
 }
 
 @keyframes marqueeScroll {
@@ -1462,91 +1459,14 @@ textarea:focus-visible {
 
 /* =========================================================================
    Scroll-Triggered Reveal & Executive Loading Transition System
-   ========================================================================= */
-
+/* Safe scroll reveal: content is visible by default so no content is ever hidden if JS or intersection observer fails */
 .scroll-reveal {
-  opacity: 0;
-  transform: translateY(36px) scale(0.985);
-  filter: blur(5px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform, filter;
-  position: relative;
-}
-
-.scroll-reveal.is-revealed {
   opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-
-/* Luminous scanner line that charges across when section comes into view */
-.scroll-reveal-section {
   position: relative;
 }
 
-.scroll-reveal-section::before {
-  content: '';
-  position: absolute;
-  top: -16px;
-  left: 5%;
-  right: 5%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--brand-primary), #0284C7, #10B981, transparent);
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: center center;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.scroll-reveal-section.is-revealed::before {
-  opacity: 0.85;
-  transform: scaleX(1);
-}
-
-/* Card-level scroll reveal with subtle scale */
 .scroll-card-reveal {
-  opacity: 0;
-  transform: translateY(28px) scale(0.97);
-  filter: blur(3px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform, filter;
-}
-
-.scroll-card-reveal.is-revealed {
   opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-
-/* Staggered entrance delays for cards & grids */
-.scroll-stagger-1 { transition-delay: 80ms; }
-.scroll-stagger-2 { transition-delay: 160ms; }
-.scroll-stagger-3 { transition-delay: 240ms; }
-.scroll-stagger-4 { transition-delay: 320ms; }
-.scroll-stagger-5 { transition-delay: 400ms; }
-.scroll-stagger-6 { transition-delay: 480ms; }
-
-/* Subtle loading pulse on newly revealed containers */
-@keyframes sectionTelemetryGlow {
-  0% {
-    box-shadow: 0 0 0 0 rgba(23, 63, 138, 0.2);
-  }
-  60% {
-    box-shadow: 0 0 0 14px rgba(23, 63, 138, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(23, 63, 138, 0);
-  }
-}
-
-.scroll-load-pulse.is-revealed {
-  animation: sectionTelemetryGlow 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Reduced motion accessibility */
@@ -1558,49 +1478,34 @@ textarea:focus-visible {
     filter: none !important;
     transition: none !important;
   }
-  .scroll-reveal-section::before {
-    display: none !important;
-  }
 }
 
-/* Editorial step pill with animated live pulse dot */
+/* Editorial step pill with non-overlapping small emerald dot */
 .editorial-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--brand-primary);
   background: var(--brand-soft);
-  border: 1px solid rgba(23, 63, 138, 0.15);
+  border: 1px solid rgba(30, 58, 138, 0.12);
   border-radius: var(--radius-pill);
   padding: 0.35rem 0.875rem;
   margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .editorial-step::before {
   content: '';
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--brand-primary);
+  background: #059669;
   display: inline-block;
-  animation: pulseLiveDot 2.2s infinite ease-in-out;
-}
-
-@keyframes pulseLiveDot {
-  0%, 100% {
-    transform: scale(0.85);
-    opacity: 0.6;
-    box-shadow: 0 0 0 0 rgba(23, 63, 138, 0.5);
-  }
-  50% {
-    transform: scale(1.25);
-    opacity: 1;
-    box-shadow: 0 0 0 5px rgba(23, 63, 138, 0);
-  }
+  flex-shrink: 0;
 }
 
 
