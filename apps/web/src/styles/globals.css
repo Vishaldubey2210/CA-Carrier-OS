@@ -87,6 +87,17 @@
   --duration-fast: 160ms;
   --duration-normal: 240ms;
   --duration-smooth: 320ms;
+
+  /* Stacking Cards sticky deck tokens */
+  --stack-base-top: 72px;
+  --stack-step: 22px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --stack-base-top: 60px;
+    --stack-step: 12px;
+  }
 }
 
 /* Optional Dark Mode (when user prefers dark or data-theme="dark") */

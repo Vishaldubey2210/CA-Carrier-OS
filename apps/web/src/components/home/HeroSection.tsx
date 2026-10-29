@@ -26,14 +26,21 @@ function StackingCardItem({ index, total, id, children }: StackingCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isLast = index === total - 1;
 
+  // Staggered sticky top offset so each stacked card peeks out above the next
+  const stickyTop = `calc(var(--stack-base-top, 72px) + ${index} * var(--stack-step, 22px))`;
+
+  // Track scroll progress as this card's container scrolls through the viewport
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start 80px', 'end 80px'],
+    offset: ['start 75px', 'end 75px'],
   });
 
-  // Card stays pinned at top 80px; fades and scales slightly down as the next card scrolls over it
-  const scale = useTransform(scrollYProgress, [0, 0.7, 1], isLast ? [1, 1, 1] : [1, 0.98, 0.94]);
-  const opacity = useTransform(scrollYProgress, [0, 0.55, 1], isLast ? [1, 1, 1] : [1, 0.85, 0.3]);
+  // Perspective scaling: top-anchored so previous cards scale gently down to create 3D depth
+  const targetScale = 1 - (total - 1 - index) * 0.02;
+  const scale = useTransform(scrollYProgress, [0, 1], isLast ? [1, 1] : [1, targetScale]);
+
+  // Subtle ambient depth dimming when subsequent cards stack on top (max 5%, keeping text 100% sharp)
+  const dimOpacity = useTransform(scrollYProgress, [0, 1], isLast ? [0, 0] : [0, 0.05]);
 
   return (
     <div
@@ -41,25 +48,35 @@ function StackingCardItem({ index, total, id, children }: StackingCardProps) {
       id={id}
       className="relative w-full"
       style={{
-        // Height allows ample scroll runway for each card to stay pinned before the next arrives
-        minHeight: isLast ? 'auto' : '100vh',
-        paddingBottom: isLast ? '0px' : '6vh',
+        // Each card has ample scroll runway to lock into place while the next card glides up
+        // Last card (Take-Home CTC) has ~85vh runway so it locks and displays before smooth exit
+        minHeight: isLast ? '85vh' : '125vh',
+        paddingBottom: isLast ? '4vh' : '8vh',
       }}
     >
       <div
-        className="sticky top-[80px] w-full"
+        className="sticky w-full"
         style={{
+          top: stickyTop,
           zIndex: 10 + index,
         }}
       >
         <motion.div
           style={{
             scale,
-            opacity,
             borderRadius: '28px 72px 28px 28px',
+            transformOrigin: 'top center',
           }}
-          className="w-full bg-white border border-[#CBD5E1] shadow-[0_25px_60px_rgba(15,23,42,0.12)] p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden transition-all duration-300 hover:shadow-[0_30px_70px_rgba(15,23,42,0.16)]"
+          className="relative w-full bg-white border border-[#CBD5E1] p-5 sm:p-7 md:p-8 lg:p-9 overflow-hidden transition-all duration-300 shadow-[0_-10px_30px_rgba(15,23,42,0.06),0_25px_60px_rgba(15,23,42,0.13),0_2px_8px_rgba(15,23,42,0.06)] hover:shadow-[0_-12px_35px_rgba(15,23,42,0.08),0_30px_70px_rgba(15,23,42,0.17)]"
         >
+          {/* Subtle depth dimmer when cards stack on top */}
+          {!isLast && (
+            <motion.div
+              style={{ opacity: dimOpacity }}
+              className="absolute inset-0 bg-[#0F172A] pointer-events-none rounded-[28px_72px_28px_28px] z-30 transition-opacity"
+            />
+          )}
+
           {children}
         </motion.div>
       </div>
