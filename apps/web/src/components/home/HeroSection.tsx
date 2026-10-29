@@ -56,7 +56,7 @@ function PinnedCardDeck() {
       <div className="sticky top-[72px] w-full flex flex-col justify-start items-center py-2 overflow-visible">
         <div
           className="relative w-full max-w-[1280px]"
-          style={{ paddingBottom: 'calc(var(--stack-step, 48px) * 3 + 32px)' }}
+          style={{ paddingBottom: 'calc(var(--stack-step, 8px) * 3 + 12px)' }}
         >
           {/* ================= CARD 1: CAREER DIAGNOSTIC ================= */}
           <motion.div
@@ -190,7 +190,7 @@ function PinnedCardDeck() {
           <motion.div
             id="card-resume"
             style={{
-              top: 'calc(var(--stack-step, 48px) * 1)',
+              top: 'calc(var(--stack-step, 8px) * 1)',
               y: card1Y,
               opacity: card1Opacity,
               scale: card1Scale,
@@ -308,7 +308,7 @@ function PinnedCardDeck() {
           <motion.div
             id="card-interview"
             style={{
-              top: 'calc(var(--stack-step, 48px) * 2)',
+              top: 'calc(var(--stack-step, 8px) * 2)',
               y: card2Y,
               opacity: card2Opacity,
               scale: card2Scale,
@@ -399,7 +399,7 @@ function PinnedCardDeck() {
           <motion.div
             id="card-ctc"
             style={{
-              top: 'calc(var(--stack-step, 48px) * 3)',
+              top: 'calc(var(--stack-step, 8px) * 3)',
               y: card3Y,
               opacity: card3Opacity,
               scale: 1,
