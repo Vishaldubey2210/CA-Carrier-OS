@@ -30,7 +30,7 @@ export class AiInferenceService {
   }
 
   private getGroqConfig() {
-    const apiKey = process.env.GROQ_API_KEY || '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';
+    const apiKey = process.env.GROQ_API_KEY || '';
     const baseUrl = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1').replace(/\/+$/, '');
     const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
     return { apiKey, baseUrl, model };
