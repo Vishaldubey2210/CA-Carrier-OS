@@ -1,7 +1,0 @@
-{
-  "engine_name": "TFIDF_Cosine_Deduplication_Engine",
-  "optimal_threshold": 0.5,
-  "f1_score": 0.9090909090909091,
-  "exact_hash_baseline_f1": 0.5882352941176471,
-  "artifact_path": "/home/vishal/Downloads/CA Carrer OS/models/job_dedup_engine_v1.pkl"
-}

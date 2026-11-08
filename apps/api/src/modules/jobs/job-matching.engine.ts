@@ -223,8 +223,8 @@ export interface JobFraudRiskReport {
 }
 
 /**
- * Calibrated Job Fraud Risk Evaluation Engine (ML-04).
- * Trained and validated in Notebook 02 using regularized logistic regression weights.
+ * Calibrated Job Fraud Risk Evaluation Engine.
+ * Multi-signal risk assessment for job listings.
  */
 export function evaluateJobFraudRisk(job: {
   title?: string;
@@ -313,8 +313,8 @@ export function evaluateJobFraudRisk(job: {
 }
 
 /**
- * Token N-gram Cosine Similarity for Multi-Signal Job Deduplication (ML-05).
- * Validated in Notebook 02 (optimal threshold = 0.50, F1 = 0.909).
+ * Token N-gram Cosine Similarity for Multi-Signal Job Deduplication.
+ * Calculates textual similarity between job title and description.
  */
 export function calculateJobDeduplicationSimilarity(
   titleA: string,

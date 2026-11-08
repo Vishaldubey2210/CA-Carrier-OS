@@ -20,7 +20,6 @@ import { BillingModule } from './modules/billing/billing.module.js';
 import { SupportModule } from './modules/support/support.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { EmailModule } from './modules/email/email.module.js';
-import { AnnotationsModule } from './modules/annotations/annotations.module.js';
 
 @Module({
   imports: [
@@ -43,7 +42,6 @@ import { AnnotationsModule } from './modules/annotations/annotations.module.js';
     BillingModule,
     SupportModule,
     NotificationsModule,
-    AnnotationsModule,
   ],
 })
 export class AppModule implements NestModule {

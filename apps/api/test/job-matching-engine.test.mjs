@@ -10,7 +10,7 @@ import {
 } from '../dist/modules/jobs/job-matching.engine.js';
 import { CAPathway } from '@ca-career-os/shared';
 
-describe('ML & AI Engineering Evidence Suite (ML-01 to ML-05 & Agent Safety)', () => {
+describe('Job Matching, Fraud Detection & Deduplication Suite', () => {
   const dummyCandidate = {
     id: 'cand-001',
     caFinalStatus: 'QUALIFIED',
