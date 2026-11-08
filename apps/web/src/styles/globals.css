@@ -62,23 +62,24 @@
   --accent-purple: #7C3AED;
 
   /* Typography Families */
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Elevation & Radii (Intentional, varied sizes) */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-pill: 9999px;
+  /* Elevation & Radii (Linear / Stripe inspired: crisp, restrained, zero cartoon pills) */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-pill: 6px;
 
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-card-hover: 0 6px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
-  --shadow-dropdown: 0 10px 25px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
-  --shadow-glow: 0 0 0 3px rgba(30, 58, 138, 0.12);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --shadow-card-hover: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+  --shadow-dropdown: 0 6px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+  --shadow-glow: none;
 
   /* Motion & Animation Tokens */
   --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
@@ -189,9 +190,9 @@ p {
 .glass-panel {
   background: var(--surface-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-fast) var(--ease-snappy);
 }
 
 .glass-panel:hover {
@@ -200,54 +201,55 @@ p {
 
 .glass-panel-interactive:hover {
   border-color: var(--border-active);
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
 }
 
-/* Standardized Buttons */
+/* Standardized Buttons - Clean, Human-Designed SaaS */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-snappy);
   text-decoration: none;
   font-family: var(--font-sans);
+  line-height: 1.25;
 }
 
 .btn-primary {
   background: var(--brand-primary);
   color: #FFFFFF;
   border-color: var(--brand-primary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .btn-primary:hover {
   background: var(--brand-primary-hover);
   border-color: var(--brand-primary-hover);
-  transform: translateY(-1px);
 }
 
 .btn-secondary {
   background: var(--surface-primary);
   color: var(--text-primary);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-xs);
 }
 
 .btn-secondary:hover {
   background: var(--surface-secondary);
-  border-color: var(--border-active);
+  border-color: var(--border-strong);
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
+  border-color: transparent;
 }
 
 .btn-ghost:hover {
@@ -256,26 +258,21 @@ p {
 }
 
 .btn-danger {
-  background: var(--danger-surface);
+  background: var(--surface-primary);
   color: var(--danger-text);
   border: 1px solid var(--danger-border);
 }
 
 .btn-danger:hover {
-  background: #FCA5A5;
+  background: var(--danger-surface);
 }
 
-/* Pill Action Button */
+/* Backward compatibility for btn-pill: now standardized to clean 6px radius */
 .btn-pill {
-  border-radius: 9999px;
-  padding: 0.625rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-pill:hover {
-  transform: translateY(-1px);
+  border-radius: var(--radius-md);
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
 }
 
 /* Form Controls */
@@ -343,6 +340,21 @@ p {
   border: 1px solid var(--success-border);
 }
 
+.badge-success-clean {
+  background: #ffffff;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  padding: 0.2rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  letter-spacing: 0.01em;
+  box-shadow: none;
+}
+
 .badge-amber {
   background: var(--warning-surface);
   color: var(--warning-text);
@@ -353,6 +365,132 @@ p {
   background: var(--brand-teal-soft);
   color: var(--brand-teal);
   border: 1px solid #CCFBF1;
+}
+
+/* Linear / Stripe / Ramp Data UI Primitives */
+.data-table-container {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.data-table th {
+  padding: 0.625rem 1rem;
+  background: var(--surface-secondary);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover td {
+  background: var(--surface-secondary);
+}
+
+/* Scan-Row (Linear Issues style list items) */
+.scan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  background: var(--surface-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--duration-instant) ease, border-color var(--duration-instant) ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.scan-row:hover {
+  background: #F8FAFC;
+}
+
+.scan-row:last-child {
+  border-bottom: none;
+}
+
+/* Segmented Control (Linear / Raycast tab switches) */
+.segmented-control {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-secondary);
+  padding: 2px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.segmented-control-btn {
+  padding: 0.3125rem 0.6875rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-instant) ease;
+}
+
+.segmented-control-btn.active {
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+/* Linear / Stripe Editorial Metric Strip */
+.editorial-metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--surface-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.metric-strip-item {
+  padding: 1.125rem 1.5rem;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-strip-item:last-child {
+  border-right: none;
+}
+
+@media (max-width: 768px) {
+  .editorial-metric-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .metric-strip-item:nth-child(2) {
+    border-right: none;
+  }
+  .metric-strip-item:nth-child(1),
+  .metric-strip-item:nth-child(2) {
+    border-bottom: 1px solid var(--border-subtle);
+  }
 }
 
 /* App Shell Layout */

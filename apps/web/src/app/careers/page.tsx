@@ -6,7 +6,6 @@ import {
   Briefcase,
   ShieldCheck,
   ArrowRight,
-  Sparkles,
   Code2,
   FileCheck2,
 } from 'lucide-react';
@@ -63,7 +62,7 @@ export default function CareersPage() {
         }}
       >
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
-          <Sparkles size={24} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <ShieldCheck size={22} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
               Current Hiring Status: Zero Invented Openings

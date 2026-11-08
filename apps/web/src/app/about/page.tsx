@@ -121,7 +121,7 @@ export default function AboutPage() {
           <div className="glass-panel" style={{ padding: '1.75rem' }}>
             <FileCheck2 size={24} color="var(--accent-indigo)" style={{ marginBottom: '1rem' }} />
             <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-              Zero-Fabrication (ADR-009)
+              Verified Credentials
             </h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
               Our resume tailoring engine operates on strict deterministic constraints. It is mathematically prohibited from hallucinating unverified corporate clients, false audit metrics, or unearned credentials.

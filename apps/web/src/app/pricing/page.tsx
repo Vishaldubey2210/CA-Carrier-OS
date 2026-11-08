@@ -245,8 +245,8 @@ export default function PublicPricingPage() {
                     {p.badge}
                   </span>
                   {p.highlight && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 600 }}>
-                      <Sparkles size={12} /> Recommended
+                    <span style={{ fontSize: '0.75rem', color: '#15803d', fontWeight: 600 }}>
+                      Recommended
                     </span>
                   )}
                 </div>

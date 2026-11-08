@@ -8,7 +8,6 @@ import {
   Circle,
   TrendingUp,
   Award,
-  Sparkles,
   BookOpen,
   Calendar,
   Layers,
@@ -505,20 +504,11 @@ export default function CareerHubPage() {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <span className="badge badge-indigo" style={{ fontWeight: 700, fontSize: '0.75rem' }}>
-              <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} />
-              ICAI Competency Framework
-            </span>
-            <span className="badge badge-emerald" style={{ fontWeight: 700, fontSize: '0.75rem' }}>
-              Verified Provenance
-            </span>
-          </div>
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em', marginBottom: '0.375rem' }}>
-            Career Pathways &amp; Execution Roadmap
+            Career Pathways &amp; Roadmap
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '640px', lineHeight: 1.5, margin: 0 }}>
-            Objective articleship skills diagnostic mapped to 7 CA horizons with roadmap.sh-style visual milestone trees.
+            Structured career milestones across 7 Chartered Accountancy specializations with visual progress tracking.
           </p>
         </div>
 
@@ -804,10 +794,7 @@ export default function CareerHubPage() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                 <span className="badge badge-indigo">
-                  {selectedPathway} Pathway Roadmap
-                </span>
-                <span className="badge badge-cyan" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <Sparkles size={11} /> ICAI Grounded GenAI
+                  {selectedPathway} Pathway
                 </span>
               </div>
               <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
@@ -987,8 +974,8 @@ export default function CareerHubPage() {
                   className="btn btn-primary btn-pill"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.75rem' }}
                 >
-                  {isGenerating ? <Loader2 size={16} className="spin" /> : <Sparkles size={16} />}
-                  <span>{isGenerating ? 'Synthesizing GenAI Graph...' : 'Generate 30-60-90 Day Roadmap'}</span>
+                  {isGenerating ? <Loader2 size={16} className="spin" /> : <Compass size={16} />}
+                  <span>{isGenerating ? 'Generating Roadmap...' : 'Generate 30-60-90 Day Roadmap'}</span>
                 </button>
                 <button
                   onClick={() => setIsAiModalOpen(true)}
@@ -2111,8 +2098,8 @@ export default function CareerHubPage() {
                       gap: '0.5rem',
                     }}
                   >
-                    {isGenerating ? <Loader2 size={15} className="spin" /> : <Sparkles size={15} />}
-                    <span>{isGenerating ? 'Synthesizing...' : 'Apply & Generate Roadmap'}</span>
+                    {isGenerating ? <Loader2 size={15} className="spin" /> : <Compass size={15} />}
+                    <span>{isGenerating ? 'Generating...' : 'Apply & Generate Roadmap'}</span>
                   </button>
                 </div>
               </div>

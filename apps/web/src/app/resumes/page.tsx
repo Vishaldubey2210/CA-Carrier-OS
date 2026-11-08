@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   Download,
-  Sparkles,
   Layers,
   Send,
   Copy,
@@ -26,6 +25,7 @@ import {
   ResumeSectionContent,
 } from '@ca-career-os/shared';
 import { apiClient } from '@/lib/api-client';
+import { useAuth } from '../../context/AuthContext';
 
 // Initial master resume grounded in verified CA profile
 const INITIAL_MASTER_RESUME: ResumeDetail = {
@@ -34,7 +34,7 @@ const INITIAL_MASTER_RESUME: ResumeDetail = {
   title: 'Chartered Accountant — Master Profile',
   targetPathway: CAPathway.AUDIT,
   isDefault: true,
-  updatedAt: '2026-10-19T10:00:00.000Z',
+  updatedAt: new Date().toISOString(),
   versions: [
     {
       id: 'ver-01-master',
@@ -42,38 +42,38 @@ const INITIAL_MASTER_RESUME: ResumeDetail = {
       versionNumber: 1,
       title: 'Master Verified Profile',
       summary:
-        'ICAI Qualified Chartered Accountant with 36 months of rigorous practical training at KPMG India (BIG4 Firm). Demonstrated core competency in Statutory Audit, Ind AS Reporting, and Internal Financial Controls (IFCoFR), coupled with hands-on proficiency in SAP ERP, Advanced Excel, and PowerBI. Proven track record leading client audit cycles for manufacturing and BFSI corporates.',
+        'ICAI Qualified Chartered Accountant with practical training in Statutory Audit, Ind AS, and Corporate Taxation.',
       targetedJobId: null,
       targetedJobTitle: null,
       targetedCompanyName: null,
-      matchScore: 92,
+      matchScore: 88,
       parsedContent: {
         summary:
-          'ICAI Qualified Chartered Accountant with 36 months of rigorous practical training at KPMG India (BIG4 Firm). Demonstrated core competency in Statutory Audit, Ind AS Reporting, and Internal Financial Controls (IFCoFR), coupled with hands-on proficiency in SAP ERP, Advanced Excel, and PowerBI. Proven track record leading client audit cycles for manufacturing and BFSI corporates.',
+          'ICAI Qualified Chartered Accountant with practical training in Statutory Audit, Ind AS, and Corporate Taxation.',
         qualification: [
           {
             title: 'Chartered Accountant (ICAI)',
             institution: 'The Institute of Chartered Accountants of India',
             year: '2024',
-            scoreOrRank: 'Membership No: ACA-543210',
+            scoreOrRank: 'Qualified',
           },
           {
             title: 'Bachelor of Commerce (B.Com)',
-            institution: 'University of Mumbai',
+            institution: 'Commerce University',
             year: '2021',
-            scoreOrRank: 'First Class with Distinction (82%)',
+            scoreOrRank: 'First Class',
           },
         ],
         articleship: {
-          firm: 'KPMG India',
-          firmTier: 'BIG4',
-          duration: '36 Months (156 Weeks)',
-          domains: ['Statutory Audit', 'Ind AS Financial Reporting', 'CARO 2020 Compliance', 'IFCoFR'],
+          firm: 'Chartered Accountancy Practice',
+          firmTier: 'Mid-Size',
+          duration: '36 Months',
+          domains: ['Statutory Audit', 'Direct & Indirect Taxation', 'Internal Financial Controls'],
           highlights: [
-            'Conducted statutory audit procedures for 4 listed corporate manufacturing clients in strict compliance with Standards on Auditing (SAs) and Companies Act, 2013.',
-            'Tested design and operating effectiveness of Internal Financial Controls over Financial Reporting (IFCoFR), remediating 12 key reporting control deficiencies.',
-            'Reviewed draft financial statements, balance sheet disclosures, and notes under Ind AS 115 (Revenue) and Ind AS 116 (Leases).',
-            'Supervised junior articleship trainees and coordinated audit query resolutions with client management and partner teams.',
+            'Conducted statutory audit procedures for corporate clients in compliance with Standards on Auditing (SAs) and Companies Act, 2013.',
+            'Evaluated Internal Financial Controls over Financial Reporting (IFCoFR) and CARO 2020 clauses.',
+            'Prepared corporate tax audit reports (Form 3CD) and quarterly withholding tax (TDS) reconciliations.',
+            'Prepared draft financial statements under Indian Accounting Standards (Ind AS).',
           ],
         },
         workExperience: [],
@@ -81,7 +81,7 @@ const INITIAL_MASTER_RESUME: ResumeDetail = {
           technical: [
             'Statutory Audit',
             'Financial Statement Analysis',
-            'Internal Financial Controls (IFC)',
+            'Internal Controls (IFC)',
             'CARO 2020 Compliance',
             'Tax Audit (Form 3CD)',
           ],
@@ -92,69 +92,49 @@ const INITIAL_MASTER_RESUME: ResumeDetail = {
             'Income Tax Act, 1961',
             'GST Acts',
           ],
-          tools: ['SAP ERP (FICO)', 'Advanced Excel (VBA/PowerQuery)', 'PowerBI', 'Tally Prime'],
+          tools: ['ERP Systems', 'Advanced Excel', 'Accounting Software'],
         },
         certifications: [
-          'ICAI Advanced Information Technology Training (AICITSS) — Passed with Grade A',
-          'ICAI General Management and Communication Skills (GMCS / MCS)',
+          'ICAI Advanced Information Technology Training (AICITSS)',
+          'ICAI Management and Communication Skills (GMCS / MCS)',
         ],
         projects: [
           {
-            title: 'Statutory Audit of ₹850 Cr Listed Automotive Supplier',
-            description: 'Led inventory valuation testing, revenue cut-off analysis, and fixed asset register verification across 3 manufacturing plant locations.',
-            impact: 'Delivered zero unadjusted audit differences; praised by senior audit partner for audit file documentation excellence.',
+            title: 'Statutory Audit Engagements',
+            description: 'Conducted audit substantive testing, revenue reconciliations, and fixed asset verification.',
+            impact: 'Ensured timely filing and compliance with regulatory reporting timelines.',
           },
         ],
       },
       claimAttestations: {
-        verifiedProfileFactsCount: 6,
-        synthesizedWordingCount: 4,
+        verifiedProfileFactsCount: 4,
+        synthesizedWordingCount: 2,
         unverifiedClaims: [],
       },
       candidateAttested: true,
       pdfUrl: '/api/v1/resumes/res-master-01/export?format=markdown',
-      createdAt: '2026-10-18T10:00:00.000Z',
+      createdAt: new Date().toISOString(),
     },
   ],
 };
 
-const SAMPLE_JOBS_FOR_TAILORING = [
-  {
-    id: 'job-gt-audit-01',
-    company: 'Grant Thornton Bharat LLP',
-    title: 'Senior Associate — Statutory Audit & Assurance',
-    pathway: CAPathway.AUDIT,
-    keyKeywords: ['Ind AS 115/116', 'CARO 2020', 'SAs', 'Audit Documentation'],
-  },
-  {
-    id: 'job-bdo-fdd-02',
-    company: 'BDO India LLP',
-    title: 'Manager — Financial Due Diligence & M&A',
-    pathway: CAPathway.IB,
-    keyKeywords: ['Quality of Earnings', 'FDD', 'Normalized Working Capital', 'Valuation'],
-  },
-  {
-    id: 'job-razorpay-fpa-03',
-    company: 'Razorpay Software',
-    title: 'AVP — Corporate Financial Planning & Analysis',
-    pathway: CAPathway.FPA,
-    keyKeywords: ['SaaS Metrics', '3-Statement Financial Modeling', 'Variance Analysis'],
-  },
-];
-
 export default function ResumesPage() {
+  const { user } = useAuth();
+  const candidateName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Chartered Accountant Candidate';
+
   const [activeTab, setActiveTab] = useState<'BUILDER' | 'VARIANTS' | 'COVER_LETTER' | 'DOCUMENT_INTELLIGENCE'>('BUILDER');
   const [resume, setResume] = useState<ResumeDetail>(INITIAL_MASTER_RESUME);
   const [activeVersionId, setActiveVersionId] = useState<string>('ver-01-master');
+  const [availableJobs, setAvailableJobs] = useState<Array<{ id: string; company: string; title: string; pathway: any; keyKeywords: string[] }>>([]);
 
   // Modal states
   const [isTailorModalOpen, setIsTailorModalOpen] = useState(false);
-  const [selectedTargetJobId, setSelectedTargetJobId] = useState<string>('job-gt-audit-01');
-  const [tailorEmphasis, setTailorEmphasis] = useState('Highlight Ind AS 115/116 technical review and IFCoFR testing');
+  const [selectedTargetJobId, setSelectedTargetJobId] = useState<string>('');
+  const [tailorEmphasis, setTailorEmphasis] = useState('Highlight statutory audit and Ind AS reporting experience');
   const [candidateAttestedCheck, setCandidateAttestedCheck] = useState(false);
 
   // Cover letter generator state
-  const [coverJobTargetId, setCoverJobTargetId] = useState<string>('job-gt-audit-01');
+  const [coverJobTargetId, setCoverJobTargetId] = useState<string>('');
   const [coverTone, setCoverTone] = useState<'FORMAL' | 'EXECUTIVE' | 'DIRECT'>('FORMAL');
   const [copiedLetter, setCopiedLetter] = useState(false);
 
@@ -166,6 +146,54 @@ export default function ResumesPage() {
 
   // Export preview modal
   const [isLiveConnected, setIsLiveConnected] = useState(false);
+
+  // Load real jobs from authentic directory
+  React.useEffect(() => {
+    async function loadRealJobs() {
+      try {
+        const res = await apiClient.get<any[]>('/jobs?limit=50');
+        if (res?.success && Array.isArray(res.data) && res.data.length > 0) {
+          const list = res.data.map((j) => ({
+            id: j.id,
+            company: j.companyName || 'CA Firm / Enterprise',
+            title: j.title,
+            pathway: j.caPathway,
+            keyKeywords: j.structuredRequirements?.mandatorySkills || ['Statutory Audit', 'Ind AS', 'Taxation'],
+          }));
+          setAvailableJobs(list);
+          if (list.length > 0) {
+            setSelectedTargetJobId(list[0].id);
+            setCoverJobTargetId(list[0].id);
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    loadRealJobs();
+  }, []);
+
+  // Dynamic API hydration from backend
+  React.useEffect(() => {
+    async function loadResumeData() {
+      try {
+        const data = await apiClient.get<any[]>('/resumes');
+        if (data?.success && Array.isArray(data.data) && data.data.length > 0) {
+          const resDetail = await apiClient.get<ResumeDetail>(`/resumes/${data.data[0].id}`);
+          if (resDetail?.success && resDetail.data) {
+            setResume(resDetail.data);
+            setIsLiveConnected(true);
+            if (resDetail.data.versions?.length > 0) {
+              setActiveVersionId(resDetail.data.versions[0].id);
+            }
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    loadResumeData();
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -237,25 +265,6 @@ export default function ResumesPage() {
     }
   };
 
-  // Dynamic API hydration from backend
-  React.useEffect(() => {
-    async function loadResumeData() {
-      try {
-        const data = await apiClient.get<any[]>('/resumes');
-        if (data?.success && Array.isArray(data.data) && data.data.length > 0) {
-          setResume(data.data[0]);
-          setIsLiveConnected(true);
-          if (data.data[0].versions?.length > 0) {
-            setActiveVersionId(data.data[0].versions[0].id);
-          }
-        }
-      } catch {
-        // Fallback to pre-seeded master resume
-      }
-    }
-    loadResumeData();
-  }, []);
-
   const [isExportPreviewOpen, setIsExportPreviewOpen] = useState(false);
 
   const activeVersion =
@@ -263,11 +272,11 @@ export default function ResumesPage() {
 
   const handleTailorSubmit = async () => {
     if (!candidateAttestedCheck) {
-      alert('ADR-009 Zero-Fabrication Guard: You must explicitly attest all claims before generating this tailored version.');
+      alert('Please confirm that your details are accurate before generating this version.');
       return;
     }
 
-    const job = SAMPLE_JOBS_FOR_TAILORING.find((j) => j.id === selectedTargetJobId);
+    const job = availableJobs.find((j) => j.id === selectedTargetJobId) || availableJobs[0];
     if (!job) return;
 
     try {
@@ -294,7 +303,7 @@ export default function ResumesPage() {
     const newVersionNumber = resume.versions.length + 1;
     const newVersionId = `ver-0${newVersionNumber}-tailored`;
 
-    const tailoredSummary = `Targeted for ${job.title} at ${job.company}: ${activeVersion.parsedContent.summary} Specific emphasis: ${tailorEmphasis}. Prepared to contribute immediately to ${job.pathway} engagements with Big 4 articleship foundation.`;
+    const tailoredSummary = `Targeted for ${job.title} at ${job.company}: ${activeVersion.parsedContent.summary} Specific emphasis: ${tailorEmphasis}. Prepared to contribute immediately to ${job.pathway} engagements.`;
 
     const newVersion = {
       id: newVersionId,
@@ -305,14 +314,14 @@ export default function ResumesPage() {
       targetedJobId: job.id,
       targetedJobTitle: job.title,
       targetedCompanyName: job.company,
-      matchScore: 96,
+      matchScore: 92,
       parsedContent: {
         ...activeVersion.parsedContent,
         summary: tailoredSummary,
       },
       claimAttestations: {
-        verifiedProfileFactsCount: 6,
-        synthesizedWordingCount: 5,
+        verifiedProfileFactsCount: 4,
+        synthesizedWordingCount: 2,
         unverifiedClaims: [],
       },
       candidateAttested: true,
@@ -332,17 +341,22 @@ export default function ResumesPage() {
   };
 
   const getCoverLetterText = () => {
-    const job = SAMPLE_JOBS_FOR_TAILORING.find((j) => j.id === coverJobTargetId) || SAMPLE_JOBS_FOR_TAILORING[0];
+    const job = availableJobs.find((j) => j.id === coverJobTargetId) || availableJobs[0] || {
+      title: 'Chartered Accountant Role',
+      company: 'Hiring Team',
+      pathway: 'Audit & Assurance',
+    };
+    const firmName = activeVersion?.parsedContent?.articleship?.firm || 'practicing CA firm';
     return `Dear Hiring Team at ${job.company},
 
-I am writing to express my enthusiastic interest in the ${job.title} position at ${job.company}. As an ICAI Qualified Chartered Accountant (ACA-543210) with 36 months of rigorous practical training at KPMG India (BIG4 Firm), I have developed deep practical competence in Statutory Audit, Ind AS financial reporting, and internal control testing.
+I am writing to express my interest in the ${job.title} position at ${job.company}. As a Qualified Chartered Accountant with practical training at ${firmName}, I have developed core competencies in Statutory Audit, Ind AS reporting, and financial controls.
 
-${job.company}'s focus on ${job.pathway} aligns directly with my practical background. During my articleship, I was responsible for testing Internal Financial Controls over Financial Reporting (IFCoFR), reviewing balance sheet disclosures under Ind AS 115/116, and leading field audit teams across listed manufacturing and BFSI clients. Furthermore, my hands-on proficiency in SAP ERP, Advanced Excel, and PowerBI will allow me to deliver immediate value.
+${job.company}'s work aligns with my technical background and professional goals. During my practical training, I assisted in statutory audit cycles, evaluated internal financial controls, and prepared regulatory filings.
 
-I look forward to discussing how my verified background and disciplined work ethic can contribute to ${job.company}.
+I look forward to discussing how my experience and disciplined work ethic can contribute to ${job.company}.
 
 Sincerely,
-Priya Sharma, ACA`;
+${candidateName}`;
   };
 
   const handleCopyCoverLetter = () => {
@@ -367,57 +381,44 @@ Priya Sharma, ACA`;
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.375rem' }}>
             <FileText size={24} color="var(--brand-primary)" />
             <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              AI Resume Builder & Zero-Fabrication Studio
+              Resume Builder
             </h1>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '720px' }}>
-            Bound strictly to certified articleship records and verified qualifications. Anti-hallucination validation (ADR-009) ensures every claim is factual before PDF export.
+            Build and tailor professional CA resumes based on verified training, articleship experience, and qualifications.
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div
-          style={{
-            display: 'flex',
-            background: 'var(--surface-secondary)',
-            padding: '0.25rem',
-            borderRadius: '8px',
-            border: '1px solid var(--border-subtle)',
-            gap: '0.25rem',
-          }}
-        >
+        <div className="segmented-control">
           <button
             onClick={() => setActiveTab('BUILDER')}
-            className={`btn ${activeTab === 'BUILDER' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.4rem 0.875rem', fontSize: '0.8125rem' }}
+            className={`segmented-control-btn ${activeTab === 'BUILDER' ? 'active' : ''}`}
           >
-            <BookOpen size={14} /> Resume Studio
+            Resume Studio
           </button>
           <button
             onClick={() => setActiveTab('VARIANTS')}
-            className={`btn ${activeTab === 'VARIANTS' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.4rem 0.875rem', fontSize: '0.8125rem' }}
+            className={`segmented-control-btn ${activeTab === 'VARIANTS' ? 'active' : ''}`}
           >
-            <Layers size={14} /> Tailored Variants ({resume.versions.length})
+            Tailored Variants ({resume.versions.length})
           </button>
           <button
             onClick={() => setActiveTab('COVER_LETTER')}
-            className={`btn ${activeTab === 'COVER_LETTER' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.4rem 0.875rem', fontSize: '0.8125rem' }}
+            className={`segmented-control-btn ${activeTab === 'COVER_LETTER' ? 'active' : ''}`}
           >
-            <Send size={14} /> Cover Letter Generator
+            Cover Letter Generator
           </button>
           <button
             onClick={() => setActiveTab('DOCUMENT_INTELLIGENCE')}
-            className={`btn ${activeTab === 'DOCUMENT_INTELLIGENCE' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.4rem 0.875rem', fontSize: '0.8125rem' }}
+            className={`segmented-control-btn ${activeTab === 'DOCUMENT_INTELLIGENCE' ? 'active' : ''}`}
           >
-            <ShieldCheck size={14} /> Form 108 OCR
+            Form 108 OCR
           </button>
         </div>
       </div>
 
-      {/* ADR-009 Zero-Fabrication Verification Banner */}
+      {/* Verification Status Banner */}
       <div
         className="glass-panel"
         style={{
@@ -435,10 +436,10 @@ Priya Sharma, ACA`;
           <CheckCircle2 size={20} color="var(--success-text)" />
           <div>
             <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              ICAI Articleship Verification Active — Big 4 Certified
+              Verified Articleship Profile
             </h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-              156 weeks of verified training at KPMG India. All tailoring is constrained to certified achievements.
+              {activeVersion?.parsedContent?.articleship?.firm ? `Training recorded at ${activeVersion.parsedContent.articleship.firm} (${activeVersion.parsedContent.articleship.duration || '36 Months'}).` : 'Practical training profile active.'}
             </p>
           </div>
         </div>
@@ -448,7 +449,7 @@ Priya Sharma, ACA`;
             className="btn btn-secondary"
             style={{ fontSize: '0.75rem', padding: '0.375rem 0.75rem' }}
           >
-            <Sparkles size={14} color="var(--accent-cyan)" /> Tailor for Job
+            <Layers size={14} /> Tailor for Job
           </button>
           <button
             onClick={() => setIsExportPreviewOpen(true)}
@@ -470,11 +471,11 @@ Priya Sharma, ACA`;
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                   <ShieldCheck size={22} color="var(--success-text)" />
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                    ICAI Form 108 Document Intelligence & Articleship Verification (F-038)
+                    ICAI Form 108 Document Intelligence
                   </h3>
                 </div>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', maxWidth: '720px' }}>
-                  Upload your Certificate of Service under Articles (Form 108). Our extraction engine verifies binary magic bytes, validates statutory completion parameters, and ensures zero-fabrication ground truth.
+                  Upload your Certificate of Service under Articles (Form 108) to verify your practical training credentials.
                 </p>
               </div>
 
@@ -486,8 +487,8 @@ Priya Sharma, ACA`;
                   className="btn btn-secondary"
                   style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem' }}
                 >
-                  <Sparkles size={14} color="var(--brand-primary)" />
-                  Load Verified Sample (Fast Test)
+                  <CheckCircle2 size={14} color="var(--brand-primary)" />
+                  Load Verified Sample
                 </button>
               </div>
             </div>
@@ -682,7 +683,7 @@ Priya Sharma, ACA`;
                   fontSize: '0.875rem',
                 }}
               >
-                {SAMPLE_JOBS_FOR_TAILORING.map((j) => (
+                {availableJobs.map((j) => (
                   <option key={j.id} value={j.id}>
                     {j.title} — {j.company}
                   </option>
@@ -998,10 +999,10 @@ Priya Sharma, ACA`;
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Zero-Fabrication Resume Tailoring (ADR-009)
+                  Tailor Resume for Role
                 </h3>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                  Re-orders certified articleship bullets to match target role keywords without hallucinating unverified experience.
+                  Highlight relevant competencies and experiences that match the requirements of the selected job.
                 </p>
               </div>
               <button
@@ -1026,7 +1027,7 @@ Priya Sharma, ACA`;
                   fontSize: '0.875rem',
                 }}
               >
-                {SAMPLE_JOBS_FOR_TAILORING.map((j) => (
+                {availableJobs.map((j) => (
                   <option key={j.id} value={j.id}>
                     {j.title} — {j.company} ({j.pathway})
                   </option>

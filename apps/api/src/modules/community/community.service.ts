@@ -25,47 +25,7 @@ export class CommunityService {
   private readonly memReports = new Map<string, CommunityReportDetail>();
 
   constructor(private readonly prisma: PrismaService) {
-    this.seedCommunityPosts();
-  }
-
-  private seedCommunityPosts() {
-    const defaultPosts: CommunityPostDetail[] = [
-      {
-        id: 'post-audit-exp-01',
-        authorUserId: '00000000-0000-0000-0000-000000000001',
-        authorName: 'Aditya Mehta, ACA',
-        pathway: CAPathway.AUDIT,
-        title: 'EY Statutory Audit Manager Technical Round — Real Experience & Key Questions',
-        content:
-          'Recently completed 3 rounds for Senior Associate / Manager at EY Gurgaon. Round 1 focused extensively on CARO 2020 Clause 3(xxi) and SA 600 component auditor documentation. Be thoroughly prepared on lease accounting modifications under Ind AS 116 and inventory observation procedures.',
-        category: 'INTERVIEW_EXPERIENCE',
-        isAnonymous: false,
-        status: 'ACTIVE',
-        upvotesCount: 28,
-        repliesCount: 4,
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: 'post-fpa-debate-02',
-        authorUserId: '00000000-0000-0000-0000-000000000002',
-        authorName: 'Sneha Kulkarni',
-        pathway: CAPathway.FPA,
-        title: 'Rolling Forecasts vs Annual Budgets: What are growth-stage CFOs actually adopting in India?',
-        content:
-          'In our FP&A team, static annual budgets become outdated by Q2. We transitioned to a 12-month rolling forecast model with monthly revenue and Headcount pegging. How are other corporate finance teams tackling capital expenditure variance?',
-        category: 'TECHNICAL_DEBATE',
-        isAnonymous: false,
-        status: 'ACTIVE',
-        upvotesCount: 42,
-        repliesCount: 7,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
-
-    for (const p of defaultPosts) {
-      this.memPosts.set(p.id, p);
-      this.memReplies.set(p.id, []);
-    }
+    // Zero fake seed posts - community posts are created by genuine users
   }
 
   /**

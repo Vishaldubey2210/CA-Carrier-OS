@@ -112,47 +112,21 @@ export function PricingSection() {
           Clear entitlements with zero hidden fees. Includes official GST invoices with input tax credit for firms.
         </p>
 
-        {/* Monthly / Annual Toggle with Sliding Indicator */}
-        <div className="inline-flex items-center p-1 rounded-full bg-[#F1F5F9] border border-[#CBD5E1] shadow-2xs">
+        {/* Monthly / Annual Toggle */}
+        <div className="segmented-control">
           <button
             type="button"
             onClick={() => setBillingCycle('MONTHLY')}
-            className={`relative px-4 sm:px-5 py-2 rounded-full text-[13px] font-semibold transition-colors cursor-pointer ${
-              billingCycle === 'MONTHLY' ? 'text-white' : 'text-[#475569] hover:text-[#0F172A]'
-            }`}
+            className={`segmented-control-btn ${billingCycle === 'MONTHLY' ? 'active' : ''}`}
           >
-            {billingCycle === 'MONTHLY' && (
-              <motion.span
-                layoutId="pricingCyclePill"
-                className="absolute inset-0 rounded-full bg-[#1E3A8A] shadow-sm -z-0"
-                transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-              />
-            )}
-            <span className="relative z-10">Monthly Billing</span>
+            Monthly Billing
           </button>
-
           <button
             type="button"
             onClick={() => setBillingCycle('ANNUAL')}
-            className={`relative px-4 sm:px-5 py-2 rounded-full text-[13px] font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
-              billingCycle === 'ANNUAL' ? 'text-white' : 'text-[#475569] hover:text-[#0F172A]'
-            }`}
+            className={`segmented-control-btn ${billingCycle === 'ANNUAL' ? 'active' : ''}`}
           >
-            {billingCycle === 'ANNUAL' && (
-              <motion.span
-                layoutId="pricingCyclePill"
-                className="absolute inset-0 rounded-full bg-[#1E3A8A] shadow-sm -z-0"
-                transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-              />
-            )}
-            <span className="relative z-10">Annual Pass</span>
-            <span
-              className={`relative z-10 text-[11px] px-1.5 py-0.5 rounded-full font-bold ${
-                billingCycle === 'ANNUAL' ? 'bg-[#059669] text-white' : 'bg-[#ECFDF5] text-[#059669]'
-              }`}
-            >
-              Save ~17%
-            </span>
+            Annual Pass (Save ~17%)
           </button>
         </div>
       </div>
@@ -167,24 +141,23 @@ export function PricingSection() {
             <motion.div
               key={plan.id}
               initial={{ opacity: 1 }}
-              className={`rounded-2xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 bg-white ${
+              className={`rounded-md border p-6 flex flex-col justify-between transition-all duration-150 bg-white ${
                 isPro
-                  ? 'border-[#059669] shadow-lg lg:-translate-y-1 relative ring-1 ring-[#059669]/20'
-                  : 'border-[#E2E8F0] shadow-card hover:shadow-card-hover hover:-translate-y-1'
+                  ? 'border-[#0F172A] shadow-sm relative'
+                  : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
               }`}
             >
               <div>
                 {/* Badge Header */}
-                <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center justify-between gap-2 mb-3">
                   <span
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${plan.badgeClass} tracking-wider uppercase`}
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-sm border ${plan.badgeClass} tracking-wider uppercase`}
                   >
                     {plan.badge}
                   </span>
                   {isPro && (
-                    <span className="text-[11px] font-semibold text-[#059669] flex items-center gap-1">
-                      <Sparkles size={12} />
-                      Featured
+                    <span className="text-[11px] font-semibold text-[#15803d]">
+                      Recommended
                     </span>
                   )}
                 </div>

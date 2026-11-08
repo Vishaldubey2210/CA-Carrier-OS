@@ -253,46 +253,33 @@ export default function PracticeOSPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <BriefcaseBusiness size={24} color="var(--brand-primary)" />
             <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              CA Independent Practice Operating System
+              Practice Management
             </h1>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '720px' }}>
-            Unified workspace for practicing Chartered Accountants & new qualifiers: statutory post-qualification guidance, confidential client CRM, and compliance calendar tracking.
+            Post-qualification statutory guidance, client CRM, and compliance calendar tracking.
           </p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <span className="badge badge-emerald">
-            <ShieldCheck size={12} style={{ display: 'inline', marginRight: '4px' }} />
-            Zero-Leakage Workspace Isolation
-          </span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
+      <div className="segmented-control" style={{ width: 'fit-content' }}>
         <button
           onClick={() => setActiveTab('guidance')}
-          className={`btn ${activeTab === 'guidance' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'guidance' ? 'active' : ''}`}
         >
-          <FileCheck size={16} />
           Post-Qualification Guidance
         </button>
         <button
           onClick={() => setActiveTab('crm')}
-          className={`btn ${activeTab === 'crm' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'crm' ? 'active' : ''}`}
         >
-          <Building2 size={16} />
           Practice Client Directory
         </button>
         <button
           onClick={() => setActiveTab('compliance')}
-          className={`btn ${activeTab === 'compliance' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'compliance' ? 'active' : ''}`}
         >
-          <Calendar size={16} />
           Statutory Compliance Calendar
         </button>
       </div>

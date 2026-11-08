@@ -48,79 +48,9 @@ export default function GrowthPage() {
   const [ctcInput, setCtcInput] = useState<number>(1800000);
   const [fixedPct, setFixedPct] = useState<number>(85);
 
-  // Benchmarks list with honest provenance
-  const benchmarks: Benchmark[] = [
-    {
-      id: '1',
-      roleTitle: 'Senior Associate — Statutory Audit',
-      pathway: 'STATUTORY_AUDIT',
-      experience: '1 - 3 yrs',
-      locationCity: 'Mumbai',
-      medianSalary: '₹15,50,000',
-      p25p75: '₹13.5L - ₹18.0L',
-      provenance: 'Aggregated ICAI Campus Placement & Verified Peer Submissions (Q1-Q3 2025)',
-      limitations: 'Excludes one-time joining bonuses and discretionary retention payouts.',
-    },
-    {
-      id: '2',
-      roleTitle: 'Transfer Pricing & International Tax Specialist',
-      pathway: 'TAXATION',
-      experience: '2 - 4 yrs',
-      locationCity: 'Bengaluru',
-      medianSalary: '₹18,50,000',
-      p25p75: '₹16.0L - ₹22.0L',
-      provenance: 'MNC Corporate Compensation Benchmarking Studies (H1 2025)',
-      limitations: 'Reflects specialized TP documentation and APA exposure; excludes equity grants.',
-    },
-    {
-      id: '3',
-      roleTitle: 'Lead Financial Analyst — Corporate FP&A',
-      pathway: 'FP_AND_A',
-      experience: '2 - 5 yrs',
-      locationCity: 'Bengaluru',
-      medianSalary: '₹21,00,000',
-      p25p75: '₹18.0L - ₹25.0L',
-      provenance: 'Verified Direct Offer Letters & FinTech Industry Disclosures (2025)',
-      limitations: 'Variable bonus ranges between 10% and 20% dependent on company EBITDA milestones.',
-    },
-  ];
-
-  // Mentors list
-  const mentors: Mentor[] = [
-    {
-      id: 'm-1',
-      fullName: 'CA Rajesh Aggarwal, FCA',
-      headline: 'Partner — Statutory Audit & Assurance (Ex-Big 4)',
-      currentCompany: 'Deloitte India (Former)',
-      pathways: ['STATUTORY_AUDIT', 'IFRS_IND_AS'],
-      hourlyRate: '₹3,500 / hr',
-      rating: 4.9,
-      totalSessions: 142,
-    },
-    {
-      id: 'm-2',
-      fullName: 'CA Meera Swaminathan, ACA',
-      headline: 'VP — Strategic Finance & Corporate FP&A',
-      currentCompany: 'Flipkart / Walmart Group',
-      pathways: ['FP_AND_A', 'DEAL_ADVISORY'],
-      hourlyRate: '₹3,000 / hr',
-      rating: 4.95,
-      totalSessions: 89,
-    },
-    {
-      id: 'm-3',
-      fullName: 'CA Vikramaditya Bose, FCA',
-      headline: 'Senior Director — International Tax & M&A',
-      currentCompany: 'KPMG India',
-      pathways: ['INTERNATIONAL_TAX', 'TRANSFER_PRICING'],
-      hourlyRate: '₹4,000 / hr',
-      rating: 4.88,
-      totalSessions: 110,
-    },
-  ];
-
-  const [liveBenchmarks, setLiveBenchmarks] = useState<Benchmark[]>(benchmarks);
-  const [liveMentors, setLiveMentors] = useState<Mentor[]>(mentors);
+  // Benchmarks & Mentors initial state (No fake data)
+  const [liveBenchmarks, setLiveBenchmarks] = useState<Benchmark[]>([]);
+  const [liveMentors, setLiveMentors] = useState<Mentor[]>([]);
   const [isLiveConnected, setIsLiveConnected] = useState(false);
 
   // Dynamic API hydration from backend
@@ -200,57 +130,42 @@ export default function GrowthPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <TrendingUp size={24} color="var(--accent-indigo)" />
+            <TrendingUp size={24} color="var(--brand-primary)" />
             <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-              Professional Growth, Compensation & Mentorship
+              Compensation & Mentorship
             </h1>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '720px' }}>
-            Verified market salary benchmarks with clear provenance, side-by-side offer comparison, and vetted 1-on-1 mentorship bookings.
+            Market salary benchmarks, in-hand take-home calculator, and 1-on-1 mentorship bookings with experienced CAs.
           </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span className={`badge ${isLiveConnected ? 'badge-emerald' : 'badge-amber'}`}>
-            {isLiveConnected ? 'API Live Connected (/api/v1/financial)' : 'Sandbox Simulation Mode'}
-          </span>
-          <span className="badge badge-indigo">Phase 5 Production Module</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
+      <div className="segmented-control" style={{ width: 'fit-content' }}>
         <button
           onClick={() => setActiveTab('salary')}
-          className={`btn ${activeTab === 'salary' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'salary' ? 'active' : ''}`}
         >
-          <DollarSign size={16} />
-          Salary Intelligence & CTC Unbundler
+          Salary Intelligence &amp; CTC Unbundler
         </button>
         <button
           onClick={() => setActiveTab('mentorship')}
-          className={`btn ${activeTab === 'mentorship' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'mentorship' ? 'active' : ''}`}
         >
-          <Users size={16} />
-          Mentor Marketplace
+          Mentor Advisory
         </button>
         <button
           onClick={() => setActiveTab('community')}
-          className={`btn ${activeTab === 'community' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'community' ? 'active' : ''}`}
         >
-          <MessageSquare size={16} />
-          CA Community & Ethics
+          CA Community &amp; Ethics
         </button>
         <button
           onClick={() => setActiveTab('recruitment')}
-          className={`btn ${activeTab === 'recruitment' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          className={`segmented-control-btn ${activeTab === 'recruitment' ? 'active' : ''}`}
         >
-          <Building2 size={16} />
-          Recruiter Pipeline & Verification
+          Recruiter Pipeline &amp; Verification
         </button>
       </div>
 
@@ -342,32 +257,44 @@ export default function GrowthPage() {
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {liveBenchmarks.map((b) => (
-                <div key={b.id} className="glass-panel" style={{ padding: '1.25rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{b.roleTitle}</h4>
-                      <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                        {b.locationCity} | Experience: {b.experience} | Pathway: {b.pathway}
+              {liveBenchmarks.length === 0 ? (
+                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--surface-secondary)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                  <DollarSign size={28} style={{ margin: '0 auto 0.5rem', opacity: 0.5 }} />
+                  <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                    No Benchmarks Available Yet
+                  </div>
+                  <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                    Verified compensation data will populate as market disclosures are recorded.
+                  </div>
+                </div>
+              ) : (
+                liveBenchmarks.map((b) => (
+                  <div key={b.id} className="glass-panel" style={{ padding: '1.25rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                      <div>
+                        <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{b.roleTitle}</h4>
+                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                          {b.locationCity} | Experience: {b.experience} | Pathway: {b.pathway}
+                        </div>
+                      </div>
+
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>{b.medianSalary}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>P25 - P75: {b.p25p75}</div>
                       </div>
                     </div>
 
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>{b.medianSalary}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>P25 - P75: {b.p25p75}</div>
+                    <div style={{ padding: '0.625rem 0.75rem', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      <div style={{ color: 'var(--accent-indigo)' }}>
+                        <strong>Source:</strong> {b.provenance}
+                      </div>
+                      <div style={{ color: 'var(--text-muted)' }}>
+                        <strong>Limitations:</strong> {b.limitations}
+                      </div>
                     </div>
                   </div>
-
-                  <div style={{ padding: '0.625rem 0.75rem', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                    <div style={{ color: 'var(--accent-indigo)' }}>
-                      <strong>Provenance:</strong> {b.provenance}
-                    </div>
-                    <div style={{ color: 'var(--text-muted)' }}>
-                      <strong>Limitations:</strong> {b.limitations}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -385,67 +312,79 @@ export default function GrowthPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
-            {liveMentors.map((m) => (
-              <div key={m.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.fullName}</h3>
-                    <span className="badge badge-emerald">Verified CA</span>
-                  </div>
-
-                  <div style={{ fontSize: '0.8125rem', color: 'var(--text-primary)', marginBottom: '0.25rem', fontWeight: 500 }}>
-                    {m.headline}
-                  </div>
-
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                    {m.currentCompany}
-                  </div>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginBottom: '1rem' }}>
-                    {m.pathways.map((p, idx) => (
-                      <span key={idx} className="badge badge-indigo" style={{ fontSize: '0.6875rem' }}>
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {liveMentors.length === 0 ? (
+            <div style={{ padding: '3rem 1.5rem', textAlign: 'center', background: 'var(--surface-primary)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+              <Users size={36} color="var(--text-muted)" style={{ margin: '0 auto 0.75rem' }} />
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                No Mentors Registered Yet
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', maxWidth: '460px', margin: '0 auto' }}>
+                Verified CA mentors will appear here once registered. Check back soon for 1-on-1 session bookings.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+              {liveMentors.map((m) => (
+                <div key={m.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.hourlyRate}</div>
-                    <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <Star size={11} fill="var(--accent-amber)" color="var(--accent-amber)" /> {m.rating} ({m.totalSessions} sessions completed)
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                      <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.fullName}</h3>
+                      <span className="badge badge-emerald">Verified CA</span>
+                    </div>
+
+                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-primary)', marginBottom: '0.25rem', fontWeight: 500 }}>
+                      {m.headline}
+                    </div>
+
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                      {m.currentCompany}
+                    </div>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginBottom: '1rem' }}>
+                      {m.pathways.map((p, idx) => (
+                        <span key={idx} className="badge badge-indigo" style={{ fontSize: '0.6875rem' }}>
+                          {p}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
-                  <button
-                    onClick={async () => {
-                      try {
-                        const res = await apiClient.post<any>('/mentorship/bookings', {
-                          mentorId: m.id,
-                          scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-                          durationMinutes: 60,
-                          topic: 'Career Pathway & Advisory Preparation',
-                        });
-                        if (res.success) {
-                          alert(`Session booking request submitted for ${m.fullName}. Concurrency lock verified.`);
-                        } else {
-                          alert(`Slot reservation request queued for ${m.fullName}.`);
+                  <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{m.hourlyRate}</div>
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <Star size={11} fill="var(--accent-amber)" color="var(--accent-amber)" /> {m.rating} ({m.totalSessions} sessions completed)
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await apiClient.post<any>('/mentorship/bookings', {
+                            mentorId: m.id,
+                            scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+                            durationMinutes: 60,
+                            topic: 'Career Pathway & Advisory Preparation',
+                          });
+                          if (res.success) {
+                            alert(`Session booking request submitted for ${m.fullName}.`);
+                          } else {
+                            alert(`Slot reservation request queued for ${m.fullName}.`);
+                          }
+                        } catch {
+                          alert(`Booking request registered for ${m.fullName}.`);
                         }
-                      } catch {
-                        alert(`Booking request registered for ${m.fullName}.`);
-                      }
-                    }}
-                    className="btn btn-primary"
-                    style={{ padding: '0.375rem 0.875rem', fontSize: '0.8125rem' }}
-                  >
-                    Request Session
-                  </button>
+                      }}
+                      className="btn btn-primary"
+                      style={{ padding: '0.375rem 0.875rem', fontSize: '0.8125rem' }}
+                    >
+                      Request Session
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -469,25 +408,14 @@ export default function GrowthPage() {
             </div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-              Active Career Discussion Threads
+          <div className="glass-panel" style={{ padding: '2rem 1.5rem', textAlign: 'center' }}>
+            <MessageSquare size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.4, color: 'var(--text-muted)' }} />
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+              No Community Discussions Yet
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ padding: '1rem', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}>
-                <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Transitioning from Mid-Size Articleship to Big 4 Statutory Audit
-                </h4>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                  Recommendations on Ind AS 115 & 116 technical preparation and CARO 2020 reporting nuances.
-                </p>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  <span>By Anonymous CA Member</span>
-                  <span>14 Replies</span>
-                  <span>Pathway: STATUTORY_AUDIT</span>
-                </div>
-              </div>
-            </div>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', maxWidth: '440px', margin: '0 auto' }}>
+              Member discussions on interview experiences, curriculum nuances, and practice questions will appear here.
+            </p>
           </div>
         </div>
       )}

@@ -30,7 +30,7 @@ export default function HelpKnowledgeBasePage() {
     {
       title: 'Zero-Fabrication Resume Tailoring',
       icon: FileText,
-      description: 'Master Big 4 standard resume generation with strict candidate attestation (ADR-009).',
+      description: 'Master Big 4 standard resume generation with verified candidate attestation.',
       articles: [
         'Attesting verified audit and taxation accomplishments',
         'Tailoring resumes to specific job descriptions without hallucination',

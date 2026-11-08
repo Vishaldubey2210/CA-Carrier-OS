@@ -53,7 +53,7 @@ const FEATURE_GROUPS = [
   },
   {
     id: 'zero-fabrication-resumes',
-    title: 'Zero-Fabrication Resumes (ADR-009)',
+    title: 'Verified CA Resumes',
     icon: FileCheck2,
     badge: 'GENERALLY AVAILABLE',
     badgeClass: 'badge-emerald',
@@ -178,22 +178,9 @@ export default function FeaturesPage() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 2rem 5rem' }}>
       {/* Page Header */}
       <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.35rem 0.85rem',
-            borderRadius: '9999px',
-            background: 'rgba(99, 102, 241, 0.1)',
-            border: '1px solid rgba(99, 102, 241, 0.25)',
-            marginBottom: '1rem',
-          }}
-        >
-          <Sparkles size={14} color="var(--accent-indigo)" />
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-indigo)', letterSpacing: '0.04em' }}>
-            PRODUCT CAPABILITIES CATALOG
-          </span>
+        <div className="badge-success-clean" style={{ marginBottom: '1rem' }}>
+          <CheckCircle2 size={12} />
+          <span>Product Capabilities Catalog</span>
         </div>
 
         <h1

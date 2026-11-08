@@ -7,6 +7,7 @@ import { JobSourceRegistryService } from './connectors/job-source-registry.servi
 import { JobDeduplicationService } from './job-deduplication.service.js';
 import { JobFreshnessService } from './job-freshness.service.js';
 import { JobIngestionOrchestratorService } from './job-ingestion-orchestrator.service.js';
+import { JobSchedulerService } from './job-scheduler.service.js';
 
 @Module({
   imports: [CareerModule],
@@ -18,6 +19,7 @@ import { JobIngestionOrchestratorService } from './job-ingestion-orchestrator.se
     JobIngestionOrchestratorService,
     JobsService,
     JobAlertsService,
+    JobSchedulerService,
   ],
   exports: [
     JobSourceRegistryService,
@@ -26,6 +28,7 @@ import { JobIngestionOrchestratorService } from './job-ingestion-orchestrator.se
     JobIngestionOrchestratorService,
     JobsService,
     JobAlertsService,
+    JobSchedulerService,
   ],
 })
 export class JobsModule {}

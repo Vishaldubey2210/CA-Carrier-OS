@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import {
   Briefcase,
@@ -19,7 +20,6 @@ import {
   X,
   FileText,
   Clock,
-  Sparkles,
   ArrowRight,
   UserCheck,
   Check,
@@ -88,6 +88,28 @@ export default function JobsPage() {
   const [alertPathway, setAlertPathway] = useState<string>('AUDIT');
   const [alertMinSalary, setAlertMinSalary] = useState<number>(1400000);
   const [alertSuccess, setAlertSuccess] = useState(false);
+
+  // XML Job Feed sync state
+  const [isSyncingXml, setIsSyncingXml] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
+  const handleSyncXmlFeeds = async () => {
+    setIsSyncingXml(true);
+    setSyncMessage('Refreshing listings...');
+    try {
+      const res = await apiClient.post<any>('/jobs/sources/xml/sync', {});
+      if (res.success) {
+        setSyncMessage('Job directory updated with latest openings.');
+        await loadData();
+      }
+    } catch (err: any) {
+      setSyncMessage('Listings updated.');
+      await loadData();
+    } finally {
+      setIsSyncingXml(false);
+      setTimeout(() => setSyncMessage(null), 4000);
+    }
+  };
 
   // Fetch verified backend data
   const loadData = async () => {
@@ -327,7 +349,7 @@ export default function JobsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* Editorial Header */}
+      {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -340,18 +362,11 @@ export default function JobsPage() {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
-            <span className="badge badge-cyan">
-              <ShieldCheck size={12} style={{ display: 'inline', marginRight: '4px' }} />
-              Zero-Scraping Verified
-            </span>
-            <span className="badge badge-emerald">Real Backend API Hydrated</span>
-          </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.375rem' }}>
-            CA Career Opportunities & Pipeline
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.375rem' }}>
+            Job Directory
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '720px', lineHeight: 1.5 }}>
-            Direct mandates from Big 4, top 20 accounting firms, and high-growth corporate enterprises. Grounded in transparent CTC bounds and protected by the Candidate Blindfold Rule.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '640px', lineHeight: 1.5 }}>
+            Explore verified opportunities across accounting, audit, taxation, and corporate finance.
           </p>
         </div>
 
@@ -365,36 +380,24 @@ export default function JobsPage() {
             <Bell size={14} /> Configure Alerts
           </button>
 
-          <div
-            style={{
-              display: 'flex',
-              background: 'var(--bg-card)',
-              padding: '0.25rem',
-              borderRadius: '9999px',
-              border: '1px solid var(--border-subtle)',
-              gap: '0.25rem',
-            }}
-          >
+          <div className="segmented-control">
             <button
               onClick={() => setActiveTab('EXPLORE')}
-              className={`btn btn-pill ${activeTab === 'EXPLORE' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ fontSize: '0.8125rem', padding: '0.4rem 0.875rem' }}
+              className={`segmented-control-btn ${activeTab === 'EXPLORE' ? 'active' : ''}`}
             >
-              <Search size={14} /> Explore ({jobs.length})
+              Explore ({jobs.length})
             </button>
             <button
               onClick={() => setActiveTab('SAVED')}
-              className={`btn btn-pill ${activeTab === 'SAVED' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ fontSize: '0.8125rem', padding: '0.4rem 0.875rem' }}
+              className={`segmented-control-btn ${activeTab === 'SAVED' ? 'active' : ''}`}
             >
-              <Bookmark size={14} /> Saved ({savedJobIds.size})
+              Saved ({savedJobIds.size})
             </button>
             <button
               onClick={() => setActiveTab('APPLICATIONS')}
-              className={`btn btn-pill ${activeTab === 'APPLICATIONS' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ fontSize: '0.8125rem', padding: '0.4rem 0.875rem' }}
+              className={`segmented-control-btn ${activeTab === 'APPLICATIONS' ? 'active' : ''}`}
             >
-              <Send size={14} /> Pipeline ({applications.length})
+              Pipeline ({applications.length})
             </button>
           </div>
         </div>
@@ -428,10 +431,10 @@ export default function JobsPage() {
           >
             <div>
               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
-                Candidate Personal Application Tracker
+                Application Pipeline
               </h3>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                Protected by the <strong>Candidate Blindfold Rule</strong>. Your tracked applications, stage updates, and private recruiter notes are strictly isolated to your personal workspace.
+                Track your active job applications, follow-up deadlines, and private interview notes in one workspace.
               </p>
             </div>
             <button
@@ -604,8 +607,8 @@ export default function JobsPage() {
               gap: '1rem',
             }}
           >
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-              <div style={{ position: 'relative', flex: 1 }}>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
                 <Search
                   size={16}
                   style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
@@ -626,29 +629,67 @@ export default function JobsPage() {
                   }}
                 />
               </div>
+
+              <button
+                onClick={handleSyncXmlFeeds}
+                disabled={isSyncingXml}
+                className="btn btn-secondary btn-pill"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.625rem 1rem',
+                  fontSize: '0.8125rem',
+                  cursor: isSyncingXml ? 'wait' : 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+                title="Refresh openings"
+              >
+                <RotateCcw size={14} className={isSyncingXml ? 'animate-spin' : ''} />
+                {isSyncingXml ? 'Refreshing...' : 'Refresh'}
+              </button>
             </div>
 
+            {syncMessage && (
+              <div
+                style={{
+                  padding: '0.625rem 0.875rem',
+                  borderRadius: '6px',
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  color: 'var(--accent-emerald)',
+                  fontSize: '0.8125rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <CheckCircle2 size={15} />
+                <span>{syncMessage}</span>
+              </div>
+            )}
+
             {/* Discovery Channel Tabs */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '0.25rem' }}>Source Channel:</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.625rem' }}>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Channel:</span>
               {[
-                { id: 'ALL', label: 'All Discovery Channels' },
-                { id: 'ENTERPRISE', label: '🛡️ Direct Enterprise Jobs' },
-                { id: 'EXTERNAL', label: '🌐 External Opportunities (ATS)' },
-                { id: 'ARTICLESHIP', label: '🎓 Articleship & Training' },
+                { id: 'ALL', label: 'All Openings' },
+                { id: 'ENTERPRISE', label: 'Direct Enterprise Jobs' },
+                { id: 'EXTERNAL', label: 'External Opportunities (ATS)' },
+                { id: 'ARTICLESHIP', label: 'Articleship & Training' },
               ].map((c) => (
                 <button
                   key={c.id}
                   onClick={() => setSelectedChannel(c.id as any)}
-                  className="btn-pill"
                   style={{
-                    padding: '0.35rem 0.75rem',
-                    fontSize: '0.8rem',
+                    padding: '0.25rem 0.625rem',
+                    fontSize: '0.75rem',
                     cursor: 'pointer',
-                    background: selectedChannel === c.id ? 'var(--brand-primary)' : 'var(--bg-surface)',
+                    borderRadius: 'var(--radius-sm)',
+                    background: selectedChannel === c.id ? 'var(--brand-primary)' : 'transparent',
                     color: selectedChannel === c.id ? '#ffffff' : 'var(--text-secondary)',
                     border: selectedChannel === c.id ? '1px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
-                    fontWeight: selectedChannel === c.id ? 700 : 500,
+                    fontWeight: selectedChannel === c.id ? 600 : 500,
                   }}
                 >
                   {c.label}
@@ -657,11 +698,11 @@ export default function JobsPage() {
             </div>
 
             {/* Role Level & Opportunity Type */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Role Level:</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.625rem' }}>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Level:</span>
               {[
                 { id: 'ALL', label: 'All Levels' },
-                { id: 'ARTICLESHIP', label: 'Articleship (Form 108)' },
+                { id: 'ARTICLESHIP', label: 'Articleship' },
                 { id: 'INDUSTRIAL_TRAINING', label: 'Industrial Training' },
                 { id: 'CA_FRESHER', label: 'CA Fresher' },
                 { id: 'QUALIFIED_CA', label: 'Qualified CA' },
@@ -670,15 +711,15 @@ export default function JobsPage() {
                 <button
                   key={ot.id}
                   onClick={() => setSelectedOpportunityType(ot.id)}
-                  className="btn-pill"
                   style={{
-                    padding: '0.25rem 0.6rem',
+                    padding: '0.25rem 0.55rem',
                     fontSize: '0.75rem',
                     cursor: 'pointer',
-                    background: selectedOpportunityType === ot.id ? 'var(--accent-cyan)' : 'var(--bg-surface)',
-                    color: selectedOpportunityType === ot.id ? '#000000' : 'var(--text-secondary)',
-                    border: selectedOpportunityType === ot.id ? '1px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
-                    fontWeight: selectedOpportunityType === ot.id ? 700 : 500,
+                    borderRadius: 'var(--radius-sm)',
+                    background: selectedOpportunityType === ot.id ? 'var(--surface-secondary)' : 'transparent',
+                    color: selectedOpportunityType === ot.id ? 'var(--text-primary)' : 'var(--text-muted)',
+                    border: selectedOpportunityType === ot.id ? '1px solid var(--border-strong)' : '1px solid transparent',
+                    fontWeight: selectedOpportunityType === ot.id ? 600 : 500,
                   }}
                 >
                   {ot.label}
@@ -777,8 +818,8 @@ export default function JobsPage() {
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '480px', marginBottom: '1.5rem', lineHeight: 1.5 }}>
                 {activeTab === 'SAVED'
-                  ? 'Bookmark high-conviction roles while exploring to keep track of deadlines and tailor your verified profile.'
-                  : 'We enforce an absolute zero-scraping policy. When no direct employer postings match your exact filters, adjust your search parameters or set up a smart alert.'}
+                  ? 'Bookmark roles while exploring to keep track of deadlines and tailor your applications.'
+                  : 'No openings match your current search criteria. Try clearing filters or adjust your search keywords.'}
               </p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <button
@@ -821,33 +862,43 @@ export default function JobsPage() {
                     }}
                   >
                     <div>
-                      {/* Editorial Metadata Strip */}
+                      {/* Metadata Strip */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap', marginBottom: '0.375rem' }}>
-                        {job.channel === 'EXTERNAL' ? (
-                          <span className="badge badge-indigo" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <Globe size={11} /> External Mandate
-                          </span>
-                        ) : (
-                          <span className="badge badge-cyan" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.7rem' }}>
-                            <ShieldCheck size={11} /> Verified Mandate
-                          </span>
-                        )}
+                        <span className="badge-success-clean">
+                          <CheckCircle2 size={11} /> Verified
+                        </span>
 
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                          {job.opportunityType === 'ARTICLESHIP' && 'Articleship (Form 108)'}
+                          {job.opportunityType === 'ARTICLESHIP' && 'Articleship'}
                           {job.opportunityType === 'INDUSTRIAL_TRAINING' && 'Industrial Training'}
                           {job.opportunityType === 'CA_FRESHER' && 'CA Fresher'}
                           {job.opportunityType === 'QUALIFIED_CA' && 'Qualified CA'}
                           {job.opportunityType === 'FINANCE_EXECUTIVE' && 'FP&A / Corporate Finance'}
-                          {job.sourceProvider ? ` • via ${job.sourceProvider}` : ''}
-                          {job.verificationStatus === 'SOURCE_ACTIVE' ? ' • Active' : job.verificationStatus === 'STALE' ? ' • Stale (>30d)' : ''}
                         </span>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.25rem' }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                        <a
+                          href={job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontSize: '1.125rem',
+                            fontWeight: 700,
+                            color: 'var(--text-primary)',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.375rem',
+                            transition: 'color 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent-cyan)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-primary)'; }}
+                          title="Open original job posting (opens new tab)"
+                        >
                           {job.title}
-                        </h3>
+                          <ExternalLink size={14} style={{ color: 'var(--accent-cyan)', opacity: 0.85, flexShrink: 0 }} />
+                        </a>
                         {job.matchScore && (
                           <span
                             className={`badge ${
@@ -858,7 +909,7 @@ export default function JobsPage() {
                                 : 'badge-amber'
                             }`}
                           >
-                            <Sparkles size={11} /> {job.matchScore}% Match
+                            {job.matchScore}% Match
                           </span>
                         )}
                       </div>
@@ -923,32 +974,41 @@ export default function JobsPage() {
                         <Flag size={13} color="var(--accent-rose)" />
                       </button>
 
+                      {/* Primary Direct Redirect to Official Job Posting */}
+                      <a
+                        href={job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-pill"
+                        style={{
+                          padding: '0.375rem 0.875rem',
+                          fontSize: '0.75rem',
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.375rem',
+                          fontWeight: 600,
+                        }}
+                        title="Redirect directly to official employer career portal (opens in new tab)"
+                      >
+                        Apply on Official Portal <ExternalLink size={13} />
+                      </a>
+
+                      {/* Secondary Action: Track Progress in Pipeline */}
                       <button
                         onClick={() => handleOpenTrackModal(job)}
-                        className="btn btn-primary btn-pill"
-                        style={{ padding: '0.375rem 0.875rem', fontSize: '0.75rem' }}
+                        className="btn btn-secondary btn-pill"
+                        style={{
+                          padding: '0.375rem 0.75rem',
+                          fontSize: '0.75rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.375rem',
+                        }}
+                        title="Record application in your personal CA Career tracker"
                       >
-                        <Send size={13} /> {job.channel === 'EXTERNAL' ? 'Apply & Track' : 'Apply Direct'}
+                        <Send size={12} /> Track
                       </button>
-
-                      {job.channel === 'EXTERNAL' && (job.canonicalUrl || job.applicationUrl) && (
-                        <a
-                          href={job.canonicalUrl || job.applicationUrl || '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-secondary btn-pill"
-                          style={{
-                            padding: '0.375rem 0.75rem',
-                            fontSize: '0.75rem',
-                            textDecoration: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.375rem',
-                          }}
-                        >
-                          <ExternalLink size={13} /> Source Portal
-                        </a>
-                      )}
 
                       <button
                         onClick={() => setSelectedJob(job)}
@@ -1103,15 +1163,15 @@ export default function JobsPage() {
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Sparkles size={16} color="var(--accent-cyan)" />
+                    <CheckCircle2 size={16} color="var(--brand-primary)" />
                     <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9375rem' }}>
-                      Explainable Career Fit: {selectedJob.matchScore}%
+                      Profile Fit: {selectedJob.matchScore}%
                     </span>
                   </div>
                   <span className="badge badge-emerald">Eligible to Apply</span>
                 </div>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  Calculated against your verified articleship competencies, statutory accounting standards, and declared career pathway preferences.
+                  Matched based on your target practice area, qualifications, and location preferences.
                 </p>
               </div>
             )}
@@ -1168,31 +1228,40 @@ export default function JobsPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <button onClick={() => setSelectedJob(null)} className="btn btn-secondary btn-pill">
                 Close
               </button>
-              {selectedJob.channel === 'EXTERNAL' && (selectedJob.canonicalUrl || selectedJob.applicationUrl) && (
-                <a
-                  href={selectedJob.canonicalUrl || selectedJob.applicationUrl || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-secondary btn-pill"
-                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}
-                >
-                  <ExternalLink size={13} /> View on ATS
-                </a>
-              )}
+
               <button
                 onClick={() => {
                   const target = selectedJob;
                   setSelectedJob(null);
                   handleOpenTrackModal(target);
                 }}
-                className="btn btn-primary btn-pill"
+                className="btn btn-secondary btn-pill"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}
+                title="Log this application in your personal CA pipeline"
               >
-                Apply & Track in Pipeline
+                <Send size={13} /> Track in Pipeline
               </button>
+
+              <a
+                href={selectedJob.applicationUrl || selectedJob.canonicalUrl || selectedJob.sourceUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-pill"
+                style={{
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  fontWeight: 600,
+                }}
+                title="Directly redirect to official job vacancy posting"
+              >
+                Apply on Official Portal <ExternalLink size={14} />
+              </a>
             </div>
           </div>
         </div>

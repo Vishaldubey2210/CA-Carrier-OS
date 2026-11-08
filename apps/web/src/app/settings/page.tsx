@@ -121,23 +121,13 @@ export default function SettingsPage() {
       )}
 
       {/* Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          borderBottom: '1px solid var(--border-subtle)',
-          paddingBottom: '0.5rem',
-          marginBottom: '2rem',
-          overflowX: 'auto',
-        }}
-      >
+      <div className="segmented-control" style={{ marginBottom: '1.5rem', width: 'fit-content' }}>
         {[
-          { id: 'PROFILE', label: 'Personal Profile', icon: User },
-          { id: 'SECURITY', label: 'Security & Password', icon: Lock },
-          { id: 'NOTIFICATIONS', label: 'Notification Preferences', icon: Bell },
-          { id: 'PRIVACY', label: 'Workspace Privacy & Export', icon: ShieldCheck },
+          { id: 'PROFILE', label: 'Personal Profile' },
+          { id: 'SECURITY', label: 'Security & Password' },
+          { id: 'NOTIFICATIONS', label: 'Notification Preferences' },
+          { id: 'PRIVACY', label: 'Workspace Privacy & Export' },
         ].map((tab) => {
-          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
@@ -146,15 +136,8 @@ export default function SettingsPage() {
                 setActiveTab(tab.id as any);
                 setStatusMessage(null);
               }}
-              className={`btn ${isActive ? 'btn-primary' : 'btn-secondary'}`}
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.8125rem',
-                whiteSpace: 'nowrap',
-                borderRadius: 'var(--radius-md)',
-              }}
+              className={`segmented-control-btn ${isActive ? 'active' : ''}`}
             >
-              <Icon size={14} />
               <span>{tab.label}</span>
             </button>
           );
@@ -370,10 +353,10 @@ export default function SettingsPage() {
       {activeTab === 'PRIVACY' && (
         <div className="glass-panel" style={{ padding: '2rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-            Data Sovereignty & Privacy Controls
+            Privacy & Data Controls
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-            Under the Candidate Blindfold Rule, you have full ownership and audit rights over your records.
+            You maintain full ownership and control over your candidate profile and personal data.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -381,10 +364,10 @@ export default function SettingsPage() {
               <ShieldCheck size={28} color="var(--accent-emerald)" />
               <div>
                 <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.2rem 0' }}>
-                  Candidate Blindfold Protection: Active
+                  Confidential Search Protection: Active
                 </h3>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0 }}>
-                  Workspace ID: <span style={{ fontFamily: 'monospace', color: 'var(--accent-cyan)' }}>{activeWorkspace?.id || 'Personal'}</span>. Search activity is completely concealed from current employer recruiters.
+                  Your profile and application activities are confidential and hidden from your current employers.
                 </p>
               </div>
             </div>

@@ -22,14 +22,7 @@ export class MentorshipService {
   private readonly memBookings = new Map<string, MentorBookingDetail>(); // id -> MentorBookingDetail
 
   constructor(private readonly prisma: PrismaService) {
-    this.seedMentors();
-  }
-
-  private seedMentors() {
-    for (const mentor of CURATED_MENTORS) {
-      this.memMentors.set(mentor.id, mentor);
-    }
-    this.logger.log(`Initialized ${this.memMentors.size} verified CA mentors.`);
+    // Zero fake seed mentors - mentors are populated through genuine registrations
   }
 
   /**

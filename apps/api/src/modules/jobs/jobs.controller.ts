@@ -27,6 +27,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { CurrentWorkspace } from '../../common/decorators/current-workspace.decorator.js';
 import { JobsService } from './jobs.service.js';
 import { JobAlertsService } from './job-alerts.service.js';
+import { JobSchedulerService } from './job-scheduler.service.js';
 import { CareerService } from '../career/career.service.js';
 
 @Controller('api/v1/jobs')
@@ -34,7 +35,8 @@ export class JobsController {
   constructor(
     private readonly jobsService: JobsService,
     private readonly careerService: CareerService,
-    private readonly jobAlertsService: JobAlertsService
+    private readonly jobAlertsService: JobAlertsService,
+    private readonly jobSchedulerService: JobSchedulerService
   ) {}
 
   /**
@@ -178,6 +180,23 @@ export class JobsController {
   async triggerSourceSync(@Query('providerId') providerId?: string) {
     const result = await this.jobsService.triggerSourceSync(providerId);
     return createSuccessResponse(result);
+  }
+
+  /**
+   * Sync authentic XML / RSS job feeds
+   */
+  @Post('sources/xml/sync')
+  async syncXmlFeeds() {
+    const result = await this.jobsService.triggerSourceSync('xml_feed');
+    return createSuccessResponse(result);
+  }
+
+  /**
+   * Status of automated daily job scheduler
+   */
+  @Get('scheduler/status')
+  getSchedulerStatus() {
+    return createSuccessResponse(this.jobSchedulerService.getStatus());
   }
 
   /**

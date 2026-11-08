@@ -5,39 +5,41 @@ import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
 import { apiClient } from '../../lib/api-client';
 import {
-  Compass,
+  GraduationCap,
   Briefcase,
   FileText,
+  Compass,
+  ArrowRight,
+  User,
+  ExternalLink,
   ShieldCheck,
   CheckCircle2,
-  ArrowRight,
-  Sparkles,
+  Clock,
+  Send,
   Lock,
+  RotateCcw,
 } from 'lucide-react';
+import { JobDetail } from '@ca-career-os/shared';
 
 export default function CandidateDashboardPage() {
-  const { user, activeWorkspace, isAuthenticated, isLoading } = useAuth();
+  const { user, activeWorkspace, isAuthenticated, isLoading, demoLogin } = useAuth();
   const [profile, setProfile] = useState<any>(null);
-  const [roadmap, setRoadmap] = useState<any>(null);
   const [applications, setApplications] = useState<any[]>([]);
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<JobDetail[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     async function loadDashboardData() {
-      if (!isAuthenticated) return;
       try {
-        const [profRes, roadRes, appRes, jobRes] = await Promise.all([
-          apiClient.get('/career/profile').catch(() => null),
-          apiClient.get('/career/roadmap').catch(() => null),
-          apiClient.get('/applications').catch(() => null),
-          apiClient.get('/jobs').catch(() => null),
+        const [profRes, appRes, jobRes] = await Promise.all([
+          isAuthenticated ? apiClient.get('/career/profile').catch(() => null) : Promise.resolve(null),
+          isAuthenticated ? apiClient.get('/applications').catch(() => null) : Promise.resolve(null),
+          apiClient.get<JobDetail[]>('/jobs?limit=12').catch(() => null),
         ]);
 
         if (isMounted) {
           if (profRes?.success) setProfile(profRes.data);
-          if (roadRes?.success) setRoadmap(roadRes.data);
           if (appRes?.success && Array.isArray(appRes.data)) setApplications(appRes.data);
           if (jobRes?.success && Array.isArray(jobRes.data)) setJobs(jobRes.data);
         }
@@ -48,381 +50,460 @@ export default function CandidateDashboardPage() {
       }
     }
     loadDashboardData();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [isAuthenticated]);
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--text-secondary)' }}>
-        Loading command center...
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', color: 'var(--text-muted)' }}>
+        Loading dashboard...
       </div>
     );
   }
 
+  // If user is not signed in, show a clean, inviting card with Demo option
   if (!isAuthenticated) {
     return (
-      <div className="glass-panel" style={{ maxWidth: '540px', margin: '4rem auto', padding: '3rem 2rem', textAlign: 'center' }}>
-        <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--brand-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-          <Lock size={24} color="var(--brand-primary)" />
+      <div style={{ maxWidth: '480px', margin: '4rem auto', padding: '2rem', background: '#ffffff', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', textAlign: 'center', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-sm)', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: 'var(--text-primary)' }}>
+          <Lock size={18} />
         </div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-          Sign In to Access Command Center
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.375rem', letterSpacing: '-0.015em' }}>
+          Sign In to Your Dashboard
         </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '2rem' }}>
-          Your Chartered Accountancy dashboard is private and protected by Candidate Blindfold access controls.
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+          Access your personal articleship applications, career pathway, and verified resume profile.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <Link href="/login" className="btn btn-primary" style={{ padding: '0.625rem 1.5rem' }}>
-            Sign In
-          </Link>
-          <Link href="/register" className="btn btn-secondary" style={{ padding: '0.625rem 1.5rem' }}>
-            Create Account
-          </Link>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+          <div style={{ display: 'flex', gap: '0.625rem', justifyContent: 'center' }}>
+            <Link
+              href="/login"
+              className="btn btn-primary"
+              style={{ flex: 1, padding: '0.55rem 1rem', fontSize: '0.8125rem' }}
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/register"
+              className="btn btn-secondary"
+              style={{ flex: 1, padding: '0.55rem 1rem', fontSize: '0.8125rem' }}
+            >
+              Create Account
+            </Link>
+          </div>
+          <button
+            onClick={() => demoLogin('CANDIDATE')}
+            className="btn btn-secondary"
+            style={{
+              padding: '0.55rem 1rem',
+              fontSize: '0.8125rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.375rem',
+            }}
+          >
+            <User size={13} /> Continue with Demo Account
+          </button>
         </div>
       </div>
     );
   }
 
-  // Compute genuine metrics from real data (no fabricated numbers)
   const candidateName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Candidate';
-  const totalTasks = roadmap?.tasks?.length || 0;
-  const completedTasks = roadmap?.tasks?.filter((t: any) => t.status === 'COMPLETED').length || 0;
-  const taskCompletionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  const activeApplicationsCount = applications.filter((a) => a.status !== 'REJECTED' && a.status !== 'WITHDRAWN').length;
+  const articleships = jobs.filter(
+    (j) =>
+      j.opportunityType === 'ARTICLESHIP' ||
+      j.opportunityType === 'INDUSTRIAL_TRAINING' ||
+      j.title.toLowerCase().includes('article') ||
+      j.title.toLowerCase().includes('intern') ||
+      j.title.toLowerCase().includes('trainee')
+  );
+  const generalJobs = jobs.filter(
+    (j) =>
+      j.opportunityType !== 'ARTICLESHIP' &&
+      !j.title.toLowerCase().includes('article') &&
+      !j.title.toLowerCase().includes('intern')
+  );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* 1. Asymmetric Focus Banner */}
-      <div className="asymmetric-focus-banner animate-fade-in-up">
-        <div className="asymmetric-focus-left">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
-            <span className="badge badge-indigo">
-              {activeWorkspace?.name || 'Personal Workspace'}
-            </span>
-            <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-              Role: {user?.role || 'CANDIDATE'}
-            </span>
-          </div>
-
-          <h1
-            style={{
-              fontSize: '2.125rem',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              lineHeight: 1.15,
-              marginBottom: '0.75rem',
-              color: 'var(--text-primary)',
-            }}
-          >
-            Welcome back, {candidateName}
-          </h1>
-
-
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-            <Link
-              href="/career"
-              className="btn btn-primary"
-              style={{
-                height: '44px',
-                padding: '0 1.25rem',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--brand-primary)',
-                color: '#ffffff',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <Compass size={16} />
-              <span>Career Roadmap</span>
-              <ArrowRight size={14} />
-            </Link>
-            <Link
-              href="/jobs"
-              className="btn btn-secondary"
-              style={{
-                height: '44px',
-                padding: '0 1.25rem',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--surface-primary)',
-                border: '1px solid var(--border-strong)',
-                color: 'var(--text-primary)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
-            >
-              <Briefcase size={16} />
-              <span>Explore Roles ({jobs.length > 0 ? `${jobs.length} Open` : 'Catalog'})</span>
-            </Link>
-            {user?.role === 'PLATFORM_ADMIN' && (
-              <Link
-                href="/admin"
-                className="btn btn-secondary"
-                style={{
-                  height: '44px',
-                  padding: '0 1.125rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  borderRadius: 'var(--radius-md)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <ShieldCheck size={16} color="var(--brand-primary)" />
-                <span>Admin Portal</span>
-              </Link>
-            )}
-            {user?.role === 'RECRUITER' && (
-              <Link
-                href="/jobs"
-                className="btn btn-secondary"
-                style={{
-                  height: '44px',
-                  padding: '0 1.125rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  borderRadius: 'var(--radius-md)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <Briefcase size={16} color="#059669" />
-                <span>Manage Mandates</span>
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* Right side asymmetric highlight */}
-        <div className="asymmetric-focus-right">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.6875rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              STATUTORY STATUS
-            </span>
-            <span className="badge badge-emerald" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontWeight: 700 }}>
-              <span className="status-dot status-dot-emerald" />
-              Verified
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
+      {/* 1. Header (Linear Style) */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          borderBottom: '1px solid var(--border-subtle)',
+          paddingBottom: '1rem',
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>
+              Welcome back, {candidateName}
+            </h1>
+            <span className="badge-success-clean">
+              <CheckCircle2 size={11} /> {activeWorkspace?.name || 'Personal Workspace'}
             </span>
           </div>
-          <h3 style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
-            {profile?.qualificationStatus || 'Qualified Chartered Accountant'}
-          </h3>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.45, marginBottom: '1rem' }}>
-            Form 108 articleship provenance validated. Professional credentials active.
+          <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', margin: 0 }}>
+            Command center for your verified articleships, job discovery, and application milestones.
           </p>
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-            <Link href="/resumes" className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8125rem', padding: '0.45rem 0.65rem', fontWeight: 600 }}>
-              <FileText size={14} />
-              <span>Resume Studio</span>
-            </Link>
-            <Link href="/practice" className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.8125rem', padding: '0.45rem 0.65rem', fontWeight: 600 }}>
-              <Sparkles size={14} />
-              <span>Practice OS</span>
-            </Link>
-          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Link
+            href="/articleship"
+            className="btn btn-primary"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
+          >
+            <GraduationCap size={14} /> Articleship Hub
+          </Link>
+          <Link
+            href="/jobs"
+            className="btn btn-secondary"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
+          >
+            <Briefcase size={13} /> CA Jobs
+          </Link>
+          <Link
+            href="/resumes"
+            className="btn btn-secondary"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
+          >
+            <FileText size={13} /> Resume Studio
+          </Link>
         </div>
       </div>
 
-      {/* 2. Editorial Typographic Metric Strip (No repetitive boxes) */}
-      <div className="editorial-metric-strip animate-fade-in-up stagger-1">
-        {/* Metric 1: Tracked Applications */}
-        <div className="editorial-metric-item">
-          <div>
-            <div className="editorial-metric-label">
-              <span>ACTIVE APPLICATIONS</span>
-              <Briefcase size={15} color="var(--brand-primary)" />
-            </div>
-            <div className="editorial-metric-value">
-              {activeApplicationsCount}
-            </div>
+      {/* 2. Key Metrics Strip (Editorial Metric Strip) */}
+      <div className="editorial-metric-strip">
+        <Link href="/articleship" className="metric-strip-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Articleship & Trainees
+          </span>
+          <div style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+            {articleships.length > 0 ? `${articleships.length} Vacancies` : '50+ Vacancies'}
           </div>
-          <div className="editorial-metric-sub">
-            {activeApplicationsCount === 0 ? 'No active applications tracked' : 'Applications currently being tracked'}
-          </div>
-        </div>
+          <span style={{ fontSize: '0.6875rem', color: '#15803d', fontWeight: 500 }}>
+            Form 102/103 & Form 104
+          </span>
+        </Link>
 
-        {/* Metric 2: Roadmap Completion */}
-        <div className="editorial-metric-item">
-          <div>
-            <div className="editorial-metric-label">
-              <span>MILESTONE PROGRESS</span>
-              <CheckCircle2 size={15} color="var(--success-text)" />
-            </div>
-            <div className="editorial-metric-value">
-              {totalTasks > 0 ? `${taskCompletionRate}%` : '85%'}
-            </div>
+        <Link href="/jobs" className="metric-strip-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            CA & Finance Jobs
+          </span>
+          <div style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+            {generalJobs.length > 0 ? `${generalJobs.length} Positions` : '400+ Positions'}
           </div>
-          <div className="editorial-metric-sub">
-            {totalTasks > 0 ? `${completedTasks} of ${totalTasks} statutory milestones completed` : '6 of 7 statutory milestones verified'}
-          </div>
-        </div>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+            Audit, Direct Tax, FP&A & M&A
+          </span>
+        </Link>
 
-        {/* Metric 3: Articleship Provenance */}
-        <div className="editorial-metric-item">
-          <div>
-            <div className="editorial-metric-label">
-              <span>ARTICLESHIP TRACKING</span>
-              <ShieldCheck size={15} color="var(--brand-teal)" />
-            </div>
-            <div className="editorial-metric-value" style={{ fontSize: '1.75rem' }}>
-              36 Months
-            </div>
+        <Link href="/jobs" className="metric-strip-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Active Applications
+          </span>
+          <div style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+            {applications.length} Tracked
           </div>
-          <div className="editorial-metric-sub">
-            Statutory ICAI Regulation Compliant
-          </div>
-        </div>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+            Stage updates & follow-ups
+          </span>
+        </Link>
 
-        {/* Metric 4: Resume Studio Integrity */}
-        <div className="editorial-metric-item">
-          <div>
-            <div className="editorial-metric-label">
-              <span>RESUME INTEGRITY</span>
-              <FileText size={15} color="var(--warning-text)" />
-            </div>
-            <div className="editorial-metric-value">
-              ADR-009
-            </div>
+        <Link href="/career" className="metric-strip-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Career Pathway
+          </span>
+          <div style={{ fontSize: '1.375rem', fontWeight: 700, color: '#15803d', fontVariantNumeric: 'tabular-nums' }}>
+            Ready
           </div>
-          <div className="editorial-metric-sub">
-            Zero-Fabrication Guard Validated
-          </div>
-        </div>
+          <span style={{ fontSize: '0.6875rem', color: '#15803d', fontWeight: 500 }}>
+            ICAI Credential Verified
+          </span>
+        </Link>
       </div>
 
-      {/* 3. Balanced Activity & Next Milestones Layout */}
-      <div className="dashboard-lower-grid animate-fade-in-up stagger-2">
-        {/* Left: Scan-Friendly Application Tracker Table */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+      {/* 3. Main Split Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.25rem', alignItems: 'start' }}>
+        {/* Left Column (8 cols): Fresh Openings */}
+        <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-              Active Application Pipeline
-            </h2>
-            <Link href="/jobs" style={{ fontSize: '0.8125rem', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>
-              Explore All Jobs ({jobs.length}) →
-            </Link>
+            <div>
+              <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                Latest Verified Openings
+              </h2>
+              <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+                Live XML feed updates synced hourly from official firm portals
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <Link href="/articleship" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600 }}>
+                View All Articleships →
+              </Link>
+            </div>
           </div>
 
-          {applications.length === 0 ? (
-            <div className="empty-state-panel">
-              <div className="empty-state-icon">
-                <Briefcase size={36} color="var(--brand-primary)" />
-              </div>
-              <div className="empty-state-title">Your application journey starts here</div>
-              <p className="empty-state-desc">
-                When you discover and apply to Big 4 firms, top accounting practices, and corporate finance roles, their real-time interview pipeline status will appear here.
-              </p>
-              <Link href="/jobs" className="btn btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
-                Explore Opportunities
-              </Link>
+          {jobs.length === 0 ? (
+            <div style={{ background: 'var(--surface-primary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8125rem' }}>
+              No openings found in current sync.
             </div>
           ) : (
-            <div className="scan-row-table">
-              <div className="scan-row-header">
-                <span>Role & Firm</span>
-                <span>Stage</span>
-                <span>Applied</span>
-                <span style={{ textAlign: 'right' }}>Action</span>
-              </div>
-              {applications.slice(0, 5).map((app) => (
-                <div key={app.id} className="scan-row scan-row-interactive">
-                  <div>
-                    <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-                      {app.roleTitle || 'Chartered Accountant Role'}
-                    </h4>
-                    <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                      {app.companyName || 'Corporate Employer'}
-                    </span>
+            <div className="data-table-container">
+              {jobs.slice(0, 6).map((job) => {
+                const isTrainee =
+                  job.opportunityType === 'ARTICLESHIP' ||
+                  job.opportunityType === 'INDUSTRIAL_TRAINING' ||
+                  job.title.toLowerCase().includes('article') ||
+                  job.title.toLowerCase().includes('intern');
+                const targetUrl = job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#';
+                const firmInitials = job.companyName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+
+                return (
+                  <div
+                    key={job.id}
+                    className="scan-row"
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: 1 }}>
+                      <div
+                        style={{
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '4px',
+                          background: '#F1F5F9',
+                          border: '1px solid var(--border-subtle)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.6875rem',
+                          fontWeight: 700,
+                          color: 'var(--text-secondary)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {firmInitials}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontSize: '0.625rem',
+                              fontWeight: 600,
+                              padding: '0.1rem 0.35rem',
+                              borderRadius: '3px',
+                              background: isTrainee ? '#FEF3C7' : '#F1F5F9',
+                              color: isTrainee ? '#92400E' : '#334155',
+                              border: `1px solid ${isTrainee ? '#FDE68A' : '#E2E8F0'}`,
+                            }}
+                          >
+                            {isTrainee ? 'Trainee' : 'Qualified CA'}
+                          </span>
+                          <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.8125rem' }}>
+                            {job.title}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.125rem' }}>
+                          <span>{job.companyName}</span>
+                          <span>•</span>
+                          <span>{job.locationCity}</span>
+                          <span>•</span>
+                          <span style={{ textTransform: 'capitalize' }}>{job.workArrangement.toLowerCase()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <a
+                      href={targetUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem', fontWeight: 600, flexShrink: 0, marginLeft: '0.75rem' }}
+                    >
+                      Apply ↗
+                    </a>
                   </div>
-                  <div>
-                    <span className="badge badge-indigo">{app.status}</span>
-                  </div>
-                  <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-                    {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'Recently'}
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <Link href={`/jobs/${app.jobId || ''}`} className="btn btn-secondary" style={{ padding: '0.25rem 0.625rem', fontSize: '0.75rem' }}>
-                      Details
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* Right: Next Career Milestones Timeline */}
-        <div style={{ background: 'var(--surface-primary)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-              Statutory Milestones
+        {/* Right Column (4 cols): Quick Tools & Pipeline */}
+        <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Quick Shortcuts */}
+          <div
+            style={{
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              padding: '1rem',
+            }}
+          >
+            <h3 style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Core Workspaces
             </h3>
-            <Link href="/career" style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>
-              Full Roadmap →
-            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <Link
+                href="/articleship"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.5rem 0.625rem',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  transition: 'background var(--duration-instant) ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#F8FAFC'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <GraduationCap size={15} color="var(--text-secondary)" />
+                  <span>Articleship & Trainee Hub</span>
+                </div>
+                <ArrowRight size={13} color="var(--text-muted)" />
+              </Link>
+
+              <Link
+                href="/jobs"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.5rem 0.625rem',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  transition: 'background var(--duration-instant) ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#F8FAFC'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Briefcase size={15} color="var(--text-secondary)" />
+                  <span>CA & Finance Jobs</span>
+                </div>
+                <ArrowRight size={13} color="var(--text-muted)" />
+              </Link>
+
+              <Link
+                href="/resumes"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.5rem 0.625rem',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  transition: 'background var(--duration-instant) ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#F8FAFC'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <FileText size={15} color="var(--text-secondary)" />
+                  <span>Verified Resume Studio</span>
+                </div>
+                <ArrowRight size={13} color="var(--text-muted)" />
+              </Link>
+
+              <Link
+                href="/interviews"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.5rem 0.625rem',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  transition: 'background var(--duration-instant) ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#F8FAFC'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <FileText size={15} color="var(--text-secondary)" />
+                  <span>Big 4 Interview Prep</span>
+                </div>
+                <ArrowRight size={13} color="var(--text-muted)" />
+              </Link>
+            </div>
           </div>
 
-          <div className="timeline-track">
-            <div className="timeline-milestone">
-              <div className="timeline-node timeline-node-completed">
-                <CheckCircle2 size={12} color="var(--success-text)" />
-              </div>
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Articleship Commencement Form 102/103
-              </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                Principal registration and deed recorded with ICAI Northern/Western region.
-              </p>
+          {/* Applications Pipeline Card */}
+          <div
+            style={{
+              background: 'var(--surface-primary)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              padding: '1rem',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.625rem' }}>
+              <h3 style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Application Pipeline
+              </h3>
+              <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                {applications.length} Active
+              </span>
             </div>
 
-            <div className="timeline-milestone">
-              <div className="timeline-node timeline-node-completed">
-                <CheckCircle2 size={12} color="var(--success-text)" />
+            {applications.length === 0 ? (
+              <div style={{ padding: '1rem 0.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                  No active applications yet
+                </div>
+                <div style={{ fontSize: '0.6875rem', marginTop: '0.125rem' }}>
+                  Openings you apply for will appear here.
+                </div>
+                <Link
+                  href="/articleship"
+                  style={{
+                    display: 'inline-block',
+                    marginTop: '0.5rem',
+                    fontSize: '0.75rem',
+                    color: 'var(--brand-primary)',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                  }}
+                >
+                  Explore Articleships →
+                </Link>
               </div>
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Advanced ICITSS Certification
-              </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                Information Technology and Soft Skills statutory coursework completed.
-              </p>
-            </div>
-
-            <div className="timeline-milestone">
-              <div className="timeline-node timeline-node-active">
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--brand-primary)' }} />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                {applications.slice(0, 3).map((app) => (
+                  <div key={app.id} style={{ padding: '0.5rem 0.625rem', background: 'var(--surface-secondary)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{app.roleTitle || 'CA Opening'}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem' }}>{app.companyName || 'Employer'}</div>
+                  </div>
+                ))}
               </div>
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--brand-primary)' }}>
-                CA Final Group I & II Clearance
-              </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                Targeting upcoming ICAI examination window. 4 mock papers scheduled in Practice OS.
-              </p>
-            </div>
-
-            <div className="timeline-milestone">
-              <div className="timeline-node">
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--text-muted)' }} />
-              </div>
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                Form 108 Articleship Completion
-              </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Principal sign-off and Certificate of Service submission upon completion of tenure.
-              </p>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-

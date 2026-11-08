@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   FileText,
   Clock,
-  Sparkles,
   ArrowRight,
   Download,
 } from 'lucide-react';
@@ -173,19 +172,8 @@ export default function BillingPage() {
             </h1>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '720px' }}>
-            Transparent pricing for candidates, CA firms, and employers. Seamless Razorpay checkout with GST-compliant tax invoicing (SAC 998314).
+            Transparent pricing for candidates and CA firms. Secure checkout with GST-compliant tax invoicing.
           </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <span className={`badge ${isLiveConnected ? 'badge-emerald' : 'badge-amber'}`}>
-            <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} />
-            {isLiveConnected ? 'API Live Connected (/api/v1/billing)' : 'Sandbox Simulation Mode'}
-          </span>
-          <span className="badge badge-emerald">
-            <ShieldCheck size={12} style={{ display: 'inline', marginRight: '4px' }} />
-            PCI-DSS Level 1 Gateway (Razorpay)
-          </span>
         </div>
       </div>
 
@@ -233,24 +221,21 @@ export default function BillingPage() {
       </div>
 
       {/* Billing Cycle Switcher */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem' }}>
-        <button
-          onClick={() => setBillingCycle('MONTHLY')}
-          className={`btn ${billingCycle === 'MONTHLY' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.375rem 1rem', fontSize: '0.875rem' }}
-        >
-          Monthly Billing
-        </button>
-        <button
-          onClick={() => setBillingCycle('ANNUAL')}
-          className={`btn ${billingCycle === 'ANNUAL' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ padding: '0.375rem 1rem', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}
-        >
-          Annual Billing
-          <span style={{ fontSize: '0.6875rem', background: '#10b981', color: '#ffffff', padding: '0.125rem 0.375rem', borderRadius: '4px' }}>
-            Save 17%
-          </span>
-        </button>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="segmented-control">
+          <button
+            onClick={() => setBillingCycle('MONTHLY')}
+            className={`segmented-control-btn ${billingCycle === 'MONTHLY' ? 'active' : ''}`}
+          >
+            Monthly Billing
+          </button>
+          <button
+            onClick={() => setBillingCycle('ANNUAL')}
+            className={`segmented-control-btn ${billingCycle === 'ANNUAL' ? 'active' : ''}`}
+          >
+            Annual Billing (Save 17%)
+          </button>
+        </div>
       </div>
 
       {/* Plans Grid */}
@@ -275,7 +260,6 @@ export default function BillingPage() {
                   <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{plan.name}</h3>
                   {plan.highlight && (
                     <span className="badge badge-indigo" style={{ fontSize: '0.6875rem' }}>
-                      <Sparkles size={10} style={{ display: 'inline', marginRight: '2px' }} />
                       Most Popular
                     </span>
                   )}

@@ -80,7 +80,7 @@ export default function TermsOfServicePage() {
           </h2>
           <p>The platform supports distinct role tiers with explicit responsibilities:</p>
           <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <li><strong>Candidates:</strong> Must provide truthful qualifications, genuine articleship records, and must formally attest to resume facts under the Zero-Fabrication Rule (ADR-009).</li>
+            <li><strong>Candidates:</strong> Must provide truthful qualifications, genuine articleship records, and must formally attest to resume accuracy.</li>
             <li><strong>Recruiters & Employers:</strong> Must undergo employer verification before job publishing. Must not solicit candidates for unverified or fraudulent positions.</li>
             <li><strong>CA Practitioners:</strong> Must maintain client confidentiality and comply with all statutory audit and tax filing responsibilities.</li>
           </ul>

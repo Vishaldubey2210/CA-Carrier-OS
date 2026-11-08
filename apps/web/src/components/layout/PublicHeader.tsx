@@ -17,6 +17,8 @@ export function PublicHeader() {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
+    { href: '/articleship', label: 'Articleship Hub' },
+    { href: '/jobs', label: 'CA Jobs' },
     { href: '/#features', label: 'Capabilities', sectionId: 'features' },
     { href: '/#pricing', label: 'Pricing', sectionId: 'pricing' },
     { href: '/#about', label: 'Governance', sectionId: 'about' },

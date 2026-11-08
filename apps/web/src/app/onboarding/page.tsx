@@ -12,7 +12,6 @@ import {
   Building,
   Award,
   Layers,
-  Sparkles,
   Save,
   Check,
 } from 'lucide-react';
@@ -210,13 +209,13 @@ export default function OnboardingPage() {
         </div>
 
         {/* Progress Bar */}
-        <div style={{ width: '100%', height: '6px', borderRadius: '9999px', background: 'var(--border-subtle)', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: '4px', borderRadius: '2px', background: 'var(--border-subtle)', overflow: 'hidden' }}>
           <div
             style={{
               width: `${(currentStep / 4) * 100}%`,
               height: '100%',
               background: 'var(--brand-primary)',
-              transition: 'width 0.3s ease',
+              transition: 'width 0.2s ease',
             }}
           />
         </div>
@@ -394,7 +393,7 @@ export default function OnboardingPage() {
         {currentStep === 3 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              <Sparkles size={24} color="var(--brand-primary)" />
+              <Compass size={24} color="var(--brand-primary)" />
               <div>
                 <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                   Financial Software & Tools

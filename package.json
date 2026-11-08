@@ -7,6 +7,7 @@
     "dev:api": "pnpm --filter @ca-career-os/api dev",
     "dev:web": "pnpm --filter @ca-career-os/web dev",
     "build": "pnpm --filter @ca-career-os/shared build && pnpm --filter @ca-career-os/api build && pnpm --filter @ca-career-os/web build",
+    "build:vercel": "pnpm --filter @ca-career-os/shared build && pnpm --filter @ca-career-os/web build",
     "test": "pnpm --filter @ca-career-os/shared test && pnpm --filter @ca-career-os/api test && pnpm --filter @ca-career-os/web test",
     "test:db": "pnpm --filter @ca-career-os/api test:db",
     "typecheck": "pnpm --filter @ca-career-os/shared typecheck && pnpm --filter @ca-career-os/api typecheck && pnpm --filter @ca-career-os/web typecheck",

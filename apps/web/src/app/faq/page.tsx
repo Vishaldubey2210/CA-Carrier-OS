@@ -21,7 +21,7 @@ const FAQ_DATA: FaqItem[] = [
   // 1. Articleship & Verification
   {
     category: 'Articleship & Resumes',
-    q: 'How does the Zero-Fabrication Rule (ADR-009) work?',
+    q: 'How does the Verified Resume standard work?',
     a: 'Our resume tailoring engine operates on strict deterministic constraints: it can only reorder, highlight, and adjust the wording of factual qualifications and articleship experiences that have been formally attested by you. It is mathematically prohibited from hallucinating unverified corporate clients, false audit metrics, or unearned credentials.',
   },
   {

@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Sparkles, ArrowRight, RotateCw, CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, RotateCw, CheckCircle2, UserCheck, ShieldCheck } from 'lucide-react';
 
 export function FinalCTA() {
   const router = useRouter();
@@ -19,95 +18,106 @@ export function FinalCTA() {
         setDemoStage('READY');
         setTimeout(() => {
           router.push('/dashboard');
-        }, 800);
-      }, 1000);
-    }, 900);
+        }, 600);
+      }, 700);
+    }, 700);
   };
 
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 max-w-[1200px] mx-auto w-full">
+    <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1rem', width: '100%' }}>
       <div
-        className="relative rounded-3xl p-8 sm:p-12 md:p-16 text-center text-white overflow-hidden shadow-2xl flex flex-col items-center gap-6"
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #0F172A 100%)',
+          background: 'var(--surface-primary)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '3rem 2rem',
+          textAlign: 'center',
+          boxShadow: 'var(--shadow-card)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1.25rem',
         }}
       >
-        {/* Subtle Ambient Radial Glow */}
+        <div className="badge-success-clean">
+          <CheckCircle2 size={12} />
+          <span>CharteredOS Workspace</span>
+        </div>
+
+        <h2 style={{ fontSize: 'clamp(1.75rem, 3.2vw, 2.5rem)', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em' }}>
+          Accelerate Your Professional Career with CharteredOS
+        </h2>
+
+        <p style={{ fontSize: '0.9375rem', color: 'var(--text-secondary)', maxWidth: '620px', margin: 0, lineHeight: 1.6 }}>
+          Direct access to 440+ verified articleship and finance positions, objective competency benchmarking, and confidential candidate isolation.
+        </p>
+
+        {/* Demo Box */}
         <div
-          aria-hidden="true"
-          className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-[#2563EB]/20 blur-3xl pointer-events-none"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-[#059669]/15 blur-3xl pointer-events-none"
-        />
+          style={{
+            width: '100%',
+            maxWidth: '460px',
+            marginTop: '0.5rem',
+            padding: '1.25rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--surface-secondary)',
+            border: '1px solid var(--border-subtle)',
+            textAlign: 'left',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Interactive Demo Workspace
+            </span>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+              NO REGISTRATION REQUIRED
+            </span>
+          </div>
 
-        <div className="relative z-10 flex flex-col items-center gap-4 max-w-[760px] mx-auto">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[12px] font-bold tracking-wider uppercase text-[#93C5FD]">
-            <Sparkles size={14} className="text-[#34D399]" />
-            <span>JOIN INDIA&apos;S PREMIER CA PLATFORM</span>
-          </span>
-
-          <h2 className="text-[clamp(1.875rem,3.5vw,2.75rem)] font-extrabold tracking-tight leading-[1.2] m-0 text-white">
-            Accelerate Your Career with CharteredOS
-          </h2>
-
-          <p className="text-[16px] sm:text-[17px] text-[#CBD5E1] leading-relaxed max-w-[60ch] m-0">
-            Benchmark your skills across 7 specialized career horizons, evaluate verified roles across India, and take full control of your growth.
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+            Instant evaluation with preloaded career diagnostic, verified resume editor, and take-home CTC unbundler.
           </p>
 
-          {/* Interactive 1-Click Test Drive Box */}
-          <div className="w-full max-w-[500px] mt-4 p-5 sm:p-6 rounded-2xl bg-white/95 text-[#0F172A] shadow-xl flex flex-col gap-3.5 text-left border border-white">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold text-[#0F172A] flex items-center gap-2">
-                <Sparkles size={16} className="text-[#1E3A8A]" />
-                <span>Instant Interactive Platform Demo</span>
-              </span>
-              <span className="font-mono text-[11px] font-semibold text-[#1E3A8A]">
-                NO LOGIN REQUIRED
-              </span>
-            </div>
+          <button
+            type="button"
+            disabled={demoStage !== 'IDLE'}
+            onClick={handleLaunchTestDrive}
+            className="btn btn-primary"
+            style={{ width: '100%', padding: '0.625rem', fontSize: '0.8125rem', justifyContent: 'center' }}
+          >
+            {demoStage === 'IDLE' ? (
+              <>
+                <UserCheck size={15} />
+                <span>Launch Interactive Demo</span>
+              </>
+            ) : (
+              <>
+                <RotateCw size={15} className="animate-spin" />
+                <span>Entering Workspace...</span>
+              </>
+            )}
+          </button>
+        </div>
 
-            <p className="text-[13px] text-[#64748B] m-0 leading-relaxed">
-              Explore the full CharteredOS workspace with preloaded career diagnostics, resume tools, and CTC calculators.
-            </p>
-
-            <button
-              type="button"
-              disabled={demoStage !== 'IDLE'}
-              onClick={handleLaunchTestDrive}
-              className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#1E3A8A] hover:bg-[#1E40AF] text-white font-semibold text-[14px] shadow-sm hover:shadow transition-all cursor-pointer disabled:opacity-75"
-            >
-              {demoStage === 'IDLE' ? (
-                <>
-                  <Sparkles size={16} />
-                  <span>Launch Interactive Demo</span>
-                </>
-              ) : (
-                <>
-                  <RotateCw size={16} className="animate-spin" />
-                  <span>Entering CharteredOS Workspace...</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Secondary Standard Links */}
-          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-[14px] border border-white/20 transition-all no-underline"
-            >
-              <span>Create Free Account</span>
-              <ArrowRight size={14} />
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-[14px] border border-white/20 transition-all no-underline"
-            >
-              <span>Sign in</span>
-            </Link>
-          </div>
+        {/* Secondary Standard Links */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginTop: '0.25rem' }}>
+          <Link
+            href="/register"
+            className="btn btn-secondary"
+            style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem' }}
+          >
+            Create Free Account <ArrowRight size={13} />
+          </Link>
+          <Link
+            href="/articleship"
+            className="btn btn-ghost"
+            style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem' }}
+          >
+            Browse Articleships
+          </Link>
         </div>
       </div>
     </section>

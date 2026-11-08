@@ -12,6 +12,7 @@ import { AshbyConnector } from './ashby.connector.js';
 import { AdzunaConnector } from './adzuna.connector.js';
 import { JoobleConnector } from './jooble.connector.js';
 import { IcaiConnector } from './icai.connector.js';
+import { XmlFeedConnector } from './xml-feed.connector.js';
 
 @Injectable()
 export class JobSourceRegistryService {
@@ -31,6 +32,7 @@ export class JobSourceRegistryService {
       new AdzunaConnector(),
       new JoobleConnector(),
       new IcaiConnector(),
+      new XmlFeedConnector(),
     ];
 
     for (const connector of defaultConnectors) {
@@ -146,6 +148,8 @@ export class JobSourceRegistryService {
         return 'Jooble REST API (Publisher Feed)';
       case 'icai_portal':
         return 'ICAI CA Jobs & SSP Articleship Registry (Official Outbound)';
+      case 'xml_feed':
+        return 'Authentic XML/RSS Job Feeds (ICAI, Big 4, Direct Portals)';
       default:
         return id.toUpperCase();
     }
@@ -165,6 +169,8 @@ export class JobSourceRegistryService {
         return 'https://jooble.org/api/';
       case 'icai_portal':
         return 'https://cajobs.icai.org/';
+      case 'xml_feed':
+        return 'https://cajobs.icai.org/rss/latest_jobs.xml';
       default:
         return 'https://api.external.com';
     }

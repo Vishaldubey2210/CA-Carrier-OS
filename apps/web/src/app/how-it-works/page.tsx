@@ -35,7 +35,7 @@ export default function HowItWorksPage() {
     },
     {
       num: '03',
-      title: 'Tailor Resumes with Zero-Fabrication (ADR-009)',
+      title: 'Tailor Resumes with Verified Records',
       subtitle: 'Stop AI hallucinations before they reach partner interviews',
       description:
         'Target specific job descriptions with our mathematically constrained tailoring engine. It is strictly prohibited from inventing unearned audit mandates or false client names. Every resume version requires your formal candidate attestation.',

@@ -18,19 +18,19 @@ import {
   User,
   Settings,
   Sparkles,
+  GraduationCap,
 } from 'lucide-react';
 import { WorkspaceType } from '@ca-career-os/shared';
 
 const CANDIDATE_NAV_ITEMS = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/onboarding', label: 'Onboarding Wizard', icon: Sparkles },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/articleship', label: 'Articleship', icon: GraduationCap },
+  { href: '/jobs', label: 'Jobs', icon: Briefcase },
   { href: '/career', label: 'Career Pathway', icon: Compass },
-  { href: '/jobs', label: 'Job Discovery', icon: Briefcase },
-  { href: '/resumes', label: 'Verified Resumes', icon: FileText },
+  { href: '/resumes', label: 'Resumes', icon: FileText },
   { href: '/interviews', label: 'Interview Prep', icon: MessageSquareCode },
-  { href: '/growth', label: 'Growth & Mentorship', icon: TrendingUp },
-  { href: '/practice', label: 'Practice OS', icon: BriefcaseBusiness },
-  { href: '/billing', label: 'Billing & Plans', icon: CreditCard },
+  { href: '/growth', label: 'Mentorship', icon: TrendingUp },
+  { href: '/practice', label: 'Practice CRM', icon: BriefcaseBusiness },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -118,23 +118,22 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Security & Verification Footer */}
+      {/* Clean Minimal Footer */}
       <div
         style={{
-          padding: '1.25rem',
+          padding: '1rem 1.25rem',
           borderTop: '1px solid var(--border-subtle)',
-          background: 'var(--surface-secondary)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '0.75rem',
+          color: 'var(--text-muted)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
-          <ShieldCheck size={16} color="var(--success-text)" />
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--success-text)' }}>
-            Candidate Blindfold Active
-          </span>
-        </div>
-        <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-          Tenant boundary isolated. Search activity hidden from current employers.
-        </div>
+        <span style={{ fontWeight: 500 }}>CharteredOS</span>
+        <Link href="/help" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>
+          Support
+        </Link>
       </div>
     </aside>
   );

@@ -112,7 +112,7 @@ export default function PrivacyPolicyPage() {
 
         <section>
           <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-            3. Zero-Fabrication Rule (ADR-009) & AI Boundaries
+            3. Verified Resume Standards & AI Boundaries
           </h2>
           <p>
             When utilizing AI-assisted resume tailoring or interview evaluations, your verified articleship records are processed strictly within bounded deterministic prompts. The AI is structurally prohibited from storing your confidential client engagements in public training datasets.

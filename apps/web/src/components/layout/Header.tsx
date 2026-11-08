@@ -25,20 +25,20 @@ import {
   TrendingUp,
   CreditCard,
   Sparkles,
+  GraduationCap,
 } from 'lucide-react';
 import { WorkspaceType } from '@ca-career-os/shared';
 import { apiClient } from '../../lib/api-client';
 
 const MOBILE_NAV_ITEMS = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/onboarding', label: 'Onboarding Wizard', icon: Sparkles },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/articleship', label: 'Articleship', icon: GraduationCap },
+  { href: '/jobs', label: 'Jobs', icon: Briefcase },
   { href: '/career', label: 'Career Pathway', icon: Compass },
-  { href: '/jobs', label: 'Job Discovery', icon: Briefcase },
-  { href: '/resumes', label: 'Verified Resumes', icon: FileText },
+  { href: '/resumes', label: 'Resumes', icon: FileText },
   { href: '/interviews', label: 'Interview Prep', icon: MessageSquareCode },
-  { href: '/growth', label: 'Growth & Mentorship', icon: TrendingUp },
-  { href: '/practice', label: 'Practice OS', icon: BriefcaseBusiness },
-  { href: '/billing', label: 'Billing & Plans', icon: CreditCard },
+  { href: '/growth', label: 'Mentorship', icon: TrendingUp },
+  { href: '/practice', label: 'Practice CRM', icon: BriefcaseBusiness },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -213,13 +213,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Right: Security, Notifications & User Status */}
+      {/* Right: Notifications & User Status */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        {/* Phase 2 Security Badge */}
-        <span className="badge badge-emerald" style={{ fontSize: '0.6875rem' }}>
-          <ShieldCheck size={12} /> Candidate Blindfold
-        </span>
-
         {/* Notifications Bell */}
         {isAuthenticated && (
           <div style={{ position: 'relative' }}>
