@@ -18,6 +18,11 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "dependencies": {
+    "next": "^15.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
     "next": "^15.1.7",
     "react": "^19.0.0",
