@@ -21,7 +21,13 @@ import {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, demoLogin, verifyOtp, resendOtp, isLoading } = useAuth();
+  const { login, demoLogin, verifyOtp, resendOtp, isLoading, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   // Step 1: Credentials
   const [email, setEmail] = useState('');

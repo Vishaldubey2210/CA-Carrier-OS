@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
@@ -19,7 +19,13 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, isLoading } = useAuth();
+  const { register, isLoading, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');

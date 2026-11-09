@@ -136,7 +136,7 @@ export default function AdminPortalPage() {
 
   const fetchAggregatorHealth = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/v1/jobs/sources/health');
+      const res = await fetch('/api/v1/jobs/sources/health');
       const json = await res.json();
       if (json.success && json.data) {
         setAggregatorHealth(json.data);
@@ -150,7 +150,7 @@ export default function AdminPortalPage() {
     setIsSyncing(true);
     setSyncMessage(null);
     try {
-      const loginRes = await fetch('http://localhost:4000/api/v1/auth/demo-login', {
+      const loginRes = await fetch('/api/v1/auth/demo-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: 'ADMIN' }),
@@ -159,7 +159,7 @@ export default function AdminPortalPage() {
       const token = loginJson.data?.accessToken;
       const workspaceId = loginJson.data?.defaultWorkspaceId;
 
-      const syncRes = await fetch('http://localhost:4000/api/v1/jobs/sources/sync', {
+      const syncRes = await fetch('/api/v1/jobs/sources/sync', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -63,54 +63,8 @@ export default function CandidateDashboardPage() {
     );
   }
 
-  // If user is not signed in, show a clean, inviting card with Demo option
   if (!isAuthenticated) {
-    return (
-      <div style={{ maxWidth: '480px', margin: '4rem auto', padding: '2rem', background: '#ffffff', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', textAlign: 'center', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-sm)', background: 'var(--surface-secondary)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: 'var(--text-primary)' }}>
-          <Lock size={18} />
-        </div>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.375rem', letterSpacing: '-0.015em' }}>
-          Sign In to Your Dashboard
-        </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', lineHeight: 1.5, marginBottom: '1.5rem' }}>
-          Access your personal articleship applications, career pathway, and verified resume profile.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-          <div style={{ display: 'flex', gap: '0.625rem', justifyContent: 'center' }}>
-            <Link
-              href="/login"
-              className="btn btn-primary"
-              style={{ flex: 1, padding: '0.55rem 1rem', fontSize: '0.8125rem' }}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="btn btn-secondary"
-              style={{ flex: 1, padding: '0.55rem 1rem', fontSize: '0.8125rem' }}
-            >
-              Create Account
-            </Link>
-          </div>
-          <button
-            onClick={() => demoLogin('CANDIDATE')}
-            className="btn btn-secondary"
-            style={{
-              padding: '0.55rem 1rem',
-              fontSize: '0.8125rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.375rem',
-            }}
-          >
-            <User size={13} /> Continue with Demo Account
-          </button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const candidateName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Candidate';
