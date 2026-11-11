@@ -77,39 +77,36 @@ export function ContactSection() {
   return (
     <section
       id="contact"
-      className="py-16 sm:py-24 px-4 sm:px-6 max-w-[1200px] mx-auto w-full"
+      className="py-16 sm:py-20 px-4 sm:px-6 max-w-[1120px] mx-auto w-full"
     >
-      {/* Section Header (Guaranteed visible, no clipping) */}
-      <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-14">
-        <span className="editorial-step">
-          07 — DIRECT CONTACT & SUPPORT
-        </span>
-        <h2 className="text-[clamp(1.875rem,3.5vw,2.75rem)] font-bold text-[#0F172A] tracking-tight leading-tight mt-2 mb-3">
-          Connect with our Member Operations Team
+      {/* Section Header */}
+      <div className="text-center max-w-[620px] mx-auto mb-10">
+        <h2 className="text-[clamp(1.75rem,2.8vw,2.25rem)] font-semibold text-[#1C1917] tracking-tight leading-snug mb-3">
+          Get in touch with member support
         </h2>
-        <p className="text-[16px] text-[#334155] leading-relaxed max-w-[65ch] mx-auto m-0">
+        <p className="text-[15px] text-[#57534E] leading-relaxed max-w-[65ch] mx-auto m-0">
           Inquiries regarding career diagnostics, firm onboarding, or verified recruitment receive responses within 4 business hours.
         </p>
       </div>
 
       {/* 2-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
-        {/* Left Column: SLA Badge, Details & Tracking Info (2 cols) */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#E2E8F0] bg-white p-6 sm:p-8 flex flex-col gap-6 shadow-card">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+        {/* Left Column */}
+        <div className="lg:col-span-2 rounded-xl border border-[#E7E5E4] bg-white p-6 sm:p-8 flex flex-col gap-6 shadow-xs">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0] text-[12px] font-bold tracking-wider uppercase mb-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0] text-[12px] font-medium mb-3">
               <Clock size={13} />
               <span>SLA: &lt; 4 Hours</span>
             </div>
-            <h3 className="text-[20px] font-bold text-[#0F172A] mb-2 m-0">
+            <h3 className="text-[18px] font-semibold text-[#1C1917] mb-2 m-0">
               Dedicated CA Support
             </h3>
-            <p className="text-[14px] text-[#475569] leading-relaxed m-0">
-              Our operations team includes qualified Chartered Accountants and technical recruiters who understand ICAI compliance and corporate recruitment cycles.
+            <p className="text-[14px] text-[#57534E] leading-relaxed m-0">
+              Our operations team includes qualified Chartered Accountants who understand ICAI compliance and recruitment cycles.
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 pt-4 border-t border-[#E2E8F0] text-[14px]">
+          <div className="flex flex-col gap-4 pt-4 border-t border-[#F5F5F4] text-[14px]">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-[#EEF2F6] flex items-center justify-center text-[#1E3A8A] shrink-0 mt-0.5">
                 <Mail size={16} />

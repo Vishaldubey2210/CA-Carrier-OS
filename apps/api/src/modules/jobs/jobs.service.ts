@@ -37,6 +37,7 @@ import { JobSourceRegistryService } from './connectors/job-source-registry.servi
 import { JobDeduplicationService } from './job-deduplication.service.js';
 import { JobFreshnessService } from './job-freshness.service.js';
 import { JobIngestionOrchestratorService } from './job-ingestion-orchestrator.service.js';
+import { CURATED_INITIAL_JOBS } from './curated-jobs.data.js';
 
 @Injectable()
 export class JobsService {
@@ -84,18 +85,43 @@ export class JobsService {
    * Guaranteed authentic with real outbound links — ZERO synthetic hallucinations.
    */
   private seedInitialCuratedJobs() {
-    // If persistent store already has jobs, use them
-    if (this.memJobs.size > 0 && process.env.NODE_ENV !== 'test') {
+    const now = new Date();
+    const expires = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    // Seed authentic curated enterprise & articleship opportunities if not already present
+    for (const job of CURATED_INITIAL_JOBS) {
+      const fingerprint = generateJobFingerprint(
+        job.companyName,
+        job.normalizedTitle,
+        job.locationCity
+      );
+      const exists = Array.from(this.memJobs.values()).some((j) => j.fingerprint === fingerprint);
+      if (!exists) {
+        const id = randomUUID();
+        this.memJobs.set(id, {
+          id,
+          ...job,
+          postedAt: now.toISOString(),
+          expiresAt: expires.toISOString(),
+          fingerprint,
+        });
+      }
+    }
+
+    // If persistent store already has jobs, log summary
+    if (this.memJobs.size > CURATED_INITIAL_JOBS.length && process.env.NODE_ENV !== 'test') {
       this.logger.log(`Loaded ${this.memJobs.size} authentic opportunities from persistent store.`);
       return;
     }
 
-    // Trigger authentic XML feed synchronization directly — ZERO synthetic placeholders
-    this.triggerSourceSync('xml_feed').then((res) => {
-      this.logger.log(`Initial XML feed sync completed with ${res.totalIngested} authentic jobs.`);
-    }).catch((err) => {
-      this.logger.warn(`Initial XML feed sync deferred: ${err.message}`);
-    });
+    // Trigger authentic XML feed synchronization when in live mode
+    if (process.env.NODE_ENV !== 'test') {
+      this.triggerSourceSync('xml_feed').then((res) => {
+        this.logger.log(`Initial XML feed sync completed with ${res.totalIngested} authentic jobs.`);
+      }).catch((err) => {
+        this.logger.warn(`Initial XML feed sync deferred: ${err.message}`);
+      });
+    }
   }
 
   /**

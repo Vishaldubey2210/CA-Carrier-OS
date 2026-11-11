@@ -3,122 +3,64 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, RotateCw, CheckCircle2, UserCheck, ShieldCheck } from 'lucide-react';
+import { RotateCw, UserCheck, ArrowRight, GraduationCap } from 'lucide-react';
 
 export function FinalCTA() {
   const router = useRouter();
-  const [demoStage, setDemoStage] = useState<'IDLE' | 'ANALYZING' | 'MATCHING' | 'READY'>('IDLE');
+  const [isEnteringDemo, setIsEnteringDemo] = useState(false);
 
   const handleLaunchTestDrive = () => {
-    if (demoStage !== 'IDLE') return;
-    setDemoStage('ANALYZING');
+    if (isEnteringDemo) return;
+    setIsEnteringDemo(true);
     setTimeout(() => {
-      setDemoStage('MATCHING');
-      setTimeout(() => {
-        setDemoStage('READY');
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 600);
-      }, 700);
-    }, 700);
+      router.push('/dashboard');
+    }, 600);
   };
 
   return (
-    <section style={{ maxWidth: '1200px', margin: '0 auto', padding: '4rem 1rem', width: '100%' }}>
-      <div
-        style={{
-          background: 'var(--surface-primary)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '3rem 2rem',
-          textAlign: 'center',
-          boxShadow: 'var(--shadow-card)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '1.25rem',
-        }}
-      >
-        <div className="badge-success-clean">
-          <CheckCircle2 size={12} />
-          <span>CharteredOS Workspace</span>
-        </div>
-
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.2vw, 2.5rem)', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.025em' }}>
-          Accelerate Your Professional Career with CharteredOS
+    <section className="max-w-[1120px] mx-auto px-4 sm:px-6 py-16 sm:py-20 w-full">
+      <div className="bg-white border border-[#E7E5E4] rounded-2xl p-8 sm:p-12 text-center shadow-xs flex flex-col items-center gap-5">
+        <h2 className="text-[clamp(1.75rem,2.8vw,2.25rem)] font-semibold text-[#1C1917] tracking-tight leading-snug m-0 max-w-[600px]">
+          Start exploring verified CA opportunities today
         </h2>
 
-        <p style={{ fontSize: '0.9375rem', color: 'var(--text-secondary)', maxWidth: '620px', margin: 0, lineHeight: 1.6 }}>
-          Direct access to 440+ verified articleship and finance positions, objective competency benchmarking, and confidential candidate isolation.
+        <p className="text-[15px] text-[#57534E] max-w-[560px] m-0 leading-relaxed">
+          Access 480+ verified articleship and qualified finance openings, Form 108 practical training tracking, and confidential career discovery.
         </p>
 
-        {/* Demo Box */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '460px',
-            marginTop: '0.5rem',
-            padding: '1.25rem',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--surface-secondary)',
-            border: '1px solid var(--border-subtle)',
-            textAlign: 'left',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Interactive Demo Workspace
-            </span>
-            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-              NO REGISTRATION REQUIRED
-            </span>
-          </div>
-
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-            Instant evaluation with preloaded career diagnostic, verified resume editor, and take-home CTC unbundler.
-          </p>
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <Link
+            href="/articleship"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1E3A8A] hover:bg-[#172554] text-white text-[14px] font-medium shadow-xs transition-colors"
+          >
+            <GraduationCap size={16} />
+            <span>Browse Articleships</span>
+          </Link>
 
           <button
             type="button"
-            disabled={demoStage !== 'IDLE'}
             onClick={handleLaunchTestDrive}
-            className="btn btn-primary"
-            style={{ width: '100%', padding: '0.625rem', fontSize: '0.8125rem', justifyContent: 'center' }}
+            disabled={isEnteringDemo}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#F5F5F4] hover:bg-[#EBEAE5] text-[#1C1917] border border-[#E7E5E4] text-[14px] font-medium transition-colors cursor-pointer"
           >
-            {demoStage === 'IDLE' ? (
+            {isEnteringDemo ? (
               <>
-                <UserCheck size={15} />
-                <span>Launch Interactive Demo</span>
+                <RotateCw size={15} className="animate-spin text-[#1E3A8A]" />
+                <span>Entering Workspace...</span>
               </>
             ) : (
               <>
-                <RotateCw size={15} className="animate-spin" />
-                <span>Entering Workspace...</span>
+                <UserCheck size={15} className="text-[#1E3A8A]" />
+                <span>One-Click Instant Demo</span>
               </>
             )}
           </button>
         </div>
 
-        {/* Secondary Standard Links */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginTop: '0.25rem' }}>
-          <Link
-            href="/register"
-            className="btn btn-secondary"
-            style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem' }}
-          >
-            Create Free Account <ArrowRight size={13} />
-          </Link>
-          <Link
-            href="/articleship"
-            className="btn btn-ghost"
-            style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem' }}
-          >
-            Browse Articleships
-          </Link>
-        </div>
+        <span className="text-[12px] text-[#78716C] pt-2">
+          Free candidate registration • No credit card required • ICAI code of ethics compliant
+        </span>
       </div>
     </section>
   );

@@ -111,7 +111,7 @@ export default function ArticleshipPage() {
   const industrialCount = useMemo(() => jobs.filter(j => j.opportunityType === 'INDUSTRIAL_TRAINING').length, [jobs]);
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
+    <div className="animate-fade-in" style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
       {/* 1. Header (Linear / Stripe style clean header) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
         <div>
@@ -182,12 +182,12 @@ export default function ArticleshipPage() {
 
         <div className="metric-strip-item">
           <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Fake / Placeholder Data
+            ICAI Stipend Norms
           </span>
           <div style={{ fontSize: '1.375rem', fontWeight: 700, color: '#15803d', fontVariantNumeric: 'tabular-nums' }}>
-            0 (Zero)
+            Regulation 48
           </div>
-          <span style={{ fontSize: '0.6875rem', color: '#15803d' }}>Live outbound applications only</span>
+          <span style={{ fontSize: '0.6875rem', color: '#15803d' }}>₹4,000 to ₹25,000+/mo verified</span>
         </div>
       </div>
 

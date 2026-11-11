@@ -239,7 +239,7 @@ export class CareerService {
         include: { tasks: { orderBy: { createdAt: 'asc' } } },
       });
 
-      if (dbRoadmap && dbRoadmap.tasks.length >= 20) {
+      if (dbRoadmap && dbRoadmap.tasks.length > 0) {
         const completedTasks = dbRoadmap.tasks.filter((t) => t.status === 'COMPLETED').length;
         const total = dbRoadmap.tasks.length;
         return {
@@ -260,7 +260,7 @@ export class CareerService {
       }
     } else {
       const mem = this.memRoadmaps.get(profile.id);
-      if (mem && mem.tasks.length >= 20) {
+      if (mem && mem.tasks.length > 0) {
         const completed = mem.tasks.filter((t) => t.status === 'COMPLETED').length;
         const total = mem.tasks.length;
         return {

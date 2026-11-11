@@ -147,7 +147,7 @@ export function SevenHorizons() {
       {/* Section Header */}
       <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-14">
         <span className="editorial-step">
-          03 — 7 CAREER HORIZONS
+          Specialized Horizons
         </span>
         <h2 className="text-[clamp(1.875rem,3.5vw,2.75rem)] font-bold text-[#0F172A] tracking-tight leading-tight mt-2 mb-3">
           Specialized Horizons for Qualified CAs

@@ -487,7 +487,7 @@ export default function CareerHubPage() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Editorial Header */}
       <div
         className="glass-panel"

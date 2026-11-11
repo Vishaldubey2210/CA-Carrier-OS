@@ -84,7 +84,7 @@ export default function CandidateDashboardPage() {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
       {/* 1. Header (Linear Style) */}
       <div
         style={{

@@ -124,8 +124,9 @@ describe('Phase 5: Professional Growth, Recruitment & Practice Management (20 Sc
     const mentors = await mentorshipService.listMentors();
     assert.ok(mentors.length > 0);
     const mentor = mentors[0];
-    const slotStart = '2026-11-05T14:00:00.000Z';
-    const slotEnd = '2026-11-05T14:45:00.000Z';
+    const now = Date.now();
+    const slotStart = new Date(now + 86400000).toISOString();
+    const slotEnd = new Date(now + 86400000 + 45 * 60000).toISOString();
 
     // First booking succeeds
     const booking1 = await mentorshipService.createBooking(
@@ -171,8 +172,8 @@ describe('Phase 5: Professional Growth, Recruitment & Practice Management (20 Sc
     const booking = await mentorshipService.createBooking(
       {
         mentorProfileId: mentor.id,
-        slotStartTime: '2026-11-06T10:00:00.000Z',
-        slotEndTime: '2026-11-06T10:45:00.000Z',
+        slotStartTime: new Date(Date.now() + 172800000).toISOString(),
+        slotEndTime: new Date(Date.now() + 172800000 + 45 * 60000).toISOString(),
         topic: 'TAXATION',
         candidateNotes: 'User A private booking',
       },
@@ -511,8 +512,8 @@ describe('Phase 5: Professional Growth, Recruitment & Practice Management (20 Sc
   test('18. Repeated requests do not create duplicate bookings for the same slot', async () => {
     const mentors = await mentorshipService.listMentors();
     const mentor = mentors[1] || mentors[0];
-    const slotStart = '2026-11-10T11:00:00.000Z';
-    const slotEnd = '2026-11-10T11:45:00.000Z';
+    const slotStart = new Date(Date.now() + 259200000).toISOString();
+    const slotEnd = new Date(Date.now() + 259200000 + 45 * 60000).toISOString();
 
     const b1 = await mentorshipService.createBooking(
       { mentorProfileId: mentor.id, slotStartTime: slotStart, slotEndTime: slotEnd, topic: 'FP_AND_A' },

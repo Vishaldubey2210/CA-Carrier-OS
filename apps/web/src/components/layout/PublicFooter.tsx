@@ -8,11 +8,11 @@ export function PublicFooter() {
   return (
     <footer
       role="contentinfo"
-      className="border-t border-[#E2E8F0] bg-white text-[#334155] mt-auto transition-colors"
+      className="border-t border-[#E7E5E4] bg-white text-[#44403C] mt-auto transition-colors"
       style={{
-        borderTop: '1px solid #E2E8F0',
+        borderTop: '1px solid #E7E5E4',
         backgroundColor: '#FFFFFF',
-        padding: '4rem 1.5rem 2.5rem',
+        padding: '3.5rem 1.5rem 2.5rem',
       }}
     >
       <div className="max-w-[1200px] mx-auto flex flex-col gap-10">

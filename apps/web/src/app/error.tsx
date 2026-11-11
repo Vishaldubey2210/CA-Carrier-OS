@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, RefreshCw, Home, HelpCircle } from 'lucide-react';
+import { AlertCircle, RotateCcw, Home } from 'lucide-react';
 import { reportFrontendError } from '../lib/error-reporter';
 
 export default function ErrorBoundary({
@@ -13,7 +13,6 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Record sanitized telemetry with correlation / digest ID
     reportFrontendError(error, {
       componentName: 'AppErrorBoundary',
       correlationId: error?.digest,
@@ -27,48 +26,50 @@ export default function ErrorBoundary({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem',
+        padding: '2rem 1.5rem',
         textAlign: 'center',
       }}
+      className="animate-fade-in"
     >
       <div
         className="glass-panel"
         style={{
-          maxWidth: '540px',
-          padding: '3rem 2.5rem',
+          maxWidth: '520px',
+          width: '100%',
+          padding: '2.5rem 2rem',
           background: 'var(--surface-primary)',
-          border: '1px solid rgba(239, 68, 68, 0.25)',
+          border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-md)',
+          boxShadow: 'var(--shadow-card)',
         }}
       >
         <div
           style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '16px',
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.25)',
+            width: '52px',
+            height: '52px',
+            borderRadius: '12px',
+            background: '#FEF3C7',
+            border: '1px solid #FDE68A',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--accent-rose)',
-            marginBottom: '1.5rem',
+            color: '#B45309',
+            marginBottom: '1.25rem',
           }}
         >
-          <AlertTriangle size={32} />
+          <AlertCircle size={26} />
         </div>
 
         <h1
           style={{
-            fontSize: '1.5rem',
-            fontWeight: 800,
+            fontSize: '1.375rem',
+            fontWeight: 700,
             color: 'var(--text-primary)',
             letterSpacing: '-0.02em',
-            marginBottom: '0.75rem',
+            marginBottom: '0.5rem',
           }}
         >
-          Something went wrong
+          Temporary service hiccup
         </h1>
 
         <p
@@ -76,53 +77,35 @@ export default function ErrorBoundary({
             fontSize: '0.875rem',
             color: 'var(--text-secondary)',
             lineHeight: 1.6,
-            marginBottom: '2rem',
+            marginBottom: '1.75rem',
           }}
         >
-          An unexpected interruption occurred while processing your request. Your account and workspace data remain safe.
+          We encountered an issue loading this view. Your session and data are secure. Please try refreshing the section.
         </p>
 
-        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.625rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
             onClick={() => reset()}
             className="btn btn-primary"
-            style={{ padding: '0.625rem 1.25rem', gap: '0.5rem' }}
+            style={{ padding: '0.55rem 1.125rem' }}
           >
-            <RefreshCw size={15} />
+            <RotateCcw size={14} />
             <span>Try Again</span>
           </button>
 
           <Link
             href="/"
             className="btn btn-secondary"
-            style={{ padding: '0.625rem 1.25rem', gap: '0.5rem' }}
+            style={{ padding: '0.55rem 1.125rem' }}
           >
-            <Home size={15} />
-            <span>Return to Homepage</span>
-          </Link>
-
-          <Link
-            href="/contact"
-            className="btn btn-secondary"
-            style={{ padding: '0.625rem 1.25rem', gap: '0.5rem' }}
-          >
-            <HelpCircle size={15} />
-            <span>Contact Support</span>
+            <Home size={14} />
+            <span>Return Home</span>
           </Link>
         </div>
 
         {error?.digest && (
-          <div
-            style={{
-              marginTop: '2rem',
-              paddingTop: '1rem',
-              borderTop: '1px solid var(--border-subtle)',
-              fontSize: '0.75rem',
-              color: 'var(--text-muted)',
-              fontFamily: 'monospace',
-            }}
-          >
-            Incident Reference: {error.digest}
+          <div style={{ marginTop: '1.5rem', fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+            Error Reference: <code style={{ fontFamily: 'var(--font-mono)' }}>{error.digest}</code>
           </div>
         )}
       </div>

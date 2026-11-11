@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const FAQS = [
@@ -32,13 +32,12 @@ export const FAQS = [
 ];
 
 export function FAQSection() {
-  const [activeFaq, setActiveFaq] = useState<number | null>(0); // First item open by default
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
     setActiveFaq((prev) => (prev === idx ? null : idx));
   };
 
-  // Structured Data JSON-LD for FAQPage
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -55,29 +54,25 @@ export function FAQSection() {
   return (
     <section
       id="faq"
-      className="py-16 sm:py-24 px-4 sm:px-6 max-w-[900px] mx-auto w-full"
+      className="py-16 sm:py-20 px-4 sm:px-6 max-w-[800px] mx-auto w-full"
     >
-      {/* FAQ Schema Script */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
       {/* Section Header */}
-      <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-12">
-        <span className="editorial-step">
-          06 — CLARITY & TRUST
-        </span>
-        <h2 className="text-[clamp(1.875rem,3.5vw,2.75rem)] font-bold text-[#0F172A] tracking-tight leading-tight mt-2 mb-3">
-          Frequently Asked Questions
+      <div className="text-center max-w-[600px] mx-auto mb-10">
+        <h2 className="text-[clamp(1.75rem,2.8vw,2.25rem)] font-semibold text-[#1C1917] tracking-tight leading-snug mb-3">
+          Frequently asked questions
         </h2>
-        <p className="text-[16px] text-[#334155] leading-relaxed max-w-[65ch] mx-auto m-0">
-          Direct answers regarding career diagnostics, candidate confidentiality, compensation benchmarks, and platform security.
+        <p className="text-[15px] text-[#57534E] leading-relaxed m-0">
+          Answers regarding articleship verification, candidate confidentiality, compensation benchmarks, and platform security.
         </p>
       </div>
 
       {/* Accordion List */}
-      <div className="flex flex-col gap-3.5">
+      <div className="flex flex-col gap-3">
         {FAQS.map((faq, idx) => {
           const isOpen = activeFaq === idx;
           const buttonId = `faq-btn-${idx}`;
@@ -86,10 +81,10 @@ export function FAQSection() {
           return (
             <div
               key={idx}
-              className={`rounded-xl border transition-all duration-200 overflow-hidden bg-white ${
+              className={`rounded-xl border transition-colors overflow-hidden bg-white ${
                 isOpen
-                  ? 'border-[#CBD5E1] shadow-card'
-                  : 'border-[#E2E8F0] shadow-2xs hover:border-[#CBD5E1]'
+                  ? 'border-[#D6D3D1] shadow-xs'
+                  : 'border-[#E7E5E4] hover:border-[#D6D3D1]'
               }`}
             >
               <button
@@ -100,15 +95,15 @@ export function FAQSection() {
                 onClick={() => toggleFaq(idx)}
                 className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]"
               >
-                <span className="text-[15px] sm:text-[16px] font-bold text-[#0F172A] leading-snug">
+                <span className="text-[15px] font-medium text-[#1C1917] leading-snug">
                   {faq.q}
                 </span>
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'bg-[#EEF2F6] text-[#1E3A8A] rotate-180' : 'bg-[#F8FAFC] text-[#64748B]'
+                  className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                    isOpen ? 'bg-[#F4F3EF] text-[#1E3A8A] rotate-180' : 'bg-[#FAF9F6] text-[#78716C]'
                   }`}
                 >
-                  <ChevronDown size={18} />
+                  <ChevronDown size={16} />
                 </div>
               </button>
 
@@ -121,10 +116,10 @@ export function FAQSection() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="px-4 sm:px-5 pb-5 pt-1 text-[14px] text-[#475569] leading-relaxed border-t border-[#F1F5F9]">
+                    <div className="px-4 sm:px-5 pb-5 pt-1 text-[14px] text-[#57534E] leading-relaxed border-t border-[#F5F5F4]">
                       <p className="m-0">{faq.a}</p>
                     </div>
                   </motion.div>

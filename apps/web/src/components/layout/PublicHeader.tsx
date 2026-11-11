@@ -100,7 +100,7 @@ export function PublicHeader() {
           style={{ height: '2.5px' }}
         >
           <div
-            className="h-full bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#059669] transition-transform duration-75 origin-left"
+            className="h-full bg-[#0F172A] transition-transform duration-75 origin-left"
             style={{
               transform: `scaleX(${scrollProgress})`,
               transformOrigin: '0% 50%',
@@ -180,7 +180,7 @@ export function PublicHeader() {
                 )}
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-[#1E3A8A] hover:bg-[#1E40AF] px-4 py-2 rounded-lg shadow-sm transition-all hover:shadow hover:-translate-y-0.5 active:translate-y-0 no-underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-[#0F172A] hover:bg-[#1E293B] px-4 py-2 rounded-lg shadow-sm transition-all no-underline"
                 >
                   <span>Command Center</span>
                   <ArrowRight size={14} />
@@ -196,9 +196,9 @@ export function PublicHeader() {
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-[#1E3A8A] hover:bg-[#1E40AF] px-4 py-2 rounded-lg shadow-sm transition-all hover:shadow hover:-translate-y-0.5 active:translate-y-0 no-underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white bg-[#1E3A8A] hover:bg-[#172554] px-4 py-2 rounded-lg shadow-xs transition-colors no-underline"
                 >
-                  <span>Launch Command Center</span>
+                  <span>Launch Workspace</span>
                   <ArrowRight size={14} />
                 </Link>
               </>

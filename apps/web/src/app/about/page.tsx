@@ -73,7 +73,7 @@ export default function AboutPage() {
 
       {/* The Core Problem */}
       <section className="glass-panel" style={{ padding: '2.5rem', marginBottom: '3.5rem' }}>
-        <span className="editorial-step" style={{ display: 'inline-block', marginBottom: '0.5rem' }}>01 — THE PROBLEM</span>
+        <span className="editorial-step" style={{ display: 'inline-block', marginBottom: '0.5rem' }}>The Industry Challenge</span>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
           Why the Traditional CA Career Journey is Broken
         </h2>
@@ -108,7 +108,7 @@ export default function AboutPage() {
       {/* Our Core Architectural Principles */}
       <section style={{ marginBottom: '4rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <span className="editorial-step" style={{ display: 'inline-block' }}>02 — PILLARS OF INTEGRITY</span>
+          <span className="editorial-step" style={{ display: 'inline-block' }}>Pillars of Integrity</span>
           <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
             Four Principles We Never Compromise
           </h2>
@@ -162,7 +162,7 @@ export default function AboutPage() {
 
       {/* Target Personas */}
       <section className="glass-panel" style={{ padding: '2.5rem', marginBottom: '4rem' }}>
-        <span className="editorial-step" style={{ display: 'inline-block', marginBottom: '0.5rem' }}>03 — WHO WE SERVE</span>
+        <span className="editorial-step" style={{ display: 'inline-block', marginBottom: '0.5rem' }}>Who We Serve</span>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1.5rem', letterSpacing: '-0.02em' }}>
           Tailored for Every Stage of the CA Lifecycle
         </h2>

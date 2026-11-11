@@ -42,40 +42,40 @@ export default function RootHomePage() {
         Skip to main content
       </a>
 
-      {/* Main Home Page Sections with Alternating Background Rhythm */}
-      <div id="main-content" className="flex flex-col w-full overflow-x-clip">
-        {/* 1. Hero Section (White / Soft Radial Glow) */}
-        <div className="bg-white">
+      {/* Main Home Page Sections with Calm Background Rhythm */}
+      <div id="main-content" className="flex flex-col w-full overflow-x-clip bg-[#FAF9F6]">
+        {/* 1. Hero Section */}
+        <div>
           <HeroSection />
         </div>
 
-        {/* 2. Core Capabilities Bento Grid (White) */}
-        <div className="bg-[#F8FAFC] border-t border-[#E2E8F0]">
+        {/* 2. Core Capabilities */}
+        <div className="bg-white border-y border-[#E7E5E4]">
           <CoreCapabilities />
         </div>
 
-        {/* 3. Transparent Pricing Tiers (Soft Tint #F8FAFC) */}
-        <div className="bg-white border-y border-[#E2E8F0]">
+        {/* 3. Transparent Pricing Tiers */}
+        <div>
           <PricingSection />
         </div>
 
-        {/* 7. Purpose & Governance (White) */}
-        <div className="bg-white">
+        {/* 4. Purpose & Governance */}
+        <div className="bg-white border-y border-[#E7E5E4]">
           <PurposeGovernance />
         </div>
 
-        {/* 8. FAQ Accordion (Soft Tint #F8FAFC) */}
-        <div className="bg-[#F8FAFC] border-y border-[#E2E8F0]">
+        {/* 5. FAQ Accordion */}
+        <div>
           <FAQSection />
         </div>
 
-        {/* 9. Contact & Member Operations (White) */}
-        <div className="bg-white">
+        {/* 6. Contact & Member Operations */}
+        <div className="bg-white border-t border-[#E7E5E4]">
           <ContactSection />
         </div>
 
-        {/* 10. Final Call to Action (Gradient Card on #F8FAFC) */}
-        <div className="bg-[#F8FAFC] border-t border-[#E2E8F0]">
+        {/* 7. Final Call to Action */}
+        <div className="border-t border-[#E7E5E4]">
           <FinalCTA />
         </div>
 

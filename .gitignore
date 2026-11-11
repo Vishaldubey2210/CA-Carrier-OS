@@ -8,6 +8,7 @@ build/
 .next/
 out/
 *.tsbuildinfo
+graphify-out/
 
 # Environment and secrets
 .env

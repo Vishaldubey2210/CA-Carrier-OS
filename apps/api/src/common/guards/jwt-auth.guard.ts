@@ -86,10 +86,14 @@ export class JwtAuthGuard implements CanActivate {
         req.defaultWorkspaceId = (payload as any).workspaceId;
         return true;
       }
+
+      // Explicitly reject invalid or tampered tokens with 401
+      throw new UnauthorizedException('Invalid or expired authentication session');
     }
 
-    // Graceful fallback for demo sessions / non-production environments
-    if (isDemoModeHeader || process.env.NODE_ENV !== 'production') {
+    // Explicit demo mode fallback (requires explicit demo header)
+    const allowDemo = process.env.ALLOW_DEMO_LOGIN === 'true' || process.env.NODE_ENV !== 'production';
+    if (allowDemo && isDemoModeHeader) {
       const explicitRole = ((req.headers['x-demo-role'] as string) || '').toUpperCase();
       let selectedDemo = demoUsers.CANDIDATE;
       if (explicitRole.includes('ADMIN')) {
@@ -111,10 +115,6 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    if (!token) {
-      throw new UnauthorizedException('Authentication token missing or malformed');
-    }
-
-    throw new UnauthorizedException('Invalid or expired authentication session');
+    throw new UnauthorizedException('Authentication token missing or malformed');
   }
 }
