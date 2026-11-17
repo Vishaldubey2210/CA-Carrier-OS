@@ -134,3 +134,4 @@ export class CareerjetConnector implements JobConnector {
     };
   }
 }
+

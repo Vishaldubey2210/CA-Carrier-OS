@@ -19,6 +19,9 @@ import {
   GraduationCap,
   SlidersHorizontal,
   Globe,
+  Download,
+  FileSpreadsheet,
+  Mail,
 } from 'lucide-react';
 import { JobDetail, HIRING_SOURCES_CATALOG, HiringSourceCategory } from '@ca-career-os/shared';
 import { apiClient } from '@/lib/api-client';
@@ -210,6 +213,45 @@ export default function ArticleshipPage() {
             <p style={{ margin: 0, color: '#52525B' }}>
               In India, formal training under the Chartered Accountants Act is designated as <strong>ICAI Articleship (Form 102/103)</strong> or <strong>Corporate Industrial Training (Form 104)</strong>. In international jurisdictions (UK, USA, Canada, Australia, South Africa), comparable programs are styled as <em>Trainee Accountant</em>, <em>Audit Apprenticeship</em>, <em>Training Contract</em>, <em>CPA Articling</em>, or <em>Graduate Programme</em> under their respective professional bodies (ICAEW, ACCA, SAICA, CPA Canada) and are not automatic statutory equivalents of ICAI Articleship.
             </p>
+          </div>
+
+          {/* 5,000 Verified CA Articleship Firms CSV Download Card */}
+          <div
+            style={{
+              padding: '1.25rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              background: '#FFFFFF',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
+            }}
+          >
+            <div style={{ maxWidth: '780px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
+                <FileSpreadsheet size={18} style={{ color: '#000000' }} />
+                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: 0, color: '#000000' }}>
+                  5,000 Verified CA Articleship Firms Directory (CSV)
+                </h3>
+                <span className="badge-clean">5,000 Firms</span>
+                <span className="badge-success-clean">WIRC • NIRC • SIRC • EIRC • CIRC</span>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: '#52525B', margin: 0, lineHeight: 1.5 }}>
+                Structured database of 5,000 CA firms across India including Big 4, Top 20 National Networks, and verified regional mid-size practices. Includes Firm Registration Numbers (FRN), official recruitment desks (<code>articleship@...</code>), city, key practice domains, stipend ranges, and recommended cold-email templates.
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <a
+                href="/downloads/ca_articleship_firms_5000.csv"
+                download="ca_articleship_firms_5000.csv"
+                className="btn btn-primary"
+                style={{ fontSize: '0.8125rem', padding: '0.55rem 1.1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <Download size={14} /> Download 5,000 CA Firms CSV
+              </a>
+            </div>
           </div>
 
           {/* Directory Search & Category Filter Toolbar */}
