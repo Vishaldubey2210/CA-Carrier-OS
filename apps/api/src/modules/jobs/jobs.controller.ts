@@ -20,6 +20,7 @@ import {
   ReportJobSchema,
   SaveJobNoteSchema,
   createSuccessResponse,
+  HIRING_SOURCES_CATALOG,
 } from '@ca-career-os/shared';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard.js';
 import { WorkspaceGuard } from '../../common/guards/workspace.guard.js';
@@ -161,6 +162,17 @@ export class JobsController {
   async listSources() {
     const sources = this.jobsService.getSourceRegistry();
     return createSuccessResponse(sources);
+  }
+
+  /**
+   * Get comprehensive verified catalog of 110+ CA hiring sources and articleship portals
+   */
+  @Get('sources/directory')
+  async getHiringSourcesDirectory() {
+    return createSuccessResponse({
+      total: HIRING_SOURCES_CATALOG.length,
+      sources: HIRING_SOURCES_CATALOG,
+    });
   }
 
   /**

@@ -17,13 +17,10 @@ export function PublicHeader() {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
-    { href: '/articleship', label: 'Articleship Hub' },
-    { href: '/jobs', label: 'CA Jobs' },
-    { href: '/#features', label: 'Capabilities', sectionId: 'features' },
-    { href: '/#pricing', label: 'Pricing', sectionId: 'pricing' },
-    { href: '/#about', label: 'Governance', sectionId: 'about' },
+    { href: '/articleship', label: 'Articleship', sectionId: 'articleship' },
+    { href: '/jobs', label: 'CA Jobs', sectionId: 'jobs' },
+    { href: '/#pricing', label: 'Pricing (₹99 & ₹199)', sectionId: 'pricing' },
     { href: '/#faq', label: 'FAQ', sectionId: 'faq' },
-    { href: '/#contact', label: 'Contact', sectionId: 'contact' },
   ];
 
   // 1. Scroll listener for progress bar, transparent->white background, and scrollspy
@@ -112,23 +109,23 @@ export function PublicHeader() {
           {/* Brand Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 no-underline group focus-visible:ring-2 focus-visible:ring-[#1E3A8A] rounded-md outline-none"
+            className="flex items-center gap-2.5 no-underline group focus-visible:ring-2 focus-visible:ring-black rounded-md outline-none"
             aria-label="CharteredOS Home"
           >
-            <div className="w-9 h-9 rounded-lg bg-[#1E3A8A] flex items-center justify-center text-white font-extrabold text-[15px] shadow-sm tracking-tight transition-transform group-hover:scale-105">
+            <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white font-extrabold text-[14px]">
               CO
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-[17px] text-[#0F172A] tracking-tight leading-tight">
+              <span className="font-bold text-[16px] text-black tracking-tight leading-tight">
                 CharteredOS
               </span>
-              <span className="text-[10px] font-semibold text-[#64748B] tracking-wider uppercase">
-                Career platform for CAs
+              <span className="text-[10px] font-medium text-neutral-500 tracking-wider uppercase">
+                Articleship &amp; CA Jobs
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation with Scrollspy */}
+          {/* Desktop Navigation */}
           <nav
             aria-label="Primary Navigation"
             className="hidden md:flex items-center gap-6 lg:gap-7"
@@ -141,15 +138,15 @@ export function PublicHeader() {
                   href={link.href}
                   className={`text-[14px] font-medium transition-colors no-underline relative py-1 ${
                     isActive
-                      ? 'text-[#1E3A8A] font-semibold'
-                      : 'text-[#475569] hover:text-[#0F172A]'
+                      ? 'text-black font-semibold'
+                      : 'text-neutral-600 hover:text-black'
                   }`}
                 >
                   {link.label}
                   {isActive && (
                     <motion.span
                       layoutId="navActivePill"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#1E3A8A] rounded-full"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-black rounded-full"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -162,27 +159,11 @@ export function PublicHeader() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-2.5">
-                {user?.role === 'PLATFORM_ADMIN' && (
-                  <Link
-                    href="/admin"
-                    className="text-[13px] font-semibold text-[#1E3A8A] px-3 py-1.5 rounded-lg border border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors no-underline"
-                  >
-                    Admin Portal
-                  </Link>
-                )}
-                {user?.role === 'RECRUITER' && (
-                  <Link
-                    href="/jobs"
-                    className="text-[13px] font-semibold text-[#1E3A8A] px-3 py-1.5 rounded-lg border border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors no-underline"
-                  >
-                    Recruiter Jobs
-                  </Link>
-                )}
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-[#0F172A] hover:bg-[#1E293B] px-4 py-2 rounded-lg shadow-sm transition-all no-underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-black hover:bg-neutral-800 px-4 py-2 rounded-md shadow-xs transition-colors no-underline"
                 >
-                  <span>Command Center</span>
+                  <span>Dashboard</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -190,15 +171,15 @@ export function PublicHeader() {
               <>
                 <Link
                   href="/login"
-                  className="text-[14px] font-medium text-[#334155] hover:text-[#0F172A] px-3.5 py-1.5 rounded-lg transition-colors no-underline"
+                  className="text-[14px] font-medium text-neutral-700 hover:text-black px-3.5 py-1.5 rounded-md transition-colors no-underline"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white bg-[#1E3A8A] hover:bg-[#172554] px-4 py-2 rounded-lg shadow-xs transition-colors no-underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white bg-black hover:bg-neutral-800 px-4 py-2 rounded-md shadow-xs transition-colors no-underline"
                 >
-                  <span>Launch Workspace</span>
+                  <span>Get Started</span>
                   <ArrowRight size={14} />
                 </Link>
               </>
@@ -251,16 +232,16 @@ export function PublicHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 no-underline"
                 >
-                  <div className="w-7 h-7 rounded-md bg-[#1E3A8A] flex items-center justify-center text-white font-extrabold text-xs">
+                  <div className="w-7 h-7 rounded-md bg-black flex items-center justify-center text-white font-extrabold text-xs">
                     CO
                   </div>
-                  <span className="font-extrabold text-[#0F172A] text-base">CharteredOS</span>
+                  <span className="font-bold text-black text-base">CharteredOS</span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close menu"
-                  className="p-1.5 text-[#64748B] hover:text-[#0F172A] rounded-md hover:bg-[#F1F5F9]"
+                  className="p-1.5 text-neutral-600 hover:text-black rounded-md hover:bg-neutral-100"
                 >
                   <X size={20} />
                 </button>
@@ -273,7 +254,7 @@ export function PublicHeader() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-[15px] font-medium text-[#334155] hover:text-[#1E3A8A] py-2.5 px-2 rounded-md hover:bg-[#F8FAFC] transition-colors no-underline"
+                    className="text-[15px] font-medium text-neutral-700 hover:text-black py-2.5 px-2 rounded-md hover:bg-neutral-100 transition-colors no-underline"
                   >
                     {link.label}
                   </Link>
@@ -281,30 +262,30 @@ export function PublicHeader() {
               </nav>
 
               {/* Mobile Actions */}
-              <div className="pt-3 border-t border-[#E2E8F0] flex flex-col gap-2.5">
+              <div className="pt-3 border-t border-neutral-200 flex flex-col gap-2.5">
                 {isAuthenticated ? (
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center py-2.5 px-4 rounded-lg bg-[#1E3A8A] text-white font-semibold text-[14px] shadow-sm no-underline"
+                    className="w-full text-center py-2.5 px-4 rounded-md bg-black text-white font-semibold text-[14px] no-underline"
                   >
-                    Go to Command Center
+                    Go to Dashboard
                   </Link>
                 ) : (
                   <>
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full text-center py-2.5 px-4 rounded-lg border border-[#CBD5E1] text-[#334155] font-semibold text-[14px] hover:bg-[#F8FAFC] transition-colors no-underline"
+                      className="w-full text-center py-2.5 px-4 rounded-md border border-neutral-300 text-neutral-800 font-semibold text-[14px] hover:bg-neutral-50 transition-colors no-underline"
                     >
                       Sign in
                     </Link>
                     <Link
                       href="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full text-center py-2.5 px-4 rounded-lg bg-[#1E3A8A] text-white font-semibold text-[14px] shadow-sm hover:bg-[#1E40AF] transition-colors no-underline"
+                      className="w-full text-center py-2.5 px-4 rounded-md bg-black text-white font-semibold text-[14px] hover:bg-neutral-800 transition-colors no-underline"
                     >
-                      Launch Command Center
+                      Get Started
                     </Link>
                   </>
                 )}

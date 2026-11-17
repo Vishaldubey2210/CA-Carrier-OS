@@ -34,11 +34,6 @@ const MOBILE_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/articleship', label: 'Articleship', icon: GraduationCap },
   { href: '/jobs', label: 'Jobs', icon: Briefcase },
-  { href: '/career', label: 'Career Pathway', icon: Compass },
-  { href: '/resumes', label: 'Resumes', icon: FileText },
-  { href: '/interviews', label: 'Interview Prep', icon: MessageSquareCode },
-  { href: '/growth', label: 'Mentorship', icon: TrendingUp },
-  { href: '/practice', label: 'Practice CRM', icon: BriefcaseBusiness },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -143,14 +138,14 @@ export function Header() {
             }}
           >
             {activeWorkspace?.type === WorkspaceType.ORGANIZATION ? (
-              <Building size={14} color="var(--brand-teal)" />
+              <Building size={14} color="#000000" />
             ) : (
-              <User size={14} color="var(--brand-primary)" />
+              <User size={14} color="#000000" />
             )}
             <span style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {activeWorkspace?.name || 'Personal Workspace'}
             </span>
-            <span className="badge badge-indigo" style={{ fontSize: '0.625rem', padding: '0.1rem 0.35rem' }}>
+            <span style={{ fontSize: '0.625rem', padding: '0.1rem 0.35rem', background: '#000000', color: '#ffffff', borderRadius: '4px', fontWeight: 600 }}>
               {activeWorkspace?.role || 'OWNER'}
             </span>
             <ChevronDown size={14} color="var(--text-muted)" />
@@ -386,7 +381,7 @@ export function Header() {
                   width: '26px',
                   height: '26px',
                   borderRadius: '50%',
-                  background: 'var(--brand-primary)',
+                  background: '#000000',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -400,7 +395,7 @@ export function Header() {
               <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {user.firstName} {user.lastName || ''}
               </span>
-              <span className="badge badge-indigo" style={{ fontSize: '0.625rem', padding: '0.1rem 0.35rem' }}>
+              <span style={{ fontSize: '0.625rem', padding: '0.1rem 0.35rem', background: '#F4F4F5', color: '#000000', borderRadius: '4px', border: '1px solid #E4E4E7', fontWeight: 600 }}>
                 {user.role}
               </span>
             </Link>

@@ -18,14 +18,22 @@ import {
   CheckCircle2,
   GraduationCap,
   SlidersHorizontal,
+  Globe,
 } from 'lucide-react';
-import { JobDetail } from '@ca-career-os/shared';
+import { JobDetail, HIRING_SOURCES_CATALOG, HiringSourceCategory } from '@ca-career-os/shared';
 import { apiClient } from '@/lib/api-client';
 
 export default function ArticleshipPage() {
   const [jobs, setJobs] = useState<JobDetail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Main View Switcher
+  const [mainView, setMainView] = useState<'VACANCIES' | 'DIRECTORY'>('VACANCIES');
+
+  // Directory Filters
+  const [directorySearch, setDirectorySearch] = useState('');
+  const [directoryCategory, setDirectoryCategory] = useState<string>('ALL');
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -110,6 +118,21 @@ export default function ArticleshipPage() {
   const articleshipCount = useMemo(() => jobs.filter(j => j.opportunityType === 'ARTICLESHIP').length, [jobs]);
   const industrialCount = useMemo(() => jobs.filter(j => j.opportunityType === 'INDUSTRIAL_TRAINING').length, [jobs]);
 
+  const filteredDirectory = useMemo(() => {
+    return HIRING_SOURCES_CATALOG.filter((source) => {
+      if (directoryCategory !== 'ALL' && source.category !== directoryCategory) return false;
+      if (directorySearch.trim()) {
+        const q = directorySearch.toLowerCase();
+        const matchesName = source.name.toLowerCase().includes(q);
+        const matchesGeo = source.geography.toLowerCase().includes(q);
+        const matchesCoverage = source.coverage.toLowerCase().includes(q);
+        const matchesKeywords = source.searchKeywords.some((k) => k.toLowerCase().includes(q));
+        if (!matchesName && !matchesGeo && !matchesCoverage && !matchesKeywords) return false;
+      }
+      return true;
+    });
+  }, [directorySearch, directoryCategory]);
+
   return (
     <div className="animate-fade-in" style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
       {/* 1. Header (Linear / Stripe style clean header) */}
@@ -148,7 +171,178 @@ export default function ArticleshipPage() {
         </div>
       </div>
 
-      {/* 2. Editorial Metric Strip (Stripe / Ramp hairline divided container) */}
+      {/* Main Mode Switcher */}
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
+        <button
+          onClick={() => setMainView('VACANCIES')}
+          className={`btn ${mainView === 'VACANCIES' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ fontSize: '0.8125rem', padding: '0.45rem 1rem' }}
+        >
+          <GraduationCap size={15} /> Live Vacancies ({jobs.length})
+        </button>
+        <button
+          onClick={() => setMainView('DIRECTORY')}
+          className={`btn ${mainView === 'DIRECTORY' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ fontSize: '0.8125rem', padding: '0.45rem 1rem' }}
+        >
+          <Globe size={15} /> 110+ Verified Hiring Sources &amp; Global Directory ({HIRING_SOURCES_CATALOG.length})
+        </button>
+      </div>
+
+      {mainView === 'DIRECTORY' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Important Distinction Advisory Banner */}
+          <div
+            style={{
+              padding: '1rem 1.25rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              background: '#FAFAFA',
+              fontSize: '0.8125rem',
+              lineHeight: 1.6,
+              color: '#18181B',
+            }}
+          >
+            <div style={{ fontWeight: 700, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <AlertCircle size={15} />
+              <span>Important ICAI Statutory Distinction</span>
+            </div>
+            <p style={{ margin: 0, color: '#52525B' }}>
+              In India, formal training under the Chartered Accountants Act is designated as <strong>ICAI Articleship (Form 102/103)</strong> or <strong>Corporate Industrial Training (Form 104)</strong>. In international jurisdictions (UK, USA, Canada, Australia, South Africa), comparable programs are styled as <em>Trainee Accountant</em>, <em>Audit Apprenticeship</em>, <em>Training Contract</em>, <em>CPA Articling</em>, or <em>Graduate Programme</em> under their respective professional bodies (ICAEW, ACCA, SAICA, CPA Canada) and are not automatic statutory equivalents of ICAI Articleship.
+            </p>
+          </div>
+
+          {/* Directory Search & Category Filter Toolbar */}
+          <div
+            style={{
+              background: 'var(--surface-primary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.875rem 1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+            }}
+          >
+            <div style={{ position: 'relative', width: '100%' }}>
+              <Search
+                size={15}
+                style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
+              />
+              <input
+                type="text"
+                placeholder="Search across 110+ portals by name, country, or keyword (e.g. PwC, ICAI, Trainee, ACCA, EIRC)..."
+                value={directorySearch}
+                onChange={(e) => setDirectorySearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem 0.75rem 0.5rem 2.25rem',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-subtle)',
+                  fontSize: '0.8125rem',
+                  outline: 'none',
+                  color: 'var(--text-primary)',
+                  background: 'var(--surface-primary)',
+                }}
+              />
+            </div>
+
+            {/* Category Pills */}
+            <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'ALL', label: `All Sources (${HIRING_SOURCES_CATALOG.length})` },
+                { id: 'INDIA_DEDICATED_CA', label: 'Dedicated CA Portals (16)' },
+                { id: 'INDIA_GENERAL_INTERNSHIP', label: 'India General & Internships (17)' },
+                { id: 'DIRECT_FIRM_CAREER_PORTAL', label: 'Direct CA Firms & Big 4 (15)' },
+                { id: 'UK_EUROPE_APPRENTICESHIP', label: 'UK & Europe Apprenticeships (19)' },
+                { id: 'INTERNATIONAL_ACCOUNTING', label: 'International Accounting (24)' },
+                { id: 'WORLDWIDE_JOB_PORTAL', label: 'Worldwide Aggregators & Feeds (19)' },
+                { id: 'REGIONAL_GLOBAL_GRADUATE', label: 'Australia, SA & Canada (8)' },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setDirectoryCategory(cat.id)}
+                  style={{
+                    padding: '0.3rem 0.625rem',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: directoryCategory === cat.id ? 700 : 500,
+                    background: directoryCategory === cat.id ? '#000000' : '#F4F4F5',
+                    color: directoryCategory === cat.id ? '#FFFFFF' : '#18181B',
+                    border: '1px solid',
+                    borderColor: directoryCategory === cat.id ? '#000000' : '#E4E4E7',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Directory Cards Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '0.875rem' }}>
+            {filteredDirectory.map((source) => (
+              <div
+                key={source.id}
+                style={{
+                  background: 'var(--surface-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '1rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '0.75rem',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.375rem' }}>
+                    <span style={{ fontSize: '0.6875rem', fontWeight: 600, padding: '0.125rem 0.375rem', borderRadius: '3px', background: '#F4F4F5', color: '#18181B', border: '1px solid #E4E4E7' }}>
+                      {source.geography}
+                    </span>
+                    <span style={{ fontSize: '0.625rem', color: '#71717A', fontWeight: 600, textTransform: 'uppercase' }}>
+                      {source.integrationType.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.375rem 0' }}>
+                    {source.name}
+                  </h3>
+
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 0.5rem 0' }}>
+                    {source.coverage}
+                  </p>
+
+                  <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                    {source.searchKeywords.map((kw, i) => (
+                      <span key={i} style={{ fontSize: '0.625rem', background: '#FAFAFA', border: '1px solid #E4E4E7', padding: '0.1rem 0.35rem', borderRadius: '3px', color: '#52525B' }}>
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.625rem' }}>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                    style={{ width: '100%', fontSize: '0.75rem', padding: '0.35rem 0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.375rem', textDecoration: 'none' }}
+                  >
+                    <span>Visit Official Portal</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* 2. Editorial Metric Strip (Stripe / Ramp hairline divided container) */}
       <div className="editorial-metric-strip">
         <div className="metric-strip-item">
           <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -466,6 +660,8 @@ export default function ArticleshipPage() {
             </tbody>
           </table>
         </div>
+      )}
+      </>
       )}
 
       {/* Quick Details Drawer / Modal */}

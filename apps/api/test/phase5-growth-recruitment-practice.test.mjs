@@ -540,11 +540,14 @@ describe('Phase 5: Professional Growth, Recruitment & Practice Management (20 Sc
     const mentors = await mentorshipService.listMentors();
     const mentor = mentors[0];
 
+    const futureStart = new Date(Date.now() + 86400000 * 2);
+    const futureEnd = new Date(futureStart.getTime() + 45 * 60 * 1000);
+
     const booking = await mentorshipService.createBooking(
       {
         mentorProfileId: mentor.id,
-        slotStartTime: '2026-11-12T16:00:00.000Z',
-        slotEndTime: '2026-11-12T16:45:00.000Z',
+        slotStartTime: futureStart.toISOString(),
+        slotEndTime: futureEnd.toISOString(),
         topic: 'TAXATION',
         candidateNotes: 'Discussing transfer pricing',
       },

@@ -13,6 +13,7 @@ import { AdzunaConnector } from './adzuna.connector.js';
 import { JoobleConnector } from './jooble.connector.js';
 import { IcaiConnector } from './icai.connector.js';
 import { XmlFeedConnector } from './xml-feed.connector.js';
+import { CareerjetConnector } from './careerjet.connector.js';
 
 @Injectable()
 export class JobSourceRegistryService {
@@ -31,6 +32,7 @@ export class JobSourceRegistryService {
       new AshbyConnector(),
       new AdzunaConnector(),
       new JoobleConnector(),
+      new CareerjetConnector(),
       new IcaiConnector(),
       new XmlFeedConnector(),
     ];
@@ -146,6 +148,8 @@ export class JobSourceRegistryService {
         return 'Adzuna India Search API (Aggregator)';
       case 'jooble':
         return 'Jooble REST API (Publisher Feed)';
+      case 'careerjet':
+        return 'Careerjet Publisher Job Search API (India Articleship & Trainees)';
       case 'icai_portal':
         return 'ICAI CA Jobs & SSP Articleship Registry (Official Outbound)';
       case 'xml_feed':
@@ -167,6 +171,8 @@ export class JobSourceRegistryService {
         return 'https://api.adzuna.com/v1/api/jobs/in/search';
       case 'jooble':
         return 'https://jooble.org/api/';
+      case 'careerjet':
+        return 'https://search.api.careerjet.net/v4/query';
       case 'icai_portal':
         return 'https://cajobs.icai.org/';
       case 'xml_feed':

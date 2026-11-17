@@ -56,6 +56,22 @@ export class XmlFeedConnector implements JobConnector {
       defaultCity: 'Remote / Global',
       defaultPathway: CAPathway.AUDIT,
     },
+    {
+      id: 'yubhub-finance-xml',
+      name: 'YubHub Global Finance RSS/XML Feed',
+      feedUrl: 'https://feeds.yubhub.co/facet/category/finance.xml',
+      defaultCompany: 'Verified Financial Practice',
+      defaultCity: 'Remote / Global',
+      defaultPathway: CAPathway.FPA,
+    },
+    {
+      id: 'yubhub-finance-rss',
+      name: 'YubHub Global Finance RSS Feed',
+      feedUrl: 'https://feeds.yubhub.co/facet/category/finance.rss',
+      defaultCompany: 'Accounting & Advisory Services',
+      defaultCity: 'Remote / Global',
+      defaultPathway: CAPathway.AUDIT,
+    },
   ];
 
   constructor() {

@@ -4,20 +4,19 @@ import { AppShell } from '../components/layout/AppShell';
 import { AuthProvider } from '../context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'CharteredOS — Career Platform for Indian Chartered Accountants',
+  title: 'CharteredOS — Verified CA Articleship & Job Board',
   description:
-    'The premier career operating system for Indian Chartered Accountants: capability diagnostics, 7 specialized horizons, verified resumes, Big 4 mock drills, and unbundled take-home compensation analytics.',
+    'The simplest platform for verified CA Articleship vacancies (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.',
   keywords: [
     'Chartered Accountant',
     'CharteredOS',
-    'ICAI',
-    'Big 4 Interview',
-    'Ind AS',
-    'Statutory Audit',
-    'Transfer Pricing',
-    'FP&A',
-    'CA Career',
+    'CA Articleship',
+    'Articleship Vacancies',
+    'Form 102',
+    'Form 103',
+    'Form 104 Industrial Training',
     'CA Jobs India',
+    'Big 4 Articleship',
   ],
   authors: [{ name: 'CharteredOS' }],
   metadataBase: new URL('https://cacareeros.com'),
@@ -25,9 +24,9 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'CharteredOS — Career Platform for Indian Chartered Accountants',
+    title: 'CharteredOS — Verified CA Articleship & Job Board',
     description:
-      'Career capability diagnostics, 7 specialized horizons, verified resumes, Big 4 interview drills, and in-hand take-home compensation analytics.',
+      'Verified CA Articleship vacancies (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.',
     url: 'https://cacareeros.com',
     siteName: 'CharteredOS',
     locale: 'en_IN',
@@ -35,9 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CharteredOS — Career Platform for Indian Chartered Accountants',
+    title: 'CharteredOS — Verified CA Articleship & Job Board',
     description:
-      'Career capability diagnostics, 7 specialized horizons, verified resumes, and Big 4 mock drills.',
+      'Verified CA Articleship vacancies and Qualified Chartered Accountant jobs in India.',
   },
   robots: {
     index: true,
@@ -48,7 +47,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#1E3A8A',
+  themeColor: '#000000',
 };
 
 export default function RootLayout({
@@ -67,7 +66,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased selection:bg-[#1E3A8A] selection:text-white">
+      <body className="antialiased selection:bg-black selection:text-white bg-white text-black">
         <AuthProvider>
           <AppShell>{children}</AppShell>
         </AuthProvider>

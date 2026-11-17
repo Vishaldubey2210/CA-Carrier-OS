@@ -6,28 +6,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const FAQS = [
   {
-    q: 'How does the verified resume builder work?',
-    a: 'Our resume engine operates under strict factual verification: it structures, highlights, and formats skills and exposure formally attested from your professional training. It focuses on validated competencies, quantifiable metrics, and audit/tax experience.',
+    q: 'What is included in the ₹99 Articleship Pass?',
+    a: 'The ₹99 Articleship Pass gives CA students 3 months of unlimited access to verified articleship vacancies under Form 102/103 (2-year scheme) and Corporate Industrial Training (Form 104) at Big 4, Top 20 firms, and leading MNCs, with direct partner contact details and stipend transparency.',
   },
   {
-    q: 'How is candidate confidentiality and privacy protected?',
-    a: 'Candidate personal workspaces, compensation targets, offer comparisons, and job applications are cryptographically isolated. Recruiters from your current firm or employer can never view your active profile during passive career discovery.',
+    q: 'What is included in the ₹199 CA Career Pro Pass?',
+    a: 'The ₹199 CA Career Pro Pass includes everything in the Articleship Pass plus full 6-month access to all Qualified and Semi-Qualified CA job postings across Audit, Tax, FP&A, Due Diligence, and Corporate Finance, along with genuine salary benchmarks and direct recruiter connections.',
   },
   {
-    q: 'How is articleship experience structured and evaluated?',
-    a: 'Candidates document their training breakdown across statutory audit, corporate tax, transfer pricing, FP&A, and reporting. Our system benchmarks this exposure against industry requirements to surface your highest-fit career pathways.',
+    q: 'Are the articleship and job postings verified?',
+    a: 'Yes. Every vacancy listed on CharteredOS is directly verified from authorized firm career portals, official partner circulars, or confirmed recruiter postings to ensure you never waste time applying to expired or fake listings.',
   },
   {
-    q: 'Does CharteredOS claim official affiliation with ICAI?',
-    a: 'No. CharteredOS is an independent career operating system built specifically for Chartered Accountants. We strictly respect the ICAI Code of Ethics and professional conduct guidelines.',
+    q: 'Is there any recurring subscription or auto-debit?',
+    a: 'No. Both the ₹99 Articleship Pass and ₹199 CA Career Pro Pass are strictly one-time payments with zero hidden fees, auto-renewals, or surprise charges.',
   },
   {
-    q: 'How are payments and GST invoicing handled for firms?',
-    a: 'All purchases generate official GST tax invoices under Service Accounting Code (SAC) 998314 (Information Technology Software Services), supporting full B2B Input Tax Credit (ITC) for firms and employers.',
+    q: 'How do I apply for the listed vacancies?',
+    a: 'Each listing provides direct outbound links to the official employer career portal, Google Form, or direct HR/Partner email, allowing you to submit your application directly to the decision makers.',
   },
   {
-    q: 'How are user credentials and session data secured?',
-    a: 'Passwords are encrypted using memory-hard scrypt hashing with per-user unique cryptographic salts. Sessions use short-lived JWT access tokens paired with secure HttpOnly refresh cookies.',
+    q: 'Is CharteredOS affiliated with ICAI?',
+    a: 'No. CharteredOS is an independent career platform built specifically to help Indian Chartered Accountants and CA students easily find genuine articleships and jobs.',
   },
 ];
 
@@ -63,11 +63,11 @@ export function FAQSection() {
 
       {/* Section Header */}
       <div className="text-center max-w-[600px] mx-auto mb-10">
-        <h2 className="text-[clamp(1.75rem,2.8vw,2.25rem)] font-semibold text-[#1C1917] tracking-tight leading-snug mb-3">
-          Frequently asked questions
+        <h2 className="text-[clamp(1.75rem,2.5vw,2.25rem)] font-bold text-black tracking-tight leading-snug mb-3">
+          Frequently Asked Questions
         </h2>
-        <p className="text-[15px] text-[#57534E] leading-relaxed m-0">
-          Answers regarding articleship verification, candidate confidentiality, compensation benchmarks, and platform security.
+        <p className="text-[15px] text-neutral-600 leading-relaxed m-0">
+          Everything you need to know about the ₹99 Articleship Pass and ₹199 CA Career Pro Pass.
         </p>
       </div>
 
@@ -81,10 +81,10 @@ export function FAQSection() {
           return (
             <div
               key={idx}
-              className={`rounded-xl border transition-colors overflow-hidden bg-white ${
+              className={`rounded-md border transition-colors overflow-hidden bg-white ${
                 isOpen
-                  ? 'border-[#D6D3D1] shadow-xs'
-                  : 'border-[#E7E5E4] hover:border-[#D6D3D1]'
+                  ? 'border-black'
+                  : 'border-neutral-200 hover:border-neutral-400'
               }`}
             >
               <button
@@ -93,18 +93,17 @@ export function FAQSection() {
                 aria-expanded={isOpen}
                 aria-controls={contentId}
                 onClick={() => toggleFaq(idx)}
-                className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A]"
+                className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
               >
-                <span className="text-[15px] font-medium text-[#1C1917] leading-snug">
+                <span className="text-[15px] font-semibold text-black leading-snug">
                   {faq.q}
                 </span>
-                <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'bg-[#F4F3EF] text-[#1E3A8A] rotate-180' : 'bg-[#FAF9F6] text-[#78716C]'
+                <ChevronDown
+                  size={18}
+                  className={`text-neutral-500 shrink-0 transition-transform duration-200 ${
+                    isOpen ? 'rotate-180 text-black' : ''
                   }`}
-                >
-                  <ChevronDown size={16} />
-                </div>
+                />
               </button>
 
               <AnimatePresence initial={false}>
@@ -116,11 +115,10 @@ export function FAQSection() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                    className="overflow-hidden"
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
                   >
-                    <div className="px-4 sm:px-5 pb-5 pt-1 text-[14px] text-[#57534E] leading-relaxed border-t border-[#F5F5F4]">
-                      <p className="m-0">{faq.a}</p>
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 text-[14px] text-neutral-600 leading-relaxed border-t border-neutral-100">
+                      {faq.a}
                     </div>
                   </motion.div>
                 )}

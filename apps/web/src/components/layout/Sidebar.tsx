@@ -26,11 +26,6 @@ const CANDIDATE_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/articleship', label: 'Articleship', icon: GraduationCap },
   { href: '/jobs', label: 'Jobs', icon: Briefcase },
-  { href: '/career', label: 'Career Pathway', icon: Compass },
-  { href: '/resumes', label: 'Resumes', icon: FileText },
-  { href: '/interviews', label: 'Interview Prep', icon: MessageSquareCode },
-  { href: '/growth', label: 'Mentorship', icon: TrendingUp },
-  { href: '/practice', label: 'Practice CRM', icon: BriefcaseBusiness },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -49,25 +44,24 @@ export function Sidebar() {
             style={{
               width: '36px',
               height: '36px',
-              borderRadius: '8px',
-              background: 'var(--brand-primary)',
+              borderRadius: '6px',
+              background: '#000000',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
               fontWeight: 800,
               fontSize: '0.9375rem',
-              boxShadow: '0 2px 4px rgba(15, 23, 42, 0.1)',
             }}
           >
             CO
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '0.9375rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
               CharteredOS
             </div>
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.04em', fontWeight: 600 }}>
-              CAREER PLATFORM
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.04em', fontWeight: 500 }}>
+              ARTICLES & JOBS
             </div>
           </div>
         </Link>
@@ -87,12 +81,12 @@ export function Sidebar() {
             <span style={{ fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', fontWeight: 600 }}>
               Active Workspace
             </span>
-            <span className={isOrg ? 'badge badge-cyan' : 'badge badge-indigo'} style={{ fontSize: '0.625rem', padding: '0.125rem 0.375rem' }}>
+            <span style={{ fontSize: '0.625rem', padding: '0.125rem 0.375rem', borderRadius: '4px', background: '#000000', color: '#ffffff', fontWeight: 600 }}>
               {isOrg ? 'Organization' : 'Personal'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-            {isOrg ? <Building size={13} color="var(--brand-teal)" /> : <User size={13} color="var(--brand-primary)" />}
+            {isOrg ? <Building size={13} color="var(--text-primary)" /> : <User size={13} color="var(--text-primary)" />}
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {activeWorkspace?.name || 'Personal Workspace'}
             </span>

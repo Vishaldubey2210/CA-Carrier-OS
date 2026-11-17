@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Briefcase,
   Search,
-  CheckCircle2,
   MapPin,
   ArrowRight,
   ExternalLink,
@@ -121,77 +120,76 @@ export function HeroSection() {
   };
 
   return (
-    <section className="w-full max-w-[1120px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-16">
+    <section className="w-full max-w-[1040px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-16">
       {/* 1. Masthead */}
-      <div className="max-w-[760px] mx-auto text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F4F3EF] border border-[#E7E5E4] text-[13px] text-[#44403C] mb-5">
-          <span className="w-2 h-2 rounded-full bg-[#15803D]" />
-          <span>ICAI Regulation 51 &amp; Form 108 Aligned Platform</span>
+      <div className="max-w-[720px] mx-auto text-center mb-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-neutral-300 text-[12px] font-medium text-neutral-800 bg-neutral-50 mb-5">
+          <span>ICAI Form 102/103 Articleship &amp; CA Job Board</span>
         </div>
 
-        <h1 className="text-[clamp(2rem,3.8vw,3.25rem)] font-semibold text-[#1C1917] tracking-tight leading-[1.2] mb-4">
-          A calm, professional workspace for Chartered Accountants
+        <h1 className="text-[clamp(2rem,3.4vw,3rem)] font-bold text-black tracking-tight leading-[1.2] mb-4">
+          Verified CA Articleship &amp; Jobs
         </h1>
 
-        <p className="text-[clamp(1rem,1.15vw,1.125rem)] text-[#57534E] leading-relaxed max-w-[640px] mx-auto mb-8 font-normal">
-          Verified articleships, corporate industrial training, and qualified CA openings across India. With Form 108 practical hours attestation, transparent stipends, and complete candidate privacy.
+        <p className="text-[clamp(1rem,1.15vw,1.125rem)] text-neutral-600 leading-relaxed max-w-[600px] mx-auto mb-8 font-normal">
+          The simplest and easiest way to search verified Articleship openings (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.
         </p>
 
         {/* Primary Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/articleship"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1E3A8A] hover:bg-[#172554] text-white text-[14px] font-medium shadow-xs transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-black hover:bg-neutral-800 text-white text-[14px] font-semibold transition-colors no-underline"
           >
             <GraduationCap size={16} />
-            <span>Articleship Hub</span>
+            <span>Articleship Hub (₹99)</span>
           </Link>
 
           <Link
             href="/jobs"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-[#F5F5F4] text-[#1C1917] border border-[#D6D3D1] text-[14px] font-medium shadow-xs transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white hover:bg-neutral-100 text-black border border-black text-[14px] font-semibold transition-colors no-underline"
           >
             <Briefcase size={15} />
-            <span>Qualified CA Jobs</span>
+            <span>CA Jobs (₹199)</span>
           </Link>
 
           <button
             type="button"
             onClick={handleLaunchDemo}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] text-[#57534E] hover:text-[#1C1917] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] text-neutral-600 hover:text-black transition-colors cursor-pointer"
           >
-            <span>Explore instant demo</span>
+            <span>Live Demo</span>
             <ArrowRight size={13} />
           </button>
         </div>
       </div>
 
-      {/* 2. Live Opportunity Board (Clean, soft, no eye strain) */}
-      <div className="w-full bg-white border border-[#E7E5E4] rounded-xl shadow-xs overflow-hidden">
+      {/* 2. Opportunity Board - Black and White */}
+      <div className="w-full bg-white border border-neutral-200 rounded-lg overflow-hidden">
         {/* Search & Filter Strip */}
-        <div className="p-4 sm:p-5 border-b border-[#F5F5F4] bg-[#FAF9F6] flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-neutral-200 bg-neutral-50 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           <div className="relative flex-1 max-w-[420px]">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#78716C]"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
             />
             <input
               type="text"
-              placeholder="Search by firm, discipline (Audit, Ind AS, Tax), or city..."
+              placeholder="Search by firm, discipline, or city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-[13px] text-[#1C1917] bg-white border border-[#E7E5E4] rounded-lg focus:outline-none focus:border-[#1E3A8A] focus:ring-2 focus:ring-[#1E3A8A]/10 placeholder:text-[#A8A29E] transition-all"
+              className="w-full pl-9 pr-3 py-2 text-[13px] text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black placeholder:text-neutral-400 transition-all"
             />
           </div>
 
-          <div className="inline-flex items-center gap-1 bg-[#F5F5F4] p-1 rounded-lg self-start sm:self-auto text-[12px]">
+          <div className="inline-flex items-center gap-1 bg-neutral-200 p-1 rounded-md self-start sm:self-auto text-[12px]">
             <button
               type="button"
               onClick={() => setSelectedFilter('ALL')}
-              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
+              className={`px-3 py-1 rounded transition-all cursor-pointer font-medium ${
                 selectedFilter === 'ALL'
-                  ? 'bg-white text-[#1C1917] shadow-xs'
-                  : 'text-[#78716C] hover:text-[#1C1917]'
+                  ? 'bg-black text-white'
+                  : 'text-neutral-700 hover:text-black'
               }`}
             >
               All Openings
@@ -199,10 +197,10 @@ export function HeroSection() {
             <button
               type="button"
               onClick={() => setSelectedFilter('ARTICLESHIP')}
-              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
+              className={`px-3 py-1 rounded transition-all cursor-pointer font-medium ${
                 selectedFilter === 'ARTICLESHIP'
-                  ? 'bg-white text-[#1C1917] shadow-xs'
-                  : 'text-[#78716C] hover:text-[#1C1917]'
+                  ? 'bg-black text-white'
+                  : 'text-neutral-700 hover:text-black'
               }`}
             >
               Articleship &amp; Trainees
@@ -210,10 +208,10 @@ export function HeroSection() {
             <button
               type="button"
               onClick={() => setSelectedFilter('QUALIFIED')}
-              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
+              className={`px-3 py-1 rounded transition-all cursor-pointer font-medium ${
                 selectedFilter === 'QUALIFIED'
-                  ? 'bg-white text-[#1C1917] shadow-xs'
-                  : 'text-[#78716C] hover:text-[#1C1917]'
+                  ? 'bg-black text-white'
+                  : 'text-neutral-700 hover:text-black'
               }`}
             >
               Qualified CAs
@@ -222,47 +220,38 @@ export function HeroSection() {
         </div>
 
         {/* Opportunity Rows */}
-        <div className="divide-y divide-[#F5F5F4]">
+        <div className="divide-y divide-neutral-200">
           {filteredList.map((job) => {
-            const isArticleship =
-              job.category === 'ARTICLESHIP' || job.category === 'INDUSTRIAL_TRAINING';
-
             return (
               <div
                 key={job.id}
-                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#FAF9F6] transition-colors"
+                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-neutral-50 transition-colors"
               >
-                <div className="space-y-1.5 flex-1 min-w-0">
+                <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className={`text-[11px] font-medium px-2 py-0.5 rounded ${
-                        isArticleship
-                          ? 'bg-[#FEF3C7] text-[#92400E]'
-                          : 'bg-[#F0FDF4] text-[#166534]'
-                      }`}
-                    >
+                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded border border-neutral-300 bg-neutral-100 text-black">
                       {job.typeLabel}
                     </span>
-                    <span className="text-[12px] font-medium text-[#78716C]">
+                    <span className="text-[13px] font-semibold text-black">
                       {job.firm}
                     </span>
-                    <span className="text-[12px] text-[#A8A29E]">•</span>
-                    <span className="text-[12px] text-[#78716C] flex items-center gap-1">
+                    <span className="text-[12px] text-neutral-400">•</span>
+                    <span className="text-[12px] text-neutral-600 flex items-center gap-1">
                       <MapPin size={11} /> {job.location}
                     </span>
                   </div>
 
-                  <h3 className="text-[15px] font-semibold text-[#1C1917] leading-snug">
+                  <h3 className="text-[15px] font-semibold text-black leading-snug">
                     {job.role}
                   </h3>
 
-                  <div className="text-[12px] text-[#78716C]">
+                  <div className="text-[12px] text-neutral-500">
                     <span>Exposure: {job.exposure}</span>
                   </div>
                 </div>
 
-                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#F5F5F4]">
-                  <span className="text-[13px] font-semibold text-[#1C1917]">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-neutral-200">
+                  <span className="text-[13px] font-bold text-black">
                     {job.compensation}
                   </span>
 
@@ -270,7 +259,7 @@ export function HeroSection() {
                     href={job.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[13px] font-medium text-[#1E3A8A] hover:text-[#172554] transition-colors"
+                    className="inline-flex items-center gap-1 text-[13px] font-medium text-black hover:underline"
                   >
                     <span>Apply</span>
                     <ExternalLink size={12} />
@@ -282,15 +271,24 @@ export function HeroSection() {
         </div>
 
         {/* Footer Link Strip */}
-        <div className="p-3.5 bg-[#FAF9F6] border-t border-[#E7E5E4] flex items-center justify-between text-[12px] text-[#78716C]">
-          <span>Verified feeds updated hourly • Zero agency intermediary fees</span>
-          <Link
-            href="/articleship"
-            className="text-[#1E3A8A] hover:text-[#172554] font-medium inline-flex items-center gap-1"
-          >
-            <span>View all 480+ vacancies</span>
-            <ArrowRight size={12} />
-          </Link>
+        <div className="p-3.5 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between text-[12px] text-neutral-600">
+          <span>Verified listings direct from firm career portals</span>
+          <div className="flex gap-4">
+            <Link
+              href="/articleship"
+              className="text-black hover:underline font-semibold inline-flex items-center gap-1 no-underline"
+            >
+              <span>View Articleships</span>
+              <ArrowRight size={12} />
+            </Link>
+            <Link
+              href="/jobs"
+              className="text-black hover:underline font-semibold inline-flex items-center gap-1 no-underline"
+            >
+              <span>View CA Jobs</span>
+              <ArrowRight size={12} />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

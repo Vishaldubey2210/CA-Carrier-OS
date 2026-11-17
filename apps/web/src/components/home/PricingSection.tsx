@@ -1,222 +1,142 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Check, ArrowRight } from 'lucide-react';
 
 export function PricingSection() {
-  const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'ANNUAL'>('MONTHLY');
-
   const plans = [
     {
-      id: 'free',
-      name: 'Candidate Free',
-      badge: 'Free Forever',
-      badgeClass: 'text-[#57534E] bg-[#F5F5F4] border-[#E7E5E4]',
-      monthlyPrice: '₹0',
-      annualPrice: '₹0',
-      period: 'forever',
-      description: 'Essential articleship diagnostic and verified job discovery for CA students.',
+      id: 'articleship-pass',
+      name: 'Articleship Pass',
+      badge: 'CA Students & Inter',
+      price: '₹99',
+      period: '3 months access',
+      description: 'Ideal for CA Intermediate cleared students looking for verified articleship and industrial training.',
       features: [
-        'Articleship capability diagnostic',
-        '7-pathway matching benchmarks',
-        'Access to verified job listings',
-        '3 tailored resume exports',
-        'Candidate employer privacy',
+        'Form 102/103 2-year articleship scheme vacancies',
+        'Corporate industrial training (Form 104) openings',
+        'Direct firm website links & partner contact details',
+        'Verified stipend transparency by city & tier',
+        'Application status tracker',
       ],
-      ctaText: 'Get Started Free',
-      ctaHref: '/register',
-      ctaPrimary: false,
+      ctaText: 'Get Articleship Pass',
+      ctaHref: '/articleship',
       popular: false,
     },
     {
-      id: 'pro',
-      name: 'Candidate Pro',
-      badge: 'Most Popular',
-      badgeClass: 'text-[#15803D] bg-[#F0FDF4] border-[#BBF7D0]',
-      monthlyPrice: '₹799',
-      annualPrice: '₹7,990',
-      period: billingCycle === 'MONTHLY' ? '/ month' : '/ year',
-      description: 'Comprehensive preparation for candidates targeting Big 4 and corporate finance.',
+      id: 'ca-pro-pass',
+      name: 'CA Career Pro',
+      badge: 'Semi-Qualified & Qualified CAs',
+      price: '₹199',
+      period: '6 months access',
+      description: 'Full access to all Qualified CA roles, corporate finance positions, and articleship listings.',
       features: [
-        'Unlimited zero-fabrication resumes',
-        'Unlimited Big 4 technical mock interviews',
-        'Interactive STAR rubric feedback',
-        '1-on-1 verified CA mentor booking',
-        'Priority applicant badge for verified firms',
+        'Everything included in the Articleship Pass',
+        'All Qualified & Semi-Qualified CA job vacancies',
+        'Direct recruiter and hiring partner contacts',
+        'CTC & compensation benchmark insights',
+        'Priority applicant visibility for hiring firms',
+        'Instant alerts for new Big 4 and corporate openings',
       ],
-      ctaText: 'Upgrade to Pro',
-      ctaHref: '/register',
-      ctaPrimary: true,
+      ctaText: 'Get CA Career Pro',
+      ctaHref: '/jobs',
       popular: true,
-    },
-    {
-      id: 'practice',
-      name: 'Practice Firm OS',
-      badge: 'Practitioners',
-      badgeClass: 'text-[#6D28D9] bg-[#F5F3FF] border-[#DDD6FE]',
-      monthlyPrice: '₹2,499',
-      annualPrice: '₹24,990',
-      period: billingCycle === 'MONTHLY' ? '/ month' : '/ year',
-      description: 'For Chartered Accountants running proprietary practices or partnership audit firms.',
-      features: [
-        'Client relationship master database',
-        'Statutory compliance filing calendar',
-        'Filing ARN & UDIN verification tracker',
-        'ICAI non-solicitation compliant operations',
-        'Encrypted document vault',
-      ],
-      ctaText: 'Start Firm Workspace',
-      ctaHref: '/register',
-      ctaPrimary: false,
-      popular: false,
-    },
-    {
-      id: 'recruiter',
-      name: 'Team Employer',
-      badge: 'Recruiters',
-      badgeClass: 'text-[#1E3A8A] bg-[#EFF6FF] border-[#BFDBFE]',
-      monthlyPrice: '₹7,999',
-      annualPrice: '₹79,990',
-      period: billingCycle === 'MONTHLY' ? '/ month' : '/ year',
-      description: 'For corporate talent teams and accounting firms hiring qualified Chartered Accountants.',
-      features: [
-        'Up to 5 active verified job postings',
-        'Candidate pipeline review workflow',
-        'Verified candidate discovery with consent',
-        'Verified employer badge',
-        'Dedicated account support',
-      ],
-      ctaText: 'Post CA Openings',
-      ctaHref: '/register',
-      ctaPrimary: false,
-      popular: false,
     },
   ];
 
   return (
     <section
       id="pricing"
-      className="py-16 sm:py-20 px-4 sm:px-6 max-w-[1120px] mx-auto w-full"
+      className="py-16 sm:py-20 px-4 sm:px-6 max-w-[960px] mx-auto w-full"
     >
       {/* Section Header */}
-      <div className="text-center max-w-[620px] mx-auto mb-10">
-        <h2 className="text-[clamp(1.75rem,2.8vw,2.25rem)] font-semibold text-[#1C1917] tracking-tight leading-snug mb-3">
-          Simple, transparent plans
+      <div className="text-center max-w-[580px] mx-auto mb-12">
+        <h2 className="text-[clamp(1.75rem,2.5vw,2.25rem)] font-bold text-black tracking-tight mb-3">
+          Simple, Transparent Pricing
         </h2>
-        <p className="text-[15px] text-[#57534E] leading-relaxed mb-6">
-          Clear entitlements with zero hidden fees. Includes official GST invoices with input tax credit for firms.
+        <p className="text-[15px] text-neutral-600 leading-relaxed">
+          No subscriptions, no hidden renewals. Pay once and get direct access to verified openings.
         </p>
-
-        {/* Monthly / Annual Toggle */}
-        <div className="inline-flex items-center gap-1 bg-[#F5F5F4] p-1 rounded-lg text-[13px]">
-          <button
-            type="button"
-            onClick={() => setBillingCycle('MONTHLY')}
-            className={`px-3.5 py-1.5 rounded-md font-medium transition-all cursor-pointer ${
-              billingCycle === 'MONTHLY'
-                ? 'bg-white text-[#1C1917] shadow-xs'
-                : 'text-[#78716C] hover:text-[#1C1917]'
-            }`}
-          >
-            Monthly billing
-          </button>
-          <button
-            type="button"
-            onClick={() => setBillingCycle('ANNUAL')}
-            className={`px-3.5 py-1.5 rounded-md font-medium transition-all cursor-pointer ${
-              billingCycle === 'ANNUAL'
-                ? 'bg-white text-[#1C1917] shadow-xs'
-                : 'text-[#78716C] hover:text-[#1C1917]'
-            }`}
-          >
-            Annual billing <span className="text-[11px] text-[#15803D] font-semibold">(Save ~17%)</span>
-          </button>
-        </div>
       </div>
 
-      {/* 4 Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+      {/* 2 Plans Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
         {plans.map((plan) => {
-          const price = billingCycle === 'MONTHLY' ? plan.monthlyPrice : plan.annualPrice;
           const isPro = plan.popular;
 
           return (
             <div
               key={plan.id}
-              className={`rounded-xl border p-6 flex flex-col justify-between transition-colors bg-white ${
+              className={`rounded-lg border p-8 flex flex-col justify-between transition-colors bg-white ${
                 isPro
-                  ? 'border-[#1E3A8A] ring-1 ring-[#1E3A8A]/20 shadow-xs'
-                  : 'border-[#E7E5E4] hover:border-[#D6D3D1]'
+                  ? 'border-black ring-1 ring-black shadow-sm'
+                  : 'border-neutral-200 hover:border-neutral-400'
               }`}
             >
               <div>
                 {/* Badge Header */}
-                <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center justify-between gap-2 mb-4">
                   <span
-                    className={`text-[11px] font-medium px-2 py-0.5 rounded border ${plan.badgeClass}`}
+                    className={`text-[12px] font-semibold px-2.5 py-1 rounded border ${
+                      isPro
+                        ? 'bg-black text-white border-black'
+                        : 'bg-neutral-100 text-neutral-800 border-neutral-300'
+                    }`}
                   >
                     {plan.badge}
                   </span>
-                  {isPro && (
-                    <span className="text-[11px] font-semibold text-[#15803D]">
-                      Recommended
-                    </span>
-                  )}
                 </div>
 
-                <h3 className="text-[17px] font-semibold text-[#1C1917] mb-2">
+                {/* Plan Name & Price */}
+                <h3 className="text-[20px] font-bold text-black mb-2">
                   {plan.name}
                 </h3>
 
-                <div className="flex items-baseline gap-1 my-3">
-                  <span className="text-3xl font-bold text-[#1C1917] tracking-tight">
-                    {price}
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-[36px] font-black tracking-tight text-black">
+                    {plan.price}
                   </span>
-                  <span className="text-[13px] text-[#78716C]">
-                    {plan.period}
+                  <span className="text-[13px] text-neutral-500 font-medium">
+                    / {plan.period}
                   </span>
                 </div>
 
-                <p className="text-[13px] text-[#57534E] leading-relaxed mb-6 min-h-[40px]">
+                <p className="text-[14px] text-neutral-600 leading-relaxed mb-6 pb-6 border-b border-neutral-100">
                   {plan.description}
                 </p>
 
-                {/* Feature Bullets */}
-                <ul className="space-y-2.5 mb-8 text-[13px] text-[#44403C]">
-                  {plan.features.map((feature, fIdx) => (
-                    <li key={fIdx} className="flex items-start gap-2">
-                      <Check size={15} className="text-[#15803D] shrink-0 mt-0.5" />
-                      <span className="leading-snug">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Features List */}
+                <div className="mb-8">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-3">
+                    What&apos;s Included
+                  </div>
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-[13px] text-neutral-800">
+                        <Check size={16} className="text-black shrink-0 mt-0.5" strokeWidth={2.5} />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
               {/* Action Button */}
-              <div className="mt-auto pt-2">
-                <Link
-                  href={plan.ctaHref}
-                  className={`w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-lg font-medium text-[13px] transition-colors ${
-                    plan.ctaPrimary
-                      ? 'bg-[#1E3A8A] hover:bg-[#172554] text-white shadow-xs'
-                      : 'bg-[#FAF9F6] hover:bg-[#F5F5F4] text-[#1C1917] border border-[#E7E5E4]'
-                  }`}
-                >
-                  <span>{plan.ctaText}</span>
-                  <ArrowRight size={13} />
-                </Link>
-              </div>
+              <Link
+                href={plan.ctaHref}
+                className={`w-full py-3 px-4 rounded-md text-[14px] font-semibold text-center flex items-center justify-center gap-2 transition-all no-underline ${
+                  isPro
+                    ? 'bg-black text-white hover:bg-neutral-800'
+                    : 'bg-white text-black border border-black hover:bg-neutral-50'
+                }`}
+              >
+                <span>{plan.ctaText}</span>
+                <ArrowRight size={15} />
+              </Link>
             </div>
           );
         })}
-      </div>
-
-      {/* Footnote */}
-      <div className="mt-8 pt-6 border-t border-[#E7E5E4] text-center text-[12px] text-[#78716C] max-w-[720px] mx-auto">
-        <p className="m-0 leading-relaxed">
-          All subscription fees are denominated in INR. Official tax invoices issued under Service Accounting Code (SAC) 998314 supporting corporate B2B Input Tax Credit.
-        </p>
       </div>
     </section>
   );
