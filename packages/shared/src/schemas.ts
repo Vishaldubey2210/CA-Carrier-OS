@@ -537,6 +537,48 @@ export const Form108ExtractionSchema = z.object({
 });
 export type Form108ExtractionResult = z.infer<typeof Form108ExtractionSchema>;
 
+// -------------------------------------------------------------
+// Mass Mailing Validation Schemas
+// -------------------------------------------------------------
+
+export const SmtpConfigSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  appPassword: z.string().min(8, 'App password / SMTP password must be provided'),
+  host: z.string().default('smtp.gmail.com'),
+  port: z.coerce.number().default(587),
+  secure: z.boolean().default(false),
+  senderName: z.string().min(2).default('CA Candidate'),
+});
+
+export const MassMailingRecipientSchema = z.object({
+  firmName: z.string().min(1),
+  email: z.string().email(),
+  primaryCity: z.string().optional(),
+  region: z.string().optional(),
+  category: z.string().optional(),
+  frn: z.string().optional(),
+});
+
+export const CandidateOutreachProfileSchema = z.object({
+  candidateName: z.string().min(2, 'Candidate name is required'),
+  icaiRegNo: z.string().min(4, 'Valid ICAI registration number is required'),
+  interStatus: z.string().min(2, 'CA Intermediate status is required'),
+  city: z.string().min(2, 'City is required'),
+  phone: z.string().optional(),
+  linkedinUrl: z.string().optional(),
+  resumeLink: z.string().optional(),
+});
+
+export const MassMailingCampaignSchema = z.object({
+  smtpConfig: SmtpConfigSchema.optional(),
+  subject: z.string().min(5, 'Email subject must be at least 5 characters'),
+  bodyTemplate: z.string().min(20, 'Email body must be at least 20 characters'),
+  recipients: z.array(MassMailingRecipientSchema).min(1, 'Select at least 1 CA firm recipient'),
+  candidateDetails: CandidateOutreachProfileSchema,
+  throttleDelayMs: z.number().min(500).max(10000).default(1500),
+});
+
+
 
 
 

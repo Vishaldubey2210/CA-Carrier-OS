@@ -16,6 +16,7 @@ graphify-out/
 .env.production
 *.pem
 *.key
+data/user_smtp_config.json
 
 # Logs
 npm-debug.log*

@@ -1124,6 +1124,80 @@ export interface EntitlementCheckResult {
   message?: string;
 }
 
+// -------------------------------------------------------------
+// Mass Mailing & Candidate Outreach Types
+// -------------------------------------------------------------
+
+export interface SmtpConfigInput {
+  email: string;
+  appPassword: string;
+  host?: string;
+  port?: number;
+  secure?: boolean;
+  senderName?: string;
+}
+
+export interface SmtpConfigRecord {
+  email: string;
+  host: string;
+  port: number;
+  secure: boolean;
+  senderName: string;
+  isVerified: boolean;
+  verifiedAt?: string;
+  maskedEmail: string;
+  lastUsedAt?: string;
+}
+
+export interface MassMailingRecipient {
+  firmName: string;
+  email: string;
+  primaryCity?: string;
+  region?: string;
+  category?: string;
+  frn?: string;
+}
+
+export interface CandidateOutreachProfile {
+  candidateName: string;
+  icaiRegNo: string;
+  interStatus: string;
+  city: string;
+  phone?: string;
+  linkedinUrl?: string;
+  resumeLink?: string;
+}
+
+export interface MassMailingCampaignRequest {
+  smtpConfig?: SmtpConfigInput;
+  subject: string;
+  bodyTemplate: string;
+  recipients: MassMailingRecipient[];
+  candidateDetails: CandidateOutreachProfile;
+  throttleDelayMs?: number;
+}
+
+export interface MassMailingLogEntry {
+  id: string;
+  timestamp: string;
+  level: 'INFO' | 'SUCCESS' | 'WARN' | 'ERROR';
+  recipientEmail: string;
+  firmName: string;
+  message: string;
+  messageId?: string;
+}
+
+export interface MassMailingCampaignResult {
+  campaignId: string;
+  totalQueued: number;
+  totalSent: number;
+  totalFailed: number;
+  startedAt: string;
+  completedAt: string;
+  logs: MassMailingLogEntry[];
+}
+
+
 
 
 

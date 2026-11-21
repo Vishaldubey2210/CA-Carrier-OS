@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { JobDetail, HIRING_SOURCES_CATALOG, HiringSourceCategory } from '@ca-career-os/shared';
 import { apiClient } from '@/lib/api-client';
+import { MassMailerSection } from '@/components/articleship/MassMailerSection';
 
 export default function ArticleshipPage() {
   const [jobs, setJobs] = useState<JobDetail[]>([]);
@@ -32,7 +33,7 @@ export default function ArticleshipPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Main View Switcher
-  const [mainView, setMainView] = useState<'VACANCIES' | 'DIRECTORY'>('VACANCIES');
+  const [mainView, setMainView] = useState<'VACANCIES' | 'DIRECTORY' | 'OUTREACH'>('VACANCIES');
 
   // Directory Filters
   const [directorySearch, setDirectorySearch] = useState('');
@@ -175,7 +176,7 @@ export default function ArticleshipPage() {
       </div>
 
       {/* Main Mode Switcher */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem', flexWrap: 'wrap' }}>
         <button
           onClick={() => setMainView('VACANCIES')}
           className={`btn ${mainView === 'VACANCIES' ? 'btn-primary' : 'btn-secondary'}`}
@@ -188,11 +189,20 @@ export default function ArticleshipPage() {
           className={`btn ${mainView === 'DIRECTORY' ? 'btn-primary' : 'btn-secondary'}`}
           style={{ fontSize: '0.8125rem', padding: '0.45rem 1rem' }}
         >
-          <Globe size={15} /> 110+ Verified Hiring Sources &amp; Global Directory ({HIRING_SOURCES_CATALOG.length})
+          <Globe size={15} /> 110+ Verified Directory ({HIRING_SOURCES_CATALOG.length})
+        </button>
+        <button
+          onClick={() => setMainView('OUTREACH')}
+          className={`btn ${mainView === 'OUTREACH' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ fontSize: '0.8125rem', padding: '0.45rem 1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+        >
+          <Mail size={15} /> ⚡ 1-Click Mass Mailing &amp; Outreach
         </button>
       </div>
 
-      {mainView === 'DIRECTORY' ? (
+      {mainView === 'OUTREACH' ? (
+        <MassMailerSection />
+      ) : mainView === 'DIRECTORY' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {/* Important Distinction Advisory Banner */}
           <div

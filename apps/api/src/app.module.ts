@@ -20,11 +20,13 @@ import { BillingModule } from './modules/billing/billing.module.js';
 import { SupportModule } from './modules/support/support.module.js';
 import { NotificationsModule } from './modules/notifications/notifications.module.js';
 import { EmailModule } from './modules/email/email.module.js';
+import { MassMailingModule } from './modules/mass-mailing/mass-mailing.module.js';
 
 @Module({
   imports: [
     PrismaModule,
     EmailModule,
+    MassMailingModule,
     HealthModule,
     AuthModule,
     WorkspaceModule,
