@@ -14,6 +14,7 @@ import { JoobleConnector } from './jooble.connector.js';
 import { IcaiConnector } from './icai.connector.js';
 import { XmlFeedConnector } from './xml-feed.connector.js';
 import { CareerjetConnector } from './careerjet.connector.js';
+import { StructuredLdJsonConnector } from './structured-ld-json.connector.js';
 
 @Injectable()
 export class JobSourceRegistryService {
@@ -35,6 +36,7 @@ export class JobSourceRegistryService {
       new CareerjetConnector(),
       new IcaiConnector(),
       new XmlFeedConnector(),
+      new StructuredLdJsonConnector(),
     ];
 
     for (const connector of defaultConnectors) {
@@ -154,6 +156,8 @@ export class JobSourceRegistryService {
         return 'ICAI CA Jobs & SSP Articleship Registry (Official Outbound)';
       case 'xml_feed':
         return 'Authentic XML/RSS Job Feeds (ICAI, Big 4, Direct Portals)';
+      case 'ld_json_directory':
+        return 'Schema.org JSON-LD & 5,000+ CA Firms Directory Extractor';
       default:
         return id.toUpperCase();
     }
@@ -177,6 +181,8 @@ export class JobSourceRegistryService {
         return 'https://cajobs.icai.org/';
       case 'xml_feed':
         return 'https://cajobs.icai.org/rss/latest_jobs.xml';
+      case 'ld_json_directory':
+        return 'https://schema.org/JobPosting (5,000 CA Firm Directory Endpoints)';
       default:
         return 'https://api.external.com';
     }

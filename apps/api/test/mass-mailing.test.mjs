@@ -125,3 +125,4 @@ describe('Mass Mailing & Automated Outreach Suite', () => {
     assert.equal(successLogs.length, 2);
   });
 });
+

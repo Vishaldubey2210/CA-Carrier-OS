@@ -30,6 +30,21 @@ export class XmlFeedConnector implements JobConnector {
 
   private status: JobSourceStatus = 'ACTIVE';
 
+  // HTTP ETag and Last-Modified cache for anti-ban 304 conditional verification
+  private readonly cache = new Map<string, { etag?: string; lastModified?: string; cachedJobs: NormalizedJobPayload[] }>();
+
+  private readonly userAgents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+    'Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0',
+    'CACareerOS/2.0 AntiBanFeedReader (+https://cacareeros.com; contact: compliance@cacareeros.com)',
+  ];
+
+  private getRandomUserAgent(): string {
+    const idx = Math.floor(Math.random() * this.userAgents.length);
+    return this.userAgents[idx];
+  }
+
   // Configured authentic live XML/RSS feeds for Chartered Accountants, Finance & Accounting
   private feedSources: XmlFeedSourceConfig[] = [
     {
@@ -421,19 +436,33 @@ export class XmlFeedConnector implements JobConnector {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
+        // Check conditional ETag cache
+        const cached = this.cache.get(source.feedUrl);
+        const reqHeaders: Record<string, string> = {
+          'User-Agent': this.getRandomUserAgent(),
+          Accept: 'application/rss+xml, application/xml, text/xml, application/json, text/plain',
+        };
+        if (cached?.etag) reqHeaders['If-None-Match'] = cached.etag;
+        if (cached?.lastModified) reqHeaders['If-Modified-Since'] = cached.lastModified;
+
         const res = await fetch(source.feedUrl, {
           signal: controller.signal,
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) CACareerOS/2.0 JobSyndicationEngine',
-            Accept: 'application/rss+xml, application/xml, text/xml, application/json, text/plain',
-          },
+          headers: reqHeaders,
         }).finally(() => clearTimeout(timeout));
+
+        if (res.status === 304 && cached) {
+          this.logger.log(`[AntiBan 304 Not Modified] ${source.name} unchanged. Zero bandwidth & 0 IP footprint.`);
+          allJobs.push(...cached.cachedJobs);
+          continue;
+        }
 
         if (!res.ok) {
           this.logger.warn(`XML feed ${source.name} returned HTTP ${res.status}. Skipping.`);
           continue;
         }
 
+        const etag = res.headers.get('etag') || undefined;
+        const lastModified = res.headers.get('last-modified') || undefined;
         const text = await res.text();
 
         // 1. Handle JSON-based feeds if endpoint returns JSON
@@ -486,6 +515,7 @@ export class XmlFeedConnector implements JobConnector {
         if (text.includes('<rss') || text.includes('<feed') || text.includes('<jobs') || text.includes('<item')) {
           const parsed = this.parseXmlJobs(text, source);
           allJobs.push(...parsed);
+          this.cache.set(source.feedUrl, { etag, lastModified, cachedJobs: parsed });
           this.logger.log(`Successfully parsed ${parsed.length} real jobs from XML feed: ${source.name}`);
         } else {
           this.logger.warn(`Feed ${source.name} did not contain valid XML/RSS markup.`);

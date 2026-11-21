@@ -8,3 +8,4 @@ import { MassMailingService } from './mass-mailing.service.js';
   exports: [MassMailingService],
 })
 export class MassMailingModule {}
+
