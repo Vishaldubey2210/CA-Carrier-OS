@@ -6,47 +6,60 @@
 
 :root {
   /* =========================================================================
-     CA Career OS — Clean Minimalist Black & White Design System
-     High legibility, normal text, zero eye strain, pure monochrome aesthetic
+     CA Career OS — Executive Monochrome & Chartered Emerald Design System
+     High legibility, architectural paper tint, deep obsidian, prestigious emerald
      ========================================================================= */
-  --page-background: #FFFFFF;
+  --page-background: #FBFBFA;     /* Warm Architectural Paper Tint */
   --sidebar-background: #FFFFFF;
-  --surface-primary: #FFFFFF;
-  --surface-secondary: #FAFAFA;
-  --surface-hover: #F4F4F5;
+  --surface-primary: #FFFFFF;     /* Crisp Pure White Surface */
+  --surface-secondary: #F4F4F5;
+  --surface-hover: #EDEDF0;
   --surface-card: #FFFFFF;
 
-  /* Typography Colors (Black and White contrast) */
-  --text-primary: #0A0A0A;       /* Crisp Deep Black */
+  /* Typography Colors (Executive High-Contrast) */
+  --text-primary: #09090B;       /* Deep Obsidian Black */
   --text-secondary: #52525B;     /* Neutral readable dark gray */
   --text-muted: #71717A;         /* Neutral light gray label */
-  --text-accent: #0A0A0A;
+  --text-accent: #059669;        /* Signature Chartered Emerald */
 
   /* Monochrome Brand Accents */
-  --brand-primary: #000000;       /* Solid Black */
-  --brand-primary-hover: #262626; /* Hover Charcoal */
-  --brand-interactive: #000000;
+  --brand-primary: #09090B;       /* Solid Carbon Black */
+  --brand-primary-hover: #18181B; /* Hover Deep Charcoal */
+  --brand-interactive: #09090B;
   --brand-soft: #F4F4F5;
-  --brand-teal: #18181B;
-  --brand-teal-soft: #F4F4F5;
+  --brand-teal: #059669;
+  --brand-teal-soft: #ECFDF5;
+
+  /* Chartered Emerald (ICAI Audit Sign-Off Green & Verification) */
+  --accent-emerald: #059669;
+  --accent-emerald-dark: #047857;
+  --accent-emerald-surface: #ECFDF5;
+  --accent-emerald-border: #A7F3D0;
+  --accent-emerald-text: #065F46;
+
+  /* Warm Gold / Brass Accent (Premium Status & Deadlines) */
+  --accent-amber: #D97706;
+  --accent-amber-surface: #FEF3C7;
+  --accent-amber-border: #FDE68A;
+  --accent-amber-text: #92400E;
 
   /* Borders & Dividers */
   --border-subtle: #E4E4E7;
   --border-strong: #D4D4D8;
-  --border-active: #0A0A0A;
+  --border-active: #09090B;
   --border-glow: none;
 
-  /* Semantic Status Colors (Monochrome Clean) */
-  --success-text: #0A0A0A;
-  --success-surface: #F4F4F5;
-  --success-border: #D4D4D8;
-  --warning-text: #0A0A0A;
-  --warning-surface: #F4F4F5;
-  --warning-border: #D4D4D8;
-  --danger-text: #0A0A0A;
-  --danger-surface: #F4F4F5;
-  --danger-border: #D4D4D8;
-  --focus-ring: #000000;
+  /* Semantic Status Colors */
+  --success-text: #065F46;
+  --success-surface: #ECFDF5;
+  --success-border: #A7F3D0;
+  --warning-text: #92400E;
+  --warning-surface: #FEF3C7;
+  --warning-border: #FDE68A;
+  --danger-text: #991B1B;
+  --danger-surface: #FEF2F2;
+  --danger-border: #FECACA;
+  --focus-ring: #09090B;
 
   /* Aliases for Full Backward Compatibility */
   --bg-main: var(--page-background);
@@ -55,10 +68,8 @@
   --bg-card-hover: var(--surface-secondary);
   --bg-glass: var(--surface-primary);
 
-  --accent-indigo: #000000;
-  --accent-emerald: #18181B;
+  --accent-indigo: #09090B;
   --accent-cyan: #27272A;
-  --accent-amber: #3F3F46;
   --accent-rose: #52525B;
   --accent-purple: #18181B;
 
@@ -75,11 +86,11 @@
   --radius-2xl: 12px;
   --radius-pill: 6px;
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 3px 6px rgba(0, 0, 0, 0.06);
-  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-dropdown: 0 6px 16px rgba(0, 0, 0, 0.08);
   --shadow-glow: none;
 
   /* Motion & Animation Tokens */
@@ -328,22 +339,50 @@ p {
   letter-spacing: 0.01em;
 }
 
+.btn-emerald {
+  background: var(--accent-emerald);
+  color: #FFFFFF;
+  border-color: var(--accent-emerald-dark);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.2);
+}
+
+.btn-emerald:hover {
+  background: var(--accent-emerald-dark);
+  border-color: var(--accent-emerald-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
 .badge-indigo {
   background: #F4F4F5;
-  color: #0A0A0A;
+  color: #09090B;
   border: 1px solid #E4E4E7;
 }
 
 .badge-emerald {
-  background: #F4F4F5;
-  color: #0A0A0A;
-  border: 1px solid #E4E4E7;
+  background: var(--accent-emerald-surface);
+  color: var(--accent-emerald-text);
+  border: 1px solid var(--accent-emerald-border);
+}
+
+.badge-verified {
+  background: var(--accent-emerald-surface);
+  color: var(--accent-emerald-text);
+  border: 1px solid var(--accent-emerald-border);
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  padding: 0.2rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
 }
 
 .badge-success-clean {
-  background: #FFFFFF;
-  color: #0A0A0A;
-  border: 1px solid #E4E4E7;
+  background: var(--accent-emerald-surface);
+  color: var(--accent-emerald-text);
+  border: 1px solid var(--accent-emerald-border);
   border-radius: 4px;
   font-weight: 600;
   font-size: 0.6875rem;
@@ -355,9 +394,22 @@ p {
 }
 
 .badge-amber {
-  background: #F4F4F5;
-  color: #0A0A0A;
-  border: 1px solid #E4E4E7;
+  background: var(--accent-amber-surface);
+  color: var(--accent-amber-text);
+  border: 1px solid var(--accent-amber-border);
+}
+
+.badge-amber-clean {
+  background: var(--accent-amber-surface);
+  color: var(--accent-amber-text);
+  border: 1px solid var(--accent-amber-border);
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  padding: 0.2rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
 }
 
 .badge-cyan {

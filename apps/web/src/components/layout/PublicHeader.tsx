@@ -9,46 +9,28 @@ import { useAuth } from '../../context/AuthContext';
 
 export function PublicHeader() {
   const pathname = usePathname();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [activeSection, setActiveSection] = useState<string>('');
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
-    { href: '/articleship', label: 'Articleship', sectionId: 'articleship' },
-    { href: '/jobs', label: 'CA Jobs', sectionId: 'jobs' },
-    { href: '/#pricing', label: 'Pricing (₹99 & ₹199)', sectionId: 'pricing' },
-    { href: '/#faq', label: 'FAQ', sectionId: 'faq' },
+    { href: '/articleship', label: 'Articleship (₹99)' },
+    { href: '/jobs', label: 'CA Jobs (₹199)' },
+    { href: '/#pricing', label: 'Pricing' },
+    { href: '/#faq', label: 'FAQ' },
   ];
 
-  // 1. Scroll listener for progress bar, transparent->white background, and scrollspy
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       setIsScrolled(scrollY > 8);
 
-      // Scroll progress
       const winHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (winHeight > 0) {
         setScrollProgress(Math.min(1, Math.max(0, scrollY / winHeight)));
       }
-
-      // Scrollspy
-      const sections = ['features', 'how-it-works', 'pathways', 'pricing', 'about', 'faq', 'contact'];
-      let current = '';
-      for (const id of sections) {
-        const el = document.getElementById(id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 140 && rect.bottom >= 140) {
-            current = id;
-            break;
-          }
-        }
-      }
-      setActiveSection(current);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -56,7 +38,6 @@ export function PublicHeader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 2. Lock body scroll and handle Escape key when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -81,23 +62,14 @@ export function PublicHeader() {
         role="banner"
         className={`sticky top-0 z-50 transition-all duration-200 ${
           isScrolled
-            ? 'bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-sm py-3'
+            ? 'bg-[#FBFBFA]/95 backdrop-blur-md border-b border-neutral-200/80 shadow-xs py-3'
             : 'bg-transparent border-b border-transparent py-4'
         }`}
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-          transition: 'all 0.2s ease',
-        }}
       >
-        {/* Thin Scroll Progress Bar */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[2.5px] bg-[#EEF2F6] overflow-hidden"
-          style={{ height: '2.5px' }}
-        >
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-neutral-200/50 overflow-hidden">
           <div
-            className="h-full bg-[#0F172A] transition-transform duration-75 origin-left"
+            className="h-full bg-[#09090B] transition-transform duration-75 origin-left"
             style={{
               transform: `scaleX(${scrollProgress})`,
               transformOrigin: '0% 50%',
@@ -105,21 +77,21 @@ export function PublicHeader() {
           />
         </div>
 
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 flex items-center justify-between">
+        <div className="max-w-[1160px] mx-auto px-4 sm:px-6 flex items-center justify-between">
           {/* Brand Logo */}
           <Link
             href="/"
             className="flex items-center gap-2.5 no-underline group focus-visible:ring-2 focus-visible:ring-black rounded-md outline-none"
             aria-label="CharteredOS Home"
           >
-            <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white font-extrabold text-[14px]">
+            <div className="w-8 h-8 rounded-md bg-[#09090B] flex items-center justify-center text-white font-black text-[13px] tracking-tight">
               CO
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-[16px] text-black tracking-tight leading-tight">
+              <span className="font-extrabold text-[15px] text-[#09090B] tracking-tight leading-tight">
                 CharteredOS
               </span>
-              <span className="text-[10px] font-medium text-neutral-500 tracking-wider uppercase">
+              <span className="text-[10px] font-semibold text-neutral-500 tracking-wider uppercase">
                 Articleship &amp; CA Jobs
               </span>
             </div>
@@ -128,28 +100,21 @@ export function PublicHeader() {
           {/* Desktop Navigation */}
           <nav
             aria-label="Primary Navigation"
-            className="hidden md:flex items-center gap-6 lg:gap-7"
+            className="hidden md:flex items-center gap-6 lg:gap-8"
           >
             {navLinks.map((link) => {
-              const isActive = activeSection === link.sectionId;
+              const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-[14px] font-medium transition-colors no-underline relative py-1 ${
+                  className={`text-[13.5px] font-medium transition-colors no-underline ${
                     isActive
-                      ? 'text-black font-semibold'
-                      : 'text-neutral-600 hover:text-black'
+                      ? 'text-[#09090B] font-semibold'
+                      : 'text-neutral-600 hover:text-[#09090B]'
                   }`}
                 >
                   {link.label}
-                  {isActive && (
-                    <motion.span
-                      layoutId="navActivePill"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-black rounded-full"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
                 </Link>
               );
             })}
@@ -158,26 +123,24 @@ export function PublicHeader() {
           {/* Action Controls */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
-              <div className="flex items-center gap-2.5">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-black hover:bg-neutral-800 px-4 py-2 rounded-md shadow-xs transition-colors no-underline"
-                >
-                  <span>Dashboard</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-[#09090B] hover:bg-neutral-800 px-4 py-2 rounded-md shadow-xs transition-colors no-underline"
+              >
+                <span>Dashboard</span>
+                <ArrowRight size={14} />
+              </Link>
             ) : (
               <>
                 <Link
                   href="/login"
-                  className="text-[14px] font-medium text-neutral-700 hover:text-black px-3.5 py-1.5 rounded-md transition-colors no-underline"
+                  className="text-[13.5px] font-medium text-neutral-700 hover:text-black px-3.5 py-1.5 rounded-md transition-colors no-underline"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white bg-black hover:bg-neutral-800 px-4 py-2 rounded-md shadow-xs transition-colors no-underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white bg-[#09090B] hover:bg-neutral-800 px-4 py-2 rounded-md shadow-xs transition-colors no-underline"
                 >
                   <span>Get Started</span>
                   <ArrowRight size={14} />
@@ -192,18 +155,17 @@ export function PublicHeader() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
-            className="md:hidden p-2 rounded-lg text-[#0F172A] hover:bg-[#F1F5F9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1E3A8A] transition-colors"
+            className="md:hidden p-2 rounded-md text-[#09090B] hover:bg-neutral-100 transition-colors"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </header>
 
-      {/* Mobile Drawer with Focus Trap & Backdrop */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden flex flex-col">
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -214,7 +176,6 @@ export function PublicHeader() {
               aria-hidden="true"
             />
 
-            {/* Slide-Down Drawer */}
             <motion.div
               ref={drawerRef}
               role="dialog"
@@ -224,15 +185,15 @@ export function PublicHeader() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="relative bg-white border-b border-[#E2E8F0] shadow-xl pt-4 pb-6 px-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
+              className="relative bg-white border-b border-neutral-200 shadow-xl pt-4 pb-6 px-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 no-underline"
                 >
-                  <div className="w-7 h-7 rounded-md bg-black flex items-center justify-center text-white font-extrabold text-xs">
+                  <div className="w-7 h-7 rounded-md bg-black flex items-center justify-center text-white font-bold text-xs">
                     CO
                   </div>
                   <span className="font-bold text-black text-base">CharteredOS</span>
@@ -247,7 +208,6 @@ export function PublicHeader() {
                 </button>
               </div>
 
-              {/* Mobile Links */}
               <nav className="flex flex-col gap-1 py-1">
                 {navLinks.map((link) => (
                   <Link
@@ -261,7 +221,6 @@ export function PublicHeader() {
                 ))}
               </nav>
 
-              {/* Mobile Actions */}
               <div className="pt-3 border-t border-neutral-200 flex flex-col gap-2.5">
                 {isAuthenticated ? (
                   <Link

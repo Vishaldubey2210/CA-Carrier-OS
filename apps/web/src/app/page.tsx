@@ -39,30 +39,30 @@ export default function RootHomePage() {
         Skip to main content
       </a>
 
-      {/* Main Home Page Sections - Clean Black & White */}
-      <div id="main-content" className="flex flex-col w-full overflow-x-clip bg-white text-black">
+      {/* Main Home Page Sections - Executive Monochrome & Emerald Accent */}
+      <div id="main-content" className="flex flex-col w-full overflow-x-clip bg-[#FBFBFA] text-[#09090B]">
         {/* 1. Hero Section */}
         <div>
           <HeroSection />
         </div>
 
         {/* 2. Core Capabilities: Articleship & Jobs */}
-        <div className="border-t border-neutral-200 bg-white">
+        <div className="border-t border-neutral-200/80 bg-white">
           <CoreCapabilities />
         </div>
 
         {/* 3. Transparent Pricing: ₹99 & ₹199 */}
-        <div className="border-t border-neutral-200 bg-white">
+        <div className="border-t border-neutral-200/80 bg-[#FBFBFA]">
           <PricingSection />
         </div>
 
         {/* 4. FAQ Accordion */}
-        <div className="border-t border-neutral-200 bg-white">
+        <div className="border-t border-neutral-200/80 bg-white">
           <FAQSection />
         </div>
 
         {/* 5. Final Call to Action */}
-        <div className="border-t border-neutral-200 bg-white">
+        <div className="border-t border-neutral-200/80 bg-[#FBFBFA]">
           <FinalCTA />
         </div>
 

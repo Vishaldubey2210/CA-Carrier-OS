@@ -10,6 +10,11 @@ import {
   MapPin,
   ArrowRight,
   ExternalLink,
+  CheckCircle2,
+  Sparkles,
+  Building,
+  Mail,
+  Zap,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -120,26 +125,50 @@ export function HeroSection() {
   };
 
   return (
-    <section className="w-full max-w-[1040px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-16">
+    <section className="w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-16">
       {/* 1. Masthead */}
-      <div className="max-w-[720px] mx-auto text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-neutral-300 text-[12px] font-medium text-neutral-800 bg-neutral-50 mb-5">
-          <span>ICAI Form 102/103 Articleship &amp; CA Job Board</span>
+      <div className="max-w-[760px] mx-auto text-center mb-10">
+        {/* Status Pill with Emerald Pulsing Dot */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-neutral-300 text-[12px] font-medium text-neutral-800 bg-white shadow-xs mb-5">
+          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+          <span className="font-semibold text-neutral-900">5,000+ Verified CA Firms</span>
+          <span className="text-neutral-400">•</span>
+          <span className="text-neutral-600">Form 102/103 &amp; Qualified Openings</span>
         </div>
 
-        <h1 className="text-[clamp(2rem,3.4vw,3rem)] font-bold text-black tracking-tight leading-[1.2] mb-4">
-          Verified CA Articleship &amp; Jobs
+        <h1 className="text-[clamp(2.1rem,3.6vw,3.25rem)] font-extrabold text-[#09090B] tracking-tight leading-[1.16] mb-4">
+          Verified CA Articleship &amp; Placement Network
         </h1>
 
-        <p className="text-[clamp(1rem,1.15vw,1.125rem)] text-neutral-600 leading-relaxed max-w-[600px] mx-auto mb-8 font-normal">
+        <p className="text-[clamp(1rem,1.15vw,1.125rem)] text-neutral-600 leading-relaxed max-w-[620px] mx-auto mb-6 font-normal">
           The simplest and easiest way to search verified Articleship openings (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.
         </p>
+
+        {/* Feature Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8 text-[12px] text-neutral-600">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-neutral-100 border border-neutral-200">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>Form 102/103 2-Yr Scheme</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-neutral-100 border border-neutral-200">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>Form 104 Industrial Training</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-neutral-100 border border-neutral-200">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>1-Click Mass Outreach</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-neutral-100 border border-neutral-200">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>₹99 / ₹199 Transparent Pricing</span>
+          </span>
+        </div>
 
         {/* Primary Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/articleship"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-black hover:bg-neutral-800 text-white text-[14px] font-semibold transition-colors no-underline"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#09090B] hover:bg-neutral-800 text-white text-[14px] font-semibold transition-all shadow-sm no-underline"
           >
             <GraduationCap size={16} />
             <span>Articleship Hub (₹99)</span>
@@ -147,7 +176,7 @@ export function HeroSection() {
 
           <Link
             href="/jobs"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white hover:bg-neutral-100 text-black border border-black text-[14px] font-semibold transition-colors no-underline"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white hover:bg-neutral-50 text-[#09090B] border border-neutral-300 text-[14px] font-semibold transition-all shadow-xs no-underline"
           >
             <Briefcase size={15} />
             <span>CA Jobs (₹199)</span>
@@ -164,10 +193,10 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* 2. Opportunity Board - Black and White */}
-      <div className="w-full bg-white border border-neutral-200 rounded-lg overflow-hidden">
+      {/* 2. Opportunity Board - Executive Monochrome & Emerald Accent */}
+      <div className="w-full bg-white border border-neutral-200 rounded-lg shadow-sm overflow-hidden">
         {/* Search & Filter Strip */}
-        <div className="p-4 sm:p-5 border-b border-neutral-200 bg-neutral-50 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-neutral-200 bg-neutral-50/70 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           <div className="relative flex-1 max-w-[420px]">
             <Search
               size={15}
@@ -182,13 +211,13 @@ export function HeroSection() {
             />
           </div>
 
-          <div className="inline-flex items-center gap-1 bg-neutral-200 p-1 rounded-md self-start sm:self-auto text-[12px]">
+          <div className="inline-flex items-center gap-1 bg-neutral-200/80 p-1 rounded-md self-start sm:self-auto text-[12px]">
             <button
               type="button"
               onClick={() => setSelectedFilter('ALL')}
               className={`px-3 py-1 rounded transition-all cursor-pointer font-medium ${
                 selectedFilter === 'ALL'
-                  ? 'bg-black text-white'
+                  ? 'bg-black text-white shadow-xs'
                   : 'text-neutral-700 hover:text-black'
               }`}
             >
@@ -199,7 +228,7 @@ export function HeroSection() {
               onClick={() => setSelectedFilter('ARTICLESHIP')}
               className={`px-3 py-1 rounded transition-all cursor-pointer font-medium ${
                 selectedFilter === 'ARTICLESHIP'
-                  ? 'bg-black text-white'
+                  ? 'bg-black text-white shadow-xs'
                   : 'text-neutral-700 hover:text-black'
               }`}
             >
@@ -210,7 +239,7 @@ export function HeroSection() {
               onClick={() => setSelectedFilter('QUALIFIED')}
               className={`px-3 py-1 rounded transition-all cursor-pointer font-medium ${
                 selectedFilter === 'QUALIFIED'
-                  ? 'bg-black text-white'
+                  ? 'bg-black text-white shadow-xs'
                   : 'text-neutral-700 hover:text-black'
               }`}
             >
@@ -222,18 +251,26 @@ export function HeroSection() {
         {/* Opportunity Rows */}
         <div className="divide-y divide-neutral-200">
           {filteredList.map((job) => {
+            const isArticleship = job.category === 'ARTICLESHIP' || job.category === 'INDUSTRIAL_TRAINING';
             return (
               <div
                 key={job.id}
-                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-neutral-50 transition-colors"
+                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-neutral-50/80 transition-colors"
               >
-                <div className="space-y-1 flex-1 min-w-0">
+                <div className="space-y-1.5 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-semibold px-2 py-0.5 rounded border border-neutral-300 bg-neutral-100 text-black">
+                    <span
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${
+                        isArticleship
+                          ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                          : 'border-neutral-200 bg-neutral-100 text-neutral-800'
+                      }`}
+                    >
                       {job.typeLabel}
                     </span>
-                    <span className="text-[13px] font-semibold text-black">
+                    <span className="text-[13px] font-semibold text-black flex items-center gap-1">
                       {job.firm}
+                      <CheckCircle2 size={13} className="text-emerald-600 inline-block" />
                     </span>
                     <span className="text-[12px] text-neutral-400">•</span>
                     <span className="text-[12px] text-neutral-600 flex items-center gap-1">
@@ -241,7 +278,7 @@ export function HeroSection() {
                     </span>
                   </div>
 
-                  <h3 className="text-[15px] font-semibold text-black leading-snug">
+                  <h3 className="text-[15px] font-semibold text-[#09090B] leading-snug">
                     {job.role}
                   </h3>
 
@@ -259,9 +296,9 @@ export function HeroSection() {
                     href={job.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[13px] font-medium text-black hover:underline"
+                    className="inline-flex items-center gap-1 text-[13px] font-medium text-emerald-700 hover:text-emerald-800 hover:underline"
                   >
-                    <span>Apply</span>
+                    <span>Apply Direct</span>
                     <ExternalLink size={12} />
                   </a>
                 </div>
@@ -271,8 +308,11 @@ export function HeroSection() {
         </div>
 
         {/* Footer Link Strip */}
-        <div className="p-3.5 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between text-[12px] text-neutral-600">
-          <span>Verified listings direct from firm career portals</span>
+        <div className="p-3.5 bg-neutral-50/80 border-t border-neutral-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[12px] text-neutral-600">
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>5,000 CA Firms Indexed via Schema.org &amp; Direct Career Portals</span>
+          </span>
           <div className="flex gap-4">
             <Link
               href="/articleship"
