@@ -21,10 +21,9 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Download,
-  Play,
-  Pause,
-  StopCircle,
+  HelpCircle,
+  Zap,
+  BookOpen,
 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import {
@@ -34,10 +33,11 @@ import {
   MassMailingLogEntry,
 } from '@ca-career-os/shared';
 
-const DEFAULT_SUBJECT_TEMPLATE =
-  'Application for Articleship | {candidate_name} | {inter_status} | ICAI Reg: {cro_number} | {city}';
-
-const DEFAULT_BODY_TEMPLATE = `Respected HR & Recruitment Team at {firm_name},
+export const GENERIC_TEMPLATES = {
+  ARTICLESHIP: {
+    name: '1. CA Articleship (Form 102/103 2-Year Scheme)',
+    subject: 'Application for Articleship | {candidate_name} | {inter_status} | ICAI Reg: {cro_number} | {city}',
+    body: `Respected HR & Recruitment Team at {firm_name},
 
 I am writing to express my keen interest in pursuing my 2-year ICAI Articleship practical training with {firm_name} at your {city} office, specifically in Statutory Audit, Taxation, or Advisory services.
 
@@ -59,7 +59,57 @@ Sincerely,
 {candidate_name}
 ICAI Student Registration: {cro_number}
 Mobile: {phone}
-{linkedin_url}`;
+{linkedin_url}`,
+  },
+  INDUSTRIAL_TRAINING: {
+    name: '2. CA Industrial Training (Form 104 - MNCs & Corporates)',
+    subject: 'Application for CA Industrial Training (Form 104) | {candidate_name} | ICAI: {cro_number} | {city}',
+    body: `Respected Campus & Finance Hiring Team at {firm_name},
+
+I am writing to formally apply for the CA Industrial Trainee position under Form 104 at {firm_name} in your {city} team, within Corporate FP&A, Financial Reporting, Internal Audit, or Treasury.
+
+Profile Highlights:
+• Candidate: {candidate_name}
+• ICAI Student Reg No: {cro_number}
+• Eligibility: Completed mandatory initial articleship tenure; eligible for Form 104 Industrial Training
+• Practical Exposure: Financial modeling, Ind AS compliance, and management reporting
+• Current Location: {candidate_city}
+• Phone: {phone}
+
+I am eager to apply my strong accounting fundamentals and analytical skills to high-impact corporate finance initiatives at {firm_name}.
+
+My CV and execution highlights are enclosed for your kind review.
+
+Warm regards,
+{candidate_name}
+Mobile: {phone}
+{linkedin_url}`,
+  },
+  QUALIFIED_JOB: {
+    name: '3. Qualified & Semi-Qualified CA Job Application',
+    subject: 'Application for Chartered Accountant Role | {candidate_name} | CA Qualified | {city}',
+    body: `Dear Hiring Team at {firm_name},
+
+I am submitting my profile for consideration for Chartered Accountant positions (Statutory Audit, Direct / Indirect Tax, Financial Due Diligence, or FP&A) at {firm_name} in {city}.
+
+Professional Overview:
+• Name: {candidate_name}
+• ICAI Membership / Registration: {cro_number}
+• Qualification: {inter_status}
+• Core Expertise: Ind AS / IFRS, CARO 2020, Tax Audit Form 3CD, Financial Analysis
+• Base Location: {candidate_city}
+• Direct Phone: {phone}
+
+I welcome the opportunity to discuss how my audit acumen and financial analysis experience can create value for {firm_name}.
+
+My comprehensive CV is attached. Looking forward to your response.
+
+Sincerely,
+{candidate_name}
+Mobile: {phone}
+{linkedin_url}`,
+  },
+};
 
 export function MassMailerSection() {
   // 1. SMTP State
@@ -70,6 +120,7 @@ export function MassMailerSection() {
   const [smtpHost, setSmtpHost] = useState('smtp.gmail.com');
   const [smtpPort, setSmtpPort] = useState(587);
   const [showAdvancedSmtp, setShowAdvancedSmtp] = useState(false);
+  const [showGuide, setShowGuide] = useState(true);
 
   const [savedConfig, setSavedConfig] = useState<SmtpConfigRecord | null>(null);
   const [isVerifyingSmtp, setIsVerifyingSmtp] = useState(false);
@@ -84,8 +135,9 @@ export function MassMailerSection() {
   const [linkedinUrl, setLinkedinUrl] = useState('https://linkedin.com/in/ca-rahul-sharma');
 
   // 3. Email Template State
-  const [subjectTemplate, setSubjectTemplate] = useState(DEFAULT_SUBJECT_TEMPLATE);
-  const [bodyTemplate, setBodyTemplate] = useState(DEFAULT_BODY_TEMPLATE);
+  const [selectedTemplateKey, setSelectedTemplateKey] = useState<'ARTICLESHIP' | 'INDUSTRIAL_TRAINING' | 'QUALIFIED_JOB'>('ARTICLESHIP');
+  const [subjectTemplate, setSubjectTemplate] = useState(GENERIC_TEMPLATES.ARTICLESHIP.subject);
+  const [bodyTemplate, setBodyTemplate] = useState(GENERIC_TEMPLATES.ARTICLESHIP.body);
   const [activePreviewTab, setActivePreviewTab] = useState<'EDIT' | 'PREVIEW'>('EDIT');
   const [throttleDelaySec, setThrottleDelaySec] = useState<number>(1.5);
 
@@ -96,7 +148,7 @@ export function MassMailerSection() {
   const [filterCity, setFilterCity] = useState('ALL');
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [searchTarget, setSearchTarget] = useState('');
-  const [selectedBatchLimit, setSelectedBatchLimit] = useState<number>(20);
+  const [selectedBatchLimit, setSelectedBatchLimit] = useState<number>(50);
   const [isLoadingFirms, setIsLoadingFirms] = useState(false);
   const [showFirmsDrawer, setShowFirmsDrawer] = useState(false);
 
@@ -106,6 +158,10 @@ export function MassMailerSection() {
   const [liveLogs, setLiveLogs] = useState<MassMailingLogEntry[]>([]);
   const [sentCount, setSentCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
+
+  // Daily quota tracker
+  const DAILY_QUOTA_LIMIT = 450;
+  const remainingDailyQuota = Math.max(0, DAILY_QUOTA_LIMIT - sentCount);
 
   // Fetch saved SMTP status & initial targets on mount
   useEffect(() => {
@@ -117,6 +173,13 @@ export function MassMailerSection() {
   useEffect(() => {
     fetchTargets();
   }, [filterRegion, filterCity, filterCategory, searchTarget, selectedBatchLimit]);
+
+  // Handle template change
+  const handleTemplateSwitch = (key: 'ARTICLESHIP' | 'INDUSTRIAL_TRAINING' | 'QUALIFIED_JOB') => {
+    setSelectedTemplateKey(key);
+    setSubjectTemplate(GENERIC_TEMPLATES[key].subject);
+    setBodyTemplate(GENERIC_TEMPLATES[key].body);
+  };
 
   const fetchSmtpStatus = async () => {
     try {
@@ -249,7 +312,7 @@ export function MassMailerSection() {
     }
 
     const confirmStart = window.confirm(
-      `Ready to dispatch personalized articleship applications to ${targetFirms.length} verified CA firms?\n\nPacing delay: ${throttleDelaySec}s between emails to protect your Gmail reputation.`
+      `Ready to dispatch personalized applications to ${targetFirms.length} verified CA firms?\n\nDaily Safe Ceiling: 450 emails/day\nPacing delay: ${throttleDelaySec}s between emails to protect your Gmail reputation.`
     );
     if (!confirmStart) return;
 
@@ -267,7 +330,7 @@ export function MassMailerSection() {
         level: 'INFO',
         recipientEmail: 'SYSTEM',
         firmName: 'Campaign Initializing',
-        message: `Starting automated outreach to ${targetFirms.length} firms from ${savedConfig?.maskedEmail || smtpEmail}...`,
+        message: `Starting automated outreach to ${targetFirms.length} firms from ${savedConfig?.maskedEmail || smtpEmail} (Daily Safe Limit: 450 emails)...`,
       },
     ]);
 
@@ -321,104 +384,204 @@ export function MassMailerSection() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      {/* 1. Header Overview & Safety Banner */}
-      <div
-        style={{
-          background: '#000000',
-          color: '#FFFFFF',
-          borderRadius: 'var(--radius-md)',
-          padding: '1.25rem 1.5rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem',
-        }}
-      >
-        <div style={{ maxWidth: '780px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-            <span style={{ background: '#FFFFFF', color: '#000000', fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+    <div className="flex flex-col gap-5 text-black">
+      {/* 1. Executive Masthead & 450 Daily Limit Banner */}
+      <div className="bg-[#09090B] text-white rounded-lg p-5 sm:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="max-w-[720px]">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="bg-emerald-500 text-black text-[11px] font-extrabold px-2.5 py-0.5 rounded tracking-wide">
               DIRECT GMAIL INTEGRATION
             </span>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-              1-Click CA Articleship Mass Mailing &amp; Outreach Engine
-            </h2>
+            <span className="bg-neutral-800 text-neutral-300 text-[11px] font-semibold px-2 py-0.5 rounded border border-neutral-700">
+              Safe Daily Limit: 450 Emails / 24h
+            </span>
           </div>
-          <p style={{ fontSize: '0.8125rem', color: '#D4D4D8', margin: 0, lineHeight: 1.5 }}>
-            Deliver personalized articleship applications directly to HR &amp; Partner inboxes of 5,000 verified CA firms across India. Emails are sent from your genuine Gmail address with automated rate-limiting to guarantee inbox placement without getting spam-flagged.
+          <h2 className="text-[20px] sm:text-[22px] font-extrabold text-white tracking-tight m-0 mb-1.5">
+            1-Click CA Articleship &amp; Job Mass Outreach
+          </h2>
+          <p className="text-[13px] text-neutral-300 leading-relaxed m-0">
+            Send genuine, personalized cover letters directly from your own Gmail address to 5,000+ verified CA firms and recruiters. Automated rate limiting prevents spam flags and guarantees partner inbox delivery.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        {/* Quota & Connection Badge */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-md p-3 min-w-[160px]">
+            <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">
+              Daily Safe Quota
+            </div>
+            <div className="text-[18px] font-black text-white flex items-baseline gap-1.5">
+              <span>{remainingDailyQuota}</span>
+              <span className="text-[11px] text-neutral-400 font-normal">/ {DAILY_QUOTA_LIMIT} left</span>
+            </div>
+            <div className="w-full bg-neutral-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+              <div
+                className="bg-emerald-500 h-full transition-all duration-300"
+                style={{ width: `${Math.min(100, (sentCount / DAILY_QUOTA_LIMIT) * 100)}%` }}
+              />
+            </div>
+          </div>
+
           {savedConfig ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#27272A', padding: '0.5rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid #3F3F46' }}>
-              <ShieldCheck size={16} style={{ color: '#4ADE80' }} />
+            <div className="flex items-center gap-2 bg-neutral-900 border border-emerald-900/60 p-3 rounded-md">
+              <ShieldCheck size={18} className="text-emerald-400 shrink-0" />
               <div>
-                <div style={{ fontSize: '0.6875rem', color: '#A1A1AA' }}>SMTP Authenticated</div>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#FFFFFF' }}>{savedConfig.maskedEmail}</div>
+                <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
+                  SMTP Connected
+                </div>
+                <div className="text-[12px] font-bold text-white font-mono">{savedConfig.maskedEmail}</div>
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#27272A', padding: '0.5rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid #3F3F46' }}>
-              <AlertCircle size={16} style={{ color: '#FACC15' }} />
-              <div style={{ fontSize: '0.75rem', color: '#E4E4E7' }}>Gmail SMTP not configured</div>
+            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 p-3 rounded-md">
+              <AlertCircle size={18} className="text-amber-400 shrink-0" />
+              <div>
+                <div className="text-[10px] font-semibold text-amber-400 uppercase tracking-wider">
+                  Not Configured
+                </div>
+                <div className="text-[11px] text-neutral-300">Enter App Password below</div>
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* 2. Grid: Left = Setup & Campaign Config, Right = Live Terminal & Progress */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.25rem' }}>
-        {/* Left Column: Setup & Inputs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* STEP 1: SMTP Connect Box */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1.25rem',
-            }}
+      {/* 2. Step-by-Step Guide on How to Get Keys / 16-Letter Google App Password */}
+      <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+        <div className="flex items-center justify-between mb-3 cursor-pointer" onClick={() => setShowGuide(!showGuide)}>
+          <div className="flex items-center gap-2">
+            <BookOpen size={16} className="text-emerald-600" />
+            <h3 className="text-[15px] font-bold text-black m-0">
+              How to Get Your 16-Character Google App Password (Step-by-Step Guide)
+            </h3>
+          </div>
+          <button
+            type="button"
+            className="text-[12px] font-medium text-neutral-500 hover:text-black flex items-center gap-1 cursor-pointer"
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+            {showGuide ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            <span>{showGuide ? 'Hide Guide' : 'View Guide'}</span>
+          </button>
+        </div>
+
+        {showGuide && (
+          <div className="space-y-4 pt-2 border-t border-neutral-100">
+            <p className="text-[13px] text-neutral-600 m-0">
+              Google requires a 16-character <strong>App Password</strong> instead of your normal Gmail password. This allows CharteredOS to securely dispatch your applications directly from your email without ever exposing your main Google Account password.
+            </p>
+
+            {/* 5 Visual Steps */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
+                  1
+                </div>
+                <div className="text-[12px] font-bold text-black">Google Security</div>
+                <div className="text-[11px] text-neutral-600 leading-snug">
+                  Open Google Account Settings and click on <strong>Security</strong>.
+                </div>
+                <a
+                  href="https://myaccount.google.com/security"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[11px] text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1 mt-auto"
+                >
+                  <span>Open Security</span>
+                  <ExternalLink size={10} />
+                </a>
+              </div>
+
+              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
+                  2
+                </div>
+                <div className="text-[12px] font-bold text-black">2-Step Verification</div>
+                <div className="text-[11px] text-neutral-600 leading-snug">
+                  Make sure <strong>2-Step Verification</strong> is turned <strong>ON</strong>.
+                </div>
+              </div>
+
+              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
+                  3
+                </div>
+                <div className="text-[12px] font-bold text-black">App Passwords</div>
+                <div className="text-[11px] text-neutral-600 leading-snug">
+                  Click on <strong>App Passwords</strong> (or search &quot;App passwords&quot;).
+                </div>
+                <a
+                  href="https://myaccount.google.com/apppasswords"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[11px] text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1 mt-auto"
+                >
+                  <span>App Passwords</span>
+                  <ExternalLink size={10} />
+                </a>
+              </div>
+
+              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
+                  4
+                </div>
+                <div className="text-[12px] font-bold text-black">Name the App</div>
+                <div className="text-[11px] text-neutral-600 leading-snug">
+                  Type <code>CharteredOS</code> or <code>Articleship Mailer</code> and click <strong>Create</strong>.
+                </div>
+              </div>
+
+              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5 bg-emerald-50/50 border-emerald-200">
+                <div className="w-5 h-5 rounded-full bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center">
+                  5
+                </div>
+                <div className="text-[12px] font-bold text-emerald-900">Copy 16 Letters</div>
+                <div className="text-[11px] text-emerald-800 leading-snug">
+                  Copy the 16-letter code (e.g. <code>abcd efgh ijkl mnop</code>) and paste below.
+                </div>
+              </div>
+            </div>
+
+            {/* Safety & Spam Prevention Note */}
+            <div className="p-3 rounded-md bg-neutral-50 border border-neutral-200 text-[12px] text-neutral-700 flex items-start gap-2">
+              <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+              <span>
+                <strong>Zero Spam Reputation Risk:</strong> Google restricts personal accounts to 500 emails/day. Our automated system limits outreach to <strong>450 emails daily</strong> with randomized 1.5s - 2.5s delay pacing, ensuring your Gmail account stays 100% compliant with Google sending limits.
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 3. Main Operational Grid: Left = Setup & Campaign, Right = Live Terminal & Progress */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Left Column (6 cols): Credentials, Candidate Profile & Generic Templates */}
+        <div className="lg:col-span-6 flex flex-col gap-5">
+          {/* STEP 1: Enter Keys & Gmail */}
+          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+            <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: 0, color: '#000000', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Key size={16} /> 1. Connect Sender Gmail Account
+                <h3 className="text-[15px] font-bold text-black m-0 flex items-center gap-1.5">
+                  <Key size={16} className="text-emerald-600" />
+                  <span>1. Enter Your Gmail &amp; App Password</span>
                 </h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>
-                  Partners reply directly to your inbox. Requires Google 16-character App Password.
+                <p className="text-[12px] text-neutral-500 m-0 mt-0.5">
+                  CA partners reply straight to your inbox.
                 </p>
               </div>
               <a
                 href="https://myaccount.google.com/apppasswords"
                 target="_blank"
                 rel="noreferrer"
-                style={{ fontSize: '0.75rem', color: '#000000', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '0.2rem', fontWeight: 500 }}
+                className="text-[12px] font-medium text-black hover:underline flex items-center gap-1"
               >
-                Get App Password <ExternalLink size={11} />
+                <span>Generate Keys</span>
+                <ExternalLink size={11} />
               </a>
             </div>
 
-            {/* Instruction Callout */}
-            <div
-              style={{
-                background: '#FAFAFA',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '0.625rem 0.75rem',
-                fontSize: '0.75rem',
-                color: '#52525B',
-                marginBottom: '1rem',
-                lineHeight: 1.4,
-              }}
-            >
-              <strong>2-Minute Setup:</strong> Go to Google Account → <em>Security</em> → <em>2-Step Verification</em> → Scroll down to <em>App passwords</em> → Generate 16 letters code (e.g. <code>abcd efgh ijkl mnop</code>) and paste below.
-            </div>
-
-            <form onSubmit={handleVerifyAndSaveSmtp} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <form onSubmit={handleVerifyAndSaveSmtp} className="flex flex-col gap-3">
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                <label className="block text-[12px] font-semibold text-neutral-800 mb-1">
                   Your Gmail Address
                 </label>
                 <input
@@ -427,50 +590,27 @@ export function MassMailerSection() {
                   placeholder="e.g. yourname.ca2026@gmail.com"
                   value={smtpEmail}
                   onChange={(e) => setSmtpEmail(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="w-full px-3 py-2 text-[13px] text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black transition-all"
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
-                  Google 16-Letter App Password
+                <label className="block text-[12px] font-semibold text-neutral-800 mb-1">
+                  Google 16-Letter App Password (Keys)
                 </label>
-                <div style={{ position: 'relative' }}>
+                <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required={!savedConfig}
                     placeholder={savedConfig ? '•••••••••••••••• (Saved in DB)' : 'e.g. abcd efgh ijkl mnop'}
                     value={appPassword}
                     onChange={(e) => setAppPassword(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem 2.25rem 0.5rem 0.75rem',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--border-subtle)',
-                      fontSize: '0.8125rem',
-                      fontFamily: 'monospace',
-                    }}
+                    className="w-full pl-3 pr-10 py-2 text-[13px] font-mono text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '0.6rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: 'var(--text-muted)',
-                      padding: 0,
-                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black"
                   >
                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
@@ -478,7 +618,7 @@ export function MassMailerSection() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                <label className="block text-[12px] font-semibold text-neutral-800 mb-1">
                   Sender Display Name
                 </label>
                 <input
@@ -486,89 +626,54 @@ export function MassMailerSection() {
                   placeholder="e.g. Rahul Sharma (CA Inter)"
                   value={senderName}
                   onChange={(e) => setSenderName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="w-full px-3 py-2 text-[13px] text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black transition-all"
                 />
               </div>
 
-              {/* Advanced SMTP Details Toggle */}
+              {/* Advanced Relay Toggle */}
               <div>
                 <button
                   type="button"
                   onClick={() => setShowAdvancedSmtp(!showAdvancedSmtp)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#71717A',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                    padding: 0,
-                  }}
+                  className="text-[11px] text-neutral-500 hover:text-black flex items-center gap-1 cursor-pointer"
                 >
                   {showAdvancedSmtp ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                  {showAdvancedSmtp ? 'Hide Advanced SMTP Relay Options' : 'Custom Host / Port (Zoho, Outlook, Custom Domain)'}
+                  <span>{showAdvancedSmtp ? 'Hide Advanced SMTP Relay' : 'Custom Host / Port (Zoho, Outlook, Domain)'}</span>
                 </button>
 
                 {showAdvancedSmtp && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <div className="grid grid-cols-2 gap-2 mt-2 p-2 bg-neutral-50 rounded-md border border-neutral-200">
                     <div>
-                      <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>SMTP Host</label>
+                      <label className="text-[10px] text-neutral-500 block">Host</label>
                       <input
                         type="text"
                         value={smtpHost}
                         onChange={(e) => setSmtpHost(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '0.35rem 0.5rem',
-                          borderRadius: 'var(--radius-sm)',
-                          border: '1px solid var(--border-subtle)',
-                          fontSize: '0.75rem',
-                        }}
+                        className="w-full px-2 py-1 text-[12px] bg-white border border-neutral-300 rounded"
                       />
                     </div>
                     <div>
-                      <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Port</label>
+                      <label className="text-[10px] text-neutral-500 block">Port</label>
                       <input
                         type="number"
                         value={smtpPort}
                         onChange={(e) => setSmtpPort(Number(e.target.value))}
-                        style={{
-                          width: '100%',
-                          padding: '0.35rem 0.5rem',
-                          borderRadius: 'var(--radius-sm)',
-                          border: '1px solid var(--border-subtle)',
-                          fontSize: '0.75rem',
-                        }}
+                        className="w-full px-2 py-1 text-[12px] bg-white border border-neutral-300 rounded"
                       />
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Feedback Alert */}
               {smtpMessage && (
                 <div
-                  style={{
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                    background: smtpMessage.type === 'success' ? '#F0FDF4' : '#FEF2F2',
-                    border: smtpMessage.type === 'success' ? '1px solid #BBF7D0' : '1px solid #FECACA',
-                    color: smtpMessage.type === 'success' ? '#166534' : '#991B1B',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                  }}
+                  className={`p-2.5 rounded-md text-[12px] flex items-center gap-2 ${
+                    smtpMessage.type === 'success'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}
                 >
-                  {smtpMessage.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+                  {smtpMessage.type === 'success' ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
                   <span>{smtpMessage.text}</span>
                 </div>
               )}
@@ -576,186 +681,229 @@ export function MassMailerSection() {
               <button
                 type="submit"
                 disabled={isVerifyingSmtp}
-                className="btn btn-primary"
-                style={{
-                  fontSize: '0.8125rem',
-                  padding: '0.5rem 1rem',
-                  marginTop: '0.25rem',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                }}
+                className="mt-1 w-full py-2.5 px-4 rounded-md bg-black text-white hover:bg-neutral-800 font-semibold text-[13px] flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs"
               >
                 {isVerifyingSmtp ? (
                   <>
-                    <RotateCcw size={14} className="animate-spin" /> Verifying SMTP Handshake...
+                    <RotateCcw size={14} className="animate-spin" />
+                    <span>Verifying Handshake...</span>
                   </>
                 ) : (
                   <>
-                    <ShieldCheck size={15} /> Verify &amp; Save Credentials
+                    <ShieldCheck size={15} />
+                    <span>Verify &amp; Save Credentials</span>
                   </>
                 )}
               </button>
             </form>
           </div>
 
-          {/* STEP 2: Candidate Info & Placeholders */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1.25rem',
-            }}
-          >
-            <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 0.75rem 0', color: '#000000' }}>
-              2. Candidate Profile (Auto-Populates Email Tags)
+          {/* STEP 2: Candidate Details */}
+          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+            <h3 className="text-[15px] font-bold text-black m-0 mb-3">
+              2. Candidate Profile (Auto-Fills Template Placeholders)
             </h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
               <div>
-                <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>Candidate Name</label>
+                <label className="font-semibold text-neutral-700 block mb-1">Your Full Name</label>
                 <input
                   type="text"
                   value={candidateName}
                   onChange={(e) => setCandidateName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>ICAI Registration Number</label>
+                <label className="font-semibold text-neutral-700 block mb-1">ICAI Registration No.</label>
                 <input
                   type="text"
                   value={icaiRegNo}
                   onChange={(e) => setIcaiRegNo(e.target.value)}
                   placeholder="e.g. WRO0786542"
-                  style={{
-                    width: '100%',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>CA Inter Clearance Status</label>
+                <label className="font-semibold text-neutral-700 block mb-1">CA Status / Clearance</label>
                 <select
                   value={interStatus}
                   onChange={(e) => setInterStatus(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                    background: '#FFFFFF',
-                  }}
+                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
                 >
                   <option value="Both Groups Cleared (1st Attempt)">Both Groups Cleared (1st Attempt)</option>
                   <option value="Both Groups Cleared">Both Groups Cleared</option>
                   <option value="Group 1 Cleared (Appearing G2)">Group 1 Cleared (Appearing G2)</option>
                   <option value="Direct Entry Route Graduate">Direct Entry Route Graduate</option>
+                  <option value="CA Final Qualified">CA Final Qualified</option>
                 </select>
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>City</label>
+                <label className="font-semibold text-neutral-700 block mb-1">Target / Base City</label>
                 <input
                   type="text"
                   value={candidateCity}
                   onChange={(e) => setCandidateCity(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>Mobile Number</label>
+                <label className="font-semibold text-neutral-700 block mb-1">Mobile Contact</label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>LinkedIn / Resume Drive URL</label>
+                <label className="font-semibold text-neutral-700 block mb-1">LinkedIn / CV Drive Link</label>
                 <input
                   type="text"
                   value={linkedinUrl}
                   onChange={(e) => setLinkedinUrl(e.target.value)}
-                  placeholder="https://linkedin.com/in/..."
-                  style={{
-                    width: '100%',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-subtle)',
-                    fontSize: '0.8125rem',
-                  }}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
                 />
               </div>
             </div>
           </div>
 
-          {/* STEP 3: Target Firms Filter & Batch Selection */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1.25rem',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          {/* STEP 3: Generic Template Selector */}
+          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
               <div>
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: 0, color: '#000000', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Building size={16} /> 3. Select Target CA Firms ({targetFirms.length} Selected)
+                <h3 className="text-[15px] font-bold text-black m-0">
+                  3. Select Pre-Built Generic Template
                 </h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>
-                  Filtered from 5,000 verified CA firms database with official articleship desks.
-                </p>
+                <span className="text-[12px] text-neutral-500">
+                  Tested high-response cover letter formats
+                </span>
+              </div>
+
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setActivePreviewTab('EDIT')}
+                  className={`px-2.5 py-1 text-[11px] font-semibold rounded ${
+                    activePreviewTab === 'EDIT' ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700'
+                  }`}
+                >
+                  Edit Copy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePreviewTab('PREVIEW')}
+                  className={`px-2.5 py-1 text-[11px] font-semibold rounded flex items-center gap-1 ${
+                    activePreviewTab === 'PREVIEW' ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700'
+                  }`}
+                >
+                  <Eye size={11} />
+                  <span>Preview</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Template Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+              {(['ARTICLESHIP', 'INDUSTRIAL_TRAINING', 'QUALIFIED_JOB'] as const).map((key) => {
+                const isSelected = selectedTemplateKey === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleTemplateSwitch(key)}
+                    className={`p-2.5 text-left rounded border transition-all cursor-pointer text-[12px] leading-tight ${
+                      isSelected
+                        ? 'border-black bg-neutral-100 font-bold text-black ring-1 ring-black'
+                        : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
+                    }`}
+                  >
+                    {key === 'ARTICLESHIP' && 'Articleship (Form 102/103)'}
+                    {key === 'INDUSTRIAL_TRAINING' && 'Industrial Training (Form 104)'}
+                    {key === 'QUALIFIED_JOB' && 'Qualified CA Job'}
+                  </button>
+                );
+              })}
+            </div>
+
+            {activePreviewTab === 'EDIT' ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-bold text-neutral-500 uppercase block mb-1">
+                    Subject Line
+                  </label>
+                  <input
+                    type="text"
+                    value={subjectTemplate}
+                    onChange={(e) => setSubjectTemplate(e.target.value)}
+                    className="w-full px-3 py-1.5 font-mono text-[12px] border border-neutral-300 rounded bg-white text-black"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-neutral-500 uppercase block mb-1">
+                    Email Body Template
+                  </label>
+                  <textarea
+                    rows={8}
+                    value={bodyTemplate}
+                    onChange={(e) => setBodyTemplate(e.target.value)}
+                    className="w-full p-3 font-mono text-[12px] leading-relaxed border border-neutral-300 rounded bg-white text-black"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-md text-[12px]">
+                <div className="pb-2 mb-2 border-b border-neutral-200 text-neutral-600">
+                  <div><strong>TO:</strong> {previewData.firm.firmName} &lt;{previewData.firm.email}&gt;</div>
+                  <div className="mt-1"><strong>SUBJECT:</strong> {previewData.subject}</div>
+                </div>
+                <div className="whitespace-pre-wrap text-neutral-800 leading-relaxed">
+                  {previewData.body}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column (6 cols): Target Firms, Batch Control & Terminal Monitor */}
+        <div className="lg:col-span-6 flex flex-col gap-5">
+          {/* STEP 4: Target Selection & Daily Batch Limit */}
+          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-[15px] font-bold text-black m-0 flex items-center gap-1.5">
+                  <Building size={16} className="text-emerald-600" />
+                  <span>4. Filter Target CA Firms ({targetFirms.length} Selected)</span>
+                </h3>
+                <span className="text-[12px] text-neutral-500">
+                  Sourced from 5,000+ verified CA firms database
+                </span>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowFirmsDrawer(!showFirmsDrawer)}
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
+                className="text-[12px] font-semibold text-black hover:underline"
               >
-                {showFirmsDrawer ? 'Hide Recipient List' : 'Preview Recipients List'}
+                {showFirmsDrawer ? 'Hide List' : 'Preview List'}
               </button>
             </div>
 
-            {/* Filter Controls */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            {/* Filters Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-3 text-[12px]">
               <div>
-                <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Region</label>
+                <label className="block text-neutral-600 mb-1 font-medium">Region</label>
                 <select
                   value={filterRegion}
                   onChange={(e) => setFilterRegion(e.target.value)}
-                  style={{ width: '100%', padding: '0.35rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}
+                  className="w-full p-1.5 border border-neutral-300 rounded bg-white text-black"
                 >
                   <option value="ALL">All Regions (5,000)</option>
                   <option value="WIRC">WIRC (Mumbai, Pune, Guj)</option>
@@ -767,11 +915,11 @@ export function MassMailerSection() {
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>City</label>
+                <label className="block text-neutral-600 mb-1 font-medium">City</label>
                 <select
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
-                  style={{ width: '100%', padding: '0.35rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}
+                  className="w-full p-1.5 border border-neutral-300 rounded bg-white text-black"
                 >
                   <option value="ALL">All Major Cities</option>
                   <option value="Mumbai">Mumbai</option>
@@ -787,159 +935,46 @@ export function MassMailerSection() {
               </div>
 
               <div>
-                <label style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Batch Size (Per Run)</label>
+                <label className="block text-neutral-600 mb-1 font-medium">Batch Size (450 Max)</label>
                 <select
                   value={selectedBatchLimit}
                   onChange={(e) => setSelectedBatchLimit(Number(e.target.value))}
-                  style={{ width: '100%', padding: '0.35rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}
+                  className="w-full p-1.5 border border-neutral-300 rounded bg-white text-black font-semibold"
                 >
-                  <option value={5}>5 Firms (Quick Test)</option>
-                  <option value={15}>15 Firms</option>
-                  <option value={25}>25 Firms (Recommended)</option>
-                  <option value={50}>50 Firms</option>
-                  <option value={100}>100 Firms (Max Batch)</option>
+                  <option value={25}>25 Firms (Quick Test)</option>
+                  <option value={50}>50 Firms (Recommended)</option>
+                  <option value={100}>100 Firms</option>
+                  <option value={250}>250 Firms</option>
+                  <option value={450}>450 Firms (Daily Maximum)</option>
                 </select>
               </div>
             </div>
 
-            {/* Recipients Drawer Preview */}
+            {/* Recipient Drawer */}
             {showFirmsDrawer && (
-              <div
-                style={{
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '0.5rem',
-                  background: '#FAFAFA',
-                  fontSize: '0.75rem',
-                }}
-              >
+              <div className="max-h-[180px] overflow-y-auto border border-neutral-200 rounded bg-neutral-50 p-2 text-[11px] mb-3">
                 {isLoadingFirms ? (
-                  <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)' }}>Loading firms...</div>
+                  <div className="text-center py-4 text-neutral-500">Loading firms...</div>
                 ) : (
                   targetFirms.map((f, i) => (
                     <div
                       key={i}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '0.35rem 0.5rem',
-                        borderBottom: i < targetFirms.length - 1 ? '1px solid #E4E4E7' : 'none',
-                      }}
+                      className="flex justify-between py-1 border-b border-neutral-200 last:border-b-0"
                     >
-                      <div>
-                        <strong>{f.firmName}</strong> <span style={{ color: '#71717A' }}>({f.primaryCity || f.region})</span>
-                      </div>
-                      <div style={{ fontFamily: 'monospace', color: '#27272A' }}>{f.email}</div>
+                      <div className="font-semibold text-black">{f.firmName} ({f.primaryCity || f.region})</div>
+                      <div className="font-mono text-neutral-600">{f.email}</div>
                     </div>
                   ))
                 )}
               </div>
             )}
-          </div>
 
-          {/* STEP 4: Email Content & Personalization */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1.25rem',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, margin: 0, color: '#000000' }}>
-                4. Email Subject &amp; Cover Letter
-              </h3>
-
-              <div style={{ display: 'flex', gap: '0.25rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setActivePreviewTab('EDIT')}
-                  className={`btn ${activePreviewTab === 'EDIT' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem' }}
-                >
-                  Edit Template
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActivePreviewTab('PREVIEW')}
-                  className={`btn ${activePreviewTab === 'PREVIEW' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem' }}
-                >
-                  <Eye size={12} /> Live Preview
-                </button>
-              </div>
-            </div>
-
-            {activePreviewTab === 'EDIT' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div>
-                  <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>Subject Line</label>
-                  <input
-                    type="text"
-                    value={subjectTemplate}
-                    onChange={(e) => setSubjectTemplate(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.45rem 0.65rem',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--border-subtle)',
-                      fontSize: '0.8125rem',
-                      fontFamily: 'monospace',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                    Email Body (Supports <code>{'{firm_name}'}</code>, <code>{'{candidate_name}'}</code>, <code>{'{cro_number}'}</code>, <code>{'{city}'}</code>)
-                  </label>
-                  <textarea
-                    rows={8}
-                    value={bodyTemplate}
-                    onChange={(e) => setBodyTemplate(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--border-subtle)',
-                      fontSize: '0.75rem',
-                      fontFamily: 'monospace',
-                      lineHeight: 1.5,
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div
-                style={{
-                  background: '#FAFAFA',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '1rem',
-                  fontSize: '0.8125rem',
-                }}
-              >
-                <div style={{ paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid #E4E4E7' }}>
-                  <div style={{ color: '#71717A', fontSize: '0.6875rem' }}>TO:</div>
-                  <div style={{ fontWeight: 600 }}>{previewData.firm.firmName} &lt;{previewData.firm.email}&gt;</div>
-                  <div style={{ color: '#71717A', fontSize: '0.6875rem', marginTop: '0.25rem' }}>SUBJECT:</div>
-                  <div style={{ fontWeight: 600 }}>{previewData.subject}</div>
-                </div>
-                <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, color: '#18181B', fontSize: '0.75rem' }}>
-                  {previewData.body}
-                </div>
-              </div>
-            )}
-
-            {/* Pacing Delay Slider */}
-            <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '0.75rem', color: '#52525B', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            {/* Delay Slider */}
+            <div className="flex justify-between items-center pt-2 border-t border-neutral-100 text-[12px]">
+              <span className="text-neutral-600 flex items-center gap-1">
                 <Clock size={13} /> Gmail Pacing Delay:
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              </span>
+              <div className="flex items-center gap-2">
                 <input
                   type="range"
                   min="0.5"
@@ -947,32 +982,22 @@ export function MassMailerSection() {
                   step="0.5"
                   value={throttleDelaySec}
                   onChange={(e) => setThrottleDelaySec(Number(e.target.value))}
-                  style={{ width: '100px' }}
+                  className="w-[90px]"
                 />
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, minWidth: '40px' }}>{throttleDelaySec}s</span>
+                <span className="font-mono font-bold text-black">{throttleDelaySec}s / mail</span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Column: Execution Terminal & Real-Time Logs Console */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Action Trigger Card */}
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1.25rem',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+          {/* STEP 5: Execution Trigger & KPI Bar */}
+          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#000000' }}>
-                  Dispatch Status &amp; Execution
+                <h3 className="text-[16px] font-bold text-black m-0">
+                  Ready to Dispatch
                 </h3>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Ready to send to <strong>{targetFirms.length}</strong> selected CA firms.
+                <div className="text-[12px] text-neutral-500 mt-0.5">
+                  Targeting <strong>{targetFirms.length}</strong> verified firms (Daily Quota: {DAILY_QUOTA_LIMIT})
                 </div>
               </div>
 
@@ -980,105 +1005,71 @@ export function MassMailerSection() {
                 type="button"
                 onClick={handleStartCampaign}
                 disabled={isSending || targetFirms.length === 0}
-                className="btn btn-primary"
-                style={{
-                  fontSize: '0.875rem',
-                  padding: '0.6rem 1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  cursor: isSending ? 'not-allowed' : 'pointer',
-                }}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-md bg-[#09090B] hover:bg-neutral-800 text-white font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSending ? (
                   <>
-                    <RotateCcw size={16} className="animate-spin" /> Dispatching Emails...
+                    <RotateCcw size={16} className="animate-spin" />
+                    <span>Dispatching Outreach...</span>
                   </>
                 ) : (
                   <>
-                    <Send size={16} /> 🚀 Start Mass Mailing ({targetFirms.length} Firms)
+                    <Send size={16} className="text-emerald-400" />
+                    <span>Start 1-Click Mass Mailing ({targetFirms.length})</span>
                   </>
                 )}
               </button>
             </div>
 
             {/* KPI Counters */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '1rem' }}>
-              <div style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '0.75rem', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>Total Queued</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#000000' }}>{targetFirms.length}</div>
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="p-3 rounded border border-neutral-200 bg-neutral-50 text-center">
+                <div className="text-[10px] font-bold text-neutral-500 uppercase">Total Selected</div>
+                <div className="text-[20px] font-black text-black">{targetFirms.length}</div>
               </div>
-              <div style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '0.75rem', textAlign: 'center', background: '#F0FDF4' }}>
-                <div style={{ fontSize: '0.6875rem', color: '#166534' }}>Delivered</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#166534' }}>{sentCount}</div>
+
+              <div className="p-3 rounded border border-emerald-200 bg-emerald-50 text-center">
+                <div className="text-[10px] font-bold text-emerald-800 uppercase">Delivered</div>
+                <div className="text-[20px] font-black text-emerald-700">{sentCount}</div>
               </div>
-              <div style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '0.75rem', textAlign: 'center', background: failedCount > 0 ? '#FEF2F2' : '#FAFAFA' }}>
-                <div style={{ fontSize: '0.6875rem', color: failedCount > 0 ? '#991B1B' : '#71717A' }}>Failed</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: failedCount > 0 ? '#991B1B' : '#71717A' }}>{failedCount}</div>
+
+              <div className="p-3 rounded border border-neutral-200 bg-neutral-50 text-center">
+                <div className="text-[10px] font-bold text-neutral-500 uppercase">Remaining Quota</div>
+                <div className="text-[20px] font-black text-black">{remainingDailyQuota}</div>
               </div>
             </div>
           </div>
 
-          {/* Interactive Monospace Terminal Logs Monitor */}
-          <div
-            style={{
-              background: '#09090B',
-              border: '1px solid #27272A',
-              borderRadius: 'var(--radius-md)',
-              padding: '1rem',
-              display: 'flex',
-              flexDirection: 'column',
-              flex: 1,
-              minHeight: '440px',
-            }}
-          >
-            {/* Terminal Header */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderBottom: '1px solid #27272A',
-                paddingBottom: '0.5rem',
-                marginBottom: '0.75rem',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#EF4444' }} />
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#F59E0B' }} />
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981' }} />
+          {/* STEP 6: Interactive Terminal Output */}
+          <div className="bg-[#09090B] border border-neutral-800 rounded-lg p-4 flex flex-col min-h-[380px] shadow-inner font-mono">
+            {/* Terminal Top Bar */}
+            <div className="flex justify-between items-center border-b border-neutral-800 pb-2 mb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                 </div>
-                <span style={{ fontSize: '0.75rem', color: '#A1A1AA', fontFamily: 'monospace', fontWeight: 600 }}>
-                  outreach-terminal://ca-articleship-dispatcher
+                <span className="text-[11px] text-neutral-400 font-semibold">
+                  outreach-terminal://ca-dispatcher (450 daily)
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span
-                  style={{
-                    fontSize: '0.6875rem',
-                    color: isSending ? '#4ADE80' : '#71717A',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    fontFamily: 'monospace',
-                  }}
-                >
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: isSending ? '#4ADE80' : '#71717A' }} />
-                  {isSending ? 'DISPATCHING LIVE' : 'IDLE'}
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] flex items-center gap-1.5">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      isSending ? 'bg-emerald-400 animate-pulse' : 'bg-neutral-600'
+                    }`}
+                  />
+                  <span className={isSending ? 'text-emerald-400' : 'text-neutral-500'}>
+                    {isSending ? 'STREAMING DISPATCH' : 'IDLE'}
+                  </span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setLiveLogs([])}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#71717A',
-                    fontSize: '0.6875rem',
-                    cursor: 'pointer',
-                    fontFamily: 'monospace',
-                  }}
+                  className="text-[10px] text-neutral-500 hover:text-white"
                 >
                   CLEAR
                 </button>
@@ -1086,67 +1077,46 @@ export function MassMailerSection() {
             </div>
 
             {/* Terminal Body */}
-            <div
-              style={{
-                flex: 1,
-                overflowY: 'auto',
-                fontFamily: 'monospace',
-                fontSize: '0.75rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.35rem',
-                paddingRight: '0.5rem',
-              }}
-            >
+            <div className="flex-1 overflow-y-auto text-[11px] space-y-1.5 text-neutral-300">
               {liveLogs.length === 0 ? (
-                <div style={{ color: '#52525B', margin: 'auto', textAlign: 'center', padding: '2rem 1rem' }}>
-                  <Terminal size={32} style={{ margin: '0 auto 0.5rem auto', opacity: 0.4 }} />
-                  <div>Terminal ready for automated outreach.</div>
-                  <div style={{ fontSize: '0.6875rem', marginTop: '0.25rem' }}>
-                    Click &quot;Start Mass Mailing&quot; to begin dispatching to selected CA firms.
+                <div className="text-center py-12 text-neutral-500">
+                  <Terminal size={32} className="mx-auto mb-2 opacity-40" />
+                  <div>Outreach terminal ready for dispatch.</div>
+                  <div className="text-[10px] text-neutral-600 mt-1">
+                    Connect your Gmail App Password and click &quot;Start 1-Click Mass Mailing&quot;.
                   </div>
                 </div>
               ) : (
                 liveLogs.map((log) => {
-                  let color = '#D4D4D8';
+                  let colorClass = 'text-neutral-300';
                   let icon = 'ℹ';
                   if (log.level === 'SUCCESS') {
-                    color = '#4ADE80';
+                    colorClass = 'text-emerald-400';
                     icon = '✓';
                   } else if (log.level === 'ERROR') {
-                    color = '#F87171';
+                    colorClass = 'text-red-400';
                     icon = '✕';
                   } else if (log.level === 'WARN') {
-                    color = '#FBBF24';
+                    colorClass = 'text-amber-400';
                     icon = '⚠';
                   }
 
                   return (
-                    <div key={log.id} style={{ display: 'flex', gap: '0.5rem', lineHeight: 1.4 }}>
-                      <span style={{ color: '#71717A', flexShrink: 0 }}>[{log.timestamp}]</span>
-                      <span style={{ color: color, fontWeight: 700, flexShrink: 0 }}>{icon}</span>
-                      <span style={{ color: color, wordBreak: 'break-word' }}>{log.message}</span>
+                    <div key={log.id} className="flex gap-2 leading-relaxed">
+                      <span className="text-neutral-600 shrink-0">[{log.timestamp}]</span>
+                      <span className={`${colorClass} font-bold shrink-0`}>{icon}</span>
+                      <span className={`${colorClass} break-all`}>{log.message}</span>
                     </div>
                   );
                 })
               )}
             </div>
 
-            {/* Terminal Footer Info */}
-            <div
-              style={{
-                borderTop: '1px solid #27272A',
-                paddingTop: '0.5rem',
-                marginTop: '0.5rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontSize: '0.6875rem',
-                color: '#71717A',
-                fontFamily: 'monospace',
-              }}
-            >
-              <span>Relay: {smtpHost}:587</span>
+            {/* Terminal Footer */}
+            <div className="pt-2 mt-2 border-t border-neutral-800 flex justify-between text-[10px] text-neutral-500">
+              <span>Host: {smtpHost}:587</span>
               <span>Throttle: {throttleDelaySec}s/msg</span>
+              <span>Safe Ceiling: 450/day</span>
             </div>
           </div>
         </div>

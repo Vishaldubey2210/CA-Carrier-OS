@@ -422,7 +422,7 @@ export class MassMailingService {
 
     let totalSent = 0;
     let totalFailed = 0;
-    const recipients = req.recipients.slice(0, 100); // Guard max 100 per single dispatch run
+    const recipients = req.recipients.slice(0, 450); // Safe daily ceiling of 450 per execution
 
     logs.push({
       id: randomUUID(),

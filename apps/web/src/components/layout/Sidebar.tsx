@@ -19,11 +19,14 @@ import {
   Settings,
   Sparkles,
   GraduationCap,
+  Mail,
+  Zap,
 } from 'lucide-react';
 import { WorkspaceType } from '@ca-career-os/shared';
 
 const CANDIDATE_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard?tab=outreach', label: 'Mass Outreach (450/Day)', icon: Mail },
   { href: '/articleship', label: 'Articleship', icon: GraduationCap },
   { href: '/jobs', label: 'Jobs', icon: Briefcase },
   { href: '/settings', label: 'Settings', icon: Settings },
