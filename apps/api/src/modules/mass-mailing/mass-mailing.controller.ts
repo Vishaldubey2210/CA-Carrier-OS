@@ -22,7 +22,7 @@ import {
   MassMailingRecipient,
 } from '@ca-career-os/shared';
 
-@Controller('mass-mailing')
+@Controller('api/v1/mass-mailing')
 export class MassMailingController {
   constructor(private readonly massMailingService: MassMailingService) {}
 
