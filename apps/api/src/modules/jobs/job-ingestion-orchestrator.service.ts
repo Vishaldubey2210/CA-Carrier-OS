@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -14,6 +14,7 @@ import { JobDeduplicationService } from './job-deduplication.service.js';
 import { JobFreshnessService } from './job-freshness.service.js';
 import { NormalizedJobPayload } from './connectors/job-connector.interface.js';
 import { generateJobFingerprint, normalizeJobTitle } from './job-matching.engine.js';
+import { EmailService } from '../email/email.service.js';
 
 @Injectable()
 export class JobIngestionOrchestratorService {
@@ -29,7 +30,8 @@ export class JobIngestionOrchestratorService {
     private readonly prisma: PrismaService,
     private readonly sourceRegistry: JobSourceRegistryService,
     private readonly deduplicationService: JobDeduplicationService,
-    private readonly freshnessService: JobFreshnessService
+    private readonly freshnessService: JobFreshnessService,
+    @Optional() private readonly emailService?: EmailService
   ) {}
 
   /**
@@ -269,12 +271,38 @@ export class JobIngestionOrchestratorService {
         this.saveJobsToDisk(Array.from(existingJobsMap.values()));
       }
 
+      const syncDuration = Date.now() - startTime;
+
+      // Dispatch automated SMTP alert to admin/user on every scrape completion
+      if (this.emailService) {
+        try {
+          await this.emailService.sendScrapingSummaryAlert({
+            totalIngested: grandTotalIngested,
+            totalDuplicates: grandTotalDuplicates,
+            durationMs: syncDuration,
+            sources: reports.map((r) => ({
+              sourceName: r.sourceName,
+              providerType: r.providerType,
+              status: r.status,
+              fetchedCount: r.fetchedCount,
+              ingestedCount: r.ingestedCount,
+              duplicateCount: r.duplicateCount,
+              durationMs: r.durationMs,
+              errorMessage: r.errorMessage,
+            })),
+            timestamp: new Date().toISOString(),
+          });
+        } catch (mailErr: any) {
+          this.logger.warn(`Scraper completion notification notice: ${mailErr.message}`);
+        }
+      }
+
       return {
         success: true,
         reports,
         totalIngested: grandTotalIngested,
         totalDuplicates: grandTotalDuplicates,
-        durationMs: Date.now() - startTime,
+        durationMs: syncDuration,
       };
     } finally {
       this.isSyncRunning = false;

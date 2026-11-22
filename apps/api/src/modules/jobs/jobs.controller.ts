@@ -195,11 +195,20 @@ export class JobsController {
   }
 
   /**
-   * Sync authentic XML / RSS job feeds
+   * Sync authentic Multi-Portal scrapers and XML / RSS job feeds
    */
   @Post('sources/xml/sync')
-  async syncXmlFeeds() {
-    const result = await this.jobsService.triggerSourceSync('xml_feed');
+  async syncXmlFeeds(@Query('providerId') providerId?: string) {
+    const result = await this.jobsService.triggerSourceSync(providerId || 'multi_portal_scraper');
+    return createSuccessResponse(result);
+  }
+
+  /**
+   * Trigger full multi-portal & scraper sync with real-time SMTP alert
+   */
+  @Post('sources/multi-portal/sync')
+  async syncMultiPortalFeeds() {
+    const result = await this.jobsService.triggerSourceSync();
     return createSuccessResponse(result);
   }
 

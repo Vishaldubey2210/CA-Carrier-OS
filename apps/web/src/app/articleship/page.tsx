@@ -44,6 +44,7 @@ export default function ArticleshipPage() {
   const [selectedType, setSelectedType] = useState<'ALL' | 'ARTICLESHIP' | 'INDUSTRIAL_TRAINING'>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
   const [selectedPathway, setSelectedPathway] = useState<string>('ALL');
+  const [selectedSource, setSelectedSource] = useState<string>('ALL');
 
   // Selected job for quick preview modal
   const [selectedJob, setSelectedJob] = useState<JobDetail | null>(null);
@@ -101,6 +102,23 @@ export default function ArticleshipPage() {
       if (selectedPathway !== 'ALL' && job.caPathway !== selectedPathway) return false;
       if (selectedCity !== 'ALL' && !job.locationCity.toLowerCase().includes(selectedCity.toLowerCase())) return false;
 
+      // Hiring Source Filter
+      if (selectedSource !== 'ALL') {
+        const prov = (job.sourceProvider || job.source || '').toUpperCase();
+        if (selectedSource === 'ICAI' && !(prov.includes('ICAI') || prov.includes('EIRC') || prov.includes('WIRC') || prov.includes('SIRC') || prov.includes('NIRC'))) {
+          return false;
+        }
+        if (selectedSource === 'BIG4' && !(prov.includes('DELOITTE') || prov.includes('PWC') || prov.includes('EY') || prov.includes('KPMG') || prov.includes('BDO') || prov.includes('GRANT') || prov.includes('SINGHI') || prov.includes('HARIBHAKTI') || prov.includes('SS_KOTHARI') || prov.includes('KOTHARI'))) {
+          return false;
+        }
+        if (selectedSource === 'PORTALS' && !(prov.includes('CACLUB') || prov.includes('CADWAR') || prov.includes('ARIVU') || prov.includes('CA_WAY') || prov.includes('MULTI_PORTAL'))) {
+          return false;
+        }
+        if (selectedSource === 'XML' && !prov.includes('XML')) {
+          return false;
+        }
+      }
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = job.title.toLowerCase().includes(q);
@@ -112,7 +130,7 @@ export default function ArticleshipPage() {
 
       return true;
     });
-  }, [jobs, selectedType, selectedPathway, selectedCity, searchQuery]);
+  }, [jobs, selectedType, selectedPathway, selectedCity, selectedSource, searchQuery]);
 
   const cities = useMemo(() => {
     const list = Array.from(new Set(jobs.map((j) => j.locationCity.split('/')[0].trim()))).filter(Boolean);
@@ -543,9 +561,29 @@ export default function ArticleshipPage() {
             ))}
           </select>
 
-          {(selectedPathway !== 'ALL' || selectedCity !== 'ALL' || searchQuery.trim()) && (
+          <select
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+            style={{
+              padding: '0.3125rem 0.625rem',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border-subtle)',
+              fontSize: '0.75rem',
+              background: 'var(--surface-primary)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="ALL">All Hiring Sources</option>
+            <option value="ICAI">Official ICAI &amp; Regional Councils (EIRC / WIRC)</option>
+            <option value="BIG4">Big 4 &amp; Premier (Deloitte, PwC, BDO, GT)</option>
+            <option value="PORTALS">CA Portals (CAClubIndia, CA Dwar, CA Way)</option>
+            <option value="XML">Verified RSS / XML Feeds</option>
+          </select>
+
+          {(selectedPathway !== 'ALL' || selectedCity !== 'ALL' || selectedSource !== 'ALL' || searchQuery.trim()) && (
             <button
-              onClick={() => { setSelectedPathway('ALL'); setSelectedCity('ALL'); setSearchQuery(''); setSelectedType('ALL'); }}
+              onClick={() => { setSelectedPathway('ALL'); setSelectedCity('ALL'); setSelectedSource('ALL'); setSearchQuery(''); setSelectedType('ALL'); }}
               className="btn btn-ghost"
               style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', color: 'var(--text-muted)' }}
             >
@@ -610,6 +648,24 @@ export default function ArticleshipPage() {
                 const targetUrl = job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#';
                 const firmInitials = job.companyName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
+                const sourceBadgeInfo = (() => {
+                  const p = (job.sourceProvider || job.source || '').toUpperCase();
+                  if (p.includes('EIRC')) return { label: 'EIRC Live', bg: 'rgba(5, 150, 105, 0.12)', text: '#059669', border: 'rgba(5, 150, 105, 0.3)' };
+                  if (p.includes('WIRC')) return { label: 'WIRC Placement', bg: 'rgba(5, 150, 105, 0.12)', text: '#059669', border: 'rgba(5, 150, 105, 0.3)' };
+                  if (p.includes('ICAI')) return { label: 'ICAI Official', bg: 'rgba(5, 150, 105, 0.12)', text: '#059669', border: 'rgba(5, 150, 105, 0.3)' };
+                  if (p.includes('DELOITTE')) return { label: 'Deloitte', bg: 'rgba(37, 99, 235, 0.1)', text: '#2563EB', border: 'rgba(37, 99, 235, 0.25)' };
+                  if (p.includes('PWC')) return { label: 'PwC SDC', bg: 'rgba(234, 88, 12, 0.1)', text: '#EA580C', border: 'rgba(234, 88, 12, 0.25)' };
+                  if (p.includes('EY')) return { label: 'EY GDS', bg: 'rgba(202, 138, 4, 0.1)', text: '#CA8A04', border: 'rgba(202, 138, 4, 0.25)' };
+                  if (p.includes('KPMG')) return { label: 'KPMG', bg: 'rgba(37, 99, 235, 0.1)', text: '#2563EB', border: 'rgba(37, 99, 235, 0.25)' };
+                  if (p.includes('BDO')) return { label: 'BDO India', bg: 'rgba(225, 29, 72, 0.1)', text: '#E11D48', border: 'rgba(225, 29, 72, 0.25)' };
+                  if (p.includes('GRANT')) return { label: 'GT Bharat', bg: 'rgba(124, 58, 237, 0.1)', text: '#7C3AED', border: 'rgba(124, 58, 237, 0.25)' };
+                  if (p.includes('CACLUB')) return { label: 'CAClubIndia', bg: 'rgba(124, 58, 237, 0.1)', text: '#7C3AED', border: 'rgba(124, 58, 237, 0.25)' };
+                  if (p.includes('CADWAR')) return { label: 'CA Dwar', bg: 'rgba(13, 148, 136, 0.1)', text: '#0D9488', border: 'rgba(13, 148, 136, 0.25)' };
+                  if (p.includes('CA_WAY')) return { label: 'CA Way', bg: 'rgba(13, 148, 136, 0.1)', text: '#0D9488', border: 'rgba(13, 148, 136, 0.25)' };
+                  if (p.includes('XML')) return { label: 'XML Feed', bg: 'rgba(75, 85, 99, 0.1)', text: '#4B5563', border: 'rgba(75, 85, 99, 0.25)' };
+                  return { label: job.sourceProvider || 'Verified Direct', bg: 'rgba(5, 150, 105, 0.08)', text: '#059669', border: 'rgba(5, 150, 105, 0.2)' };
+                })();
+
                 return (
                   <tr
                     key={job.id}
@@ -640,10 +696,22 @@ export default function ArticleshipPage() {
                           <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.8125rem', lineHeight: 1.3 }}>
                             {job.title}
                           </div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.125rem' }}>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.125rem', flexWrap: 'wrap' }}>
                             <span>{job.companyName}</span>
                             <span>•</span>
-                            <span style={{ color: '#15803d', fontWeight: 500 }}>Verified Feed</span>
+                            <span
+                              style={{
+                                color: sourceBadgeInfo.text,
+                                background: sourceBadgeInfo.bg,
+                                border: `1px solid ${sourceBadgeInfo.border}`,
+                                padding: '1px 6px',
+                                borderRadius: '4px',
+                                fontWeight: 600,
+                                fontSize: '0.6875rem',
+                              }}
+                            >
+                              {sourceBadgeInfo.label}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -769,6 +837,11 @@ export default function ArticleshipPage() {
                 {selectedJob.opportunityType === 'INDUSTRIAL_TRAINING' ? 'Industrial Training (Form 104)' : 'Articleship (Form 102/103)'}
               </span>
               <span className="badge-success-clean">Verified Direct Portal</span>
+              {selectedJob.sourceProvider && (
+                <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                  Scraped Source: <strong>{selectedJob.sourceProvider}</strong>
+                </span>
+              )}
             </div>
 
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>

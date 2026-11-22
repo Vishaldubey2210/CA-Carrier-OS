@@ -1,6 +1,6 @@
 import { Injectable, Logger, BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import nodemailer, { Transporter } from 'nodemailer';
-import { randomUUID } from 'node:crypto';
+import crypto, { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -142,15 +142,57 @@ export class MassMailingService {
     }
   }
 
+  private getEncryptionKey(): Buffer {
+    const secret = process.env.APP_SECRET || process.env.JWT_SECRET || 'ca-career-os-default-aes-vault-key-2026';
+    return crypto.scryptSync(secret, 'ca-salt-vault-2026', 32);
+  }
+
+  private encryptPassword(plainText: string): string {
+    if (!plainText) return '';
+    const key = this.getEncryptionKey();
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    let encrypted = cipher.update(plainText, 'utf-8', 'hex');
+    encrypted += cipher.final('hex');
+    const authTag = cipher.getAuthTag().toString('hex');
+    return `enc:${iv.toString('hex')}:${authTag}:${encrypted}`;
+  }
+
+  private decryptPassword(cipherText: string): string {
+    if (!cipherText) return '';
+    if (!cipherText.startsWith('enc:')) {
+      // Legacy unencrypted plaintext fallback
+      return cipherText;
+    }
+    const parts = cipherText.split(':');
+    if (parts.length !== 4) return cipherText;
+    const [, ivHex, authTagHex, encryptedHex] = parts;
+    try {
+      const key = this.getEncryptionKey();
+      const iv = Buffer.from(ivHex, 'hex');
+      const authTag = Buffer.from(authTagHex, 'hex');
+      const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+      decipher.setAuthTag(authTag);
+      let decrypted = decipher.update(encryptedHex, 'hex', 'utf-8');
+      decrypted += decipher.final('utf-8');
+      return decrypted;
+    } catch (err: any) {
+      this.logger.error(`Failed to decrypt SMTP credentials: ${err.message}`);
+      return '';
+    }
+  }
+
   /**
-   * Save verified SMTP configuration to persistent storage
+   * Save verified SMTP configuration to persistent storage (AES-256-GCM encrypted)
    */
   async saveSmtpConfig(input: SmtpConfigInput): Promise<SmtpConfigRecord> {
     const verified = await this.verifySmtp(input);
+    const sanitizedPassword = this.sanitizeAppPassword(input.appPassword);
+    const encryptedPassword = this.encryptPassword(sanitizedPassword);
 
     const record = {
       email: input.email.trim().toLowerCase(),
-      appPassword: this.sanitizeAppPassword(input.appPassword),
+      appPassword: encryptedPassword,
       host: input.host?.trim() || 'smtp.gmail.com',
       port: Number(input.port) || 587,
       secure: input.secure ?? ((Number(input.port) || 587) === 465),
@@ -162,7 +204,7 @@ export class MassMailingService {
     };
 
     fs.writeFileSync(this.getConfigPath(), JSON.stringify(record, null, 2), 'utf-8');
-    this.logger.log(`Saved verified SMTP configuration for ${record.maskedEmail}`);
+    this.logger.log(`Saved verified and AES-256-GCM encrypted SMTP configuration for ${record.maskedEmail}`);
 
     return {
       email: record.email,
@@ -204,7 +246,7 @@ export class MassMailingService {
   }
 
   /**
-   * Read raw stored config for actual mailing
+   * Read raw stored config for actual mailing with decrypted password
    */
   private getInternalSavedConfig(): {
     email: string;
@@ -217,7 +259,15 @@ export class MassMailingService {
     const p = this.getConfigPath();
     if (!fs.existsSync(p)) return null;
     try {
-      return JSON.parse(fs.readFileSync(p, 'utf-8'));
+      const data = JSON.parse(fs.readFileSync(p, 'utf-8'));
+      return {
+        email: data.email,
+        appPassword: this.decryptPassword(data.appPassword),
+        host: data.host,
+        port: data.port,
+        secure: data.secure,
+        senderName: data.senderName,
+      };
     } catch {
       return null;
     }

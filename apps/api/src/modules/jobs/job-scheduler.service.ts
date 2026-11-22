@@ -82,29 +82,26 @@ export class JobSchedulerService implements OnApplicationBootstrap, OnApplicatio
   }
 
   /**
-   * Execute synchronization across configured XML feeds and 5,000 CA firms Schema.org directory
+   * Execute synchronization across multi-website scrapers, XML feeds and 5,000 CA firms directory.
+   * Dispatches automated SMTP alert report upon completion.
    */
   async executeSync(): Promise<any> {
-    this.logger.log('[JobScheduler] ⏰ Starting automated safe job extraction across XML feeds & 5,000 CA firm career portals...');
+    this.logger.log(
+      '[JobScheduler] ⏰ Starting automated safe job extraction across Multi-Portal Scrapers (ICAI Regional, Big 4, CA Portals), XML feeds & 5,000 CA firm career portals...'
+    );
     this.lastRunDate = new Date();
     try {
-      // Sync both XML feeds and 5,000 CA firm Schema.org JSON-LD directories
-      const xmlResult = await this.jobsService.triggerSourceSync('xml_feed');
-      let ldJsonResult = { totalIngested: 0, totalDuplicates: 0 };
-      try {
-        ldJsonResult = await this.jobsService.triggerSourceSync('ld_json_directory');
-      } catch (ldErr: any) {
-        this.logger.warn(`JSON-LD sync notice: ${ldErr?.message}`);
-      }
+      // Trigger full multi-source synchronization across all registered active connectors
+      const syncResult = await this.jobsService.triggerSourceSync();
 
       this.lastRunStatus = 'SUCCESS';
-      const totalIngested = (xmlResult.totalIngested || 0) + (ldJsonResult.totalIngested || 0);
-      const totalDuplicates = (xmlResult.totalDuplicates || 0) + (ldJsonResult.totalDuplicates || 0);
+      const totalIngested = syncResult.totalIngested || 0;
+      const totalDuplicates = syncResult.totalDuplicates || 0;
 
       this.logger.log(
-        `[JobScheduler] Safe extraction finished. Ingested: ${totalIngested}, Duplicates: ${totalDuplicates}`
+        `[JobScheduler] Safe multi-portal extraction finished in ${syncResult.durationMs}ms. Ingested: ${totalIngested}, Duplicates: ${totalDuplicates}. SMTP Notification dispatched.`
       );
-      return { totalIngested, totalDuplicates };
+      return { totalIngested, totalDuplicates, reports: syncResult.reports };
     } catch (err: any) {
       this.lastRunStatus = 'FAILED';
       this.logger.error(`[JobScheduler] Extraction encountered an error: ${err?.message}`);

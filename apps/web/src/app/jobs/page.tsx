@@ -868,6 +868,22 @@ export default function JobsPage() {
                           <CheckCircle2 size={11} /> Verified
                         </span>
 
+                        {job.sourceProvider && (
+                          <span
+                            style={{
+                              fontSize: '0.6875rem',
+                              fontWeight: 600,
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              background: 'rgba(5, 150, 105, 0.08)',
+                              border: '1px solid rgba(5, 150, 105, 0.25)',
+                              color: '#059669',
+                            }}
+                          >
+                            {job.sourceProvider}
+                          </span>
+                        )}
+
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
                           {job.opportunityType === 'ARTICLESHIP' && 'Articleship'}
                           {job.opportunityType === 'INDUSTRIAL_TRAINING' && 'Industrial Training'}

@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   BadRequestException,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import {
@@ -38,6 +39,7 @@ import { JobDeduplicationService } from './job-deduplication.service.js';
 import { JobFreshnessService } from './job-freshness.service.js';
 import { JobIngestionOrchestratorService } from './job-ingestion-orchestrator.service.js';
 import { CURATED_INITIAL_JOBS } from './curated-jobs.data.js';
+import { EmailService } from '../email/email.service.js';
 
 @Injectable()
 export class JobsService {
@@ -58,7 +60,8 @@ export class JobsService {
     sourceRegistry?: JobSourceRegistryService,
     deduplicationService?: JobDeduplicationService,
     freshnessService?: JobFreshnessService,
-    ingestionOrchestrator?: JobIngestionOrchestratorService
+    ingestionOrchestrator?: JobIngestionOrchestratorService,
+    @Optional() private readonly emailService?: EmailService
   ) {
     this.sourceRegistry = sourceRegistry || new JobSourceRegistryService(prisma);
     this.deduplicationService = deduplicationService || new JobDeduplicationService();
@@ -69,7 +72,8 @@ export class JobsService {
         prisma,
         this.sourceRegistry,
         this.deduplicationService,
-        this.freshnessService
+        this.freshnessService,
+        this.emailService
       );
 
     const diskJobs = this.ingestionOrchestrator.loadJobsFromDisk();

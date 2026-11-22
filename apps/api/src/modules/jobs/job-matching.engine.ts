@@ -21,13 +21,20 @@ export function generateJobFingerprint(
 }
 
 /**
- * Sanitize external job text to defend against prompt injection and malicious instructions.
+ * Sanitize external job text to defend against prompt injection, XSS, and malicious instructions.
  */
 export function sanitizeJobText(raw: string): string {
   if (!raw) return '';
   return raw
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
+    .replace(/javascript:[^"'\s]*/gi, '')
+    .replace(/data:text\/html[^"'\s]*/gi, '')
+    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/\bon\w+\s*=\s*[^"'\s>]+/gi, '')
     .replace(/(?:ignore\s+all\s+previous\s+instructions|system\s+prompt\s+override|<\|im_start\|>|<\|endoftext\|>)/gi, '[REDACTED_SUSPICIOUS_TOKEN]')
     .trim();
 }

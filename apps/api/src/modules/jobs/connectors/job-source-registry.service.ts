@@ -15,6 +15,7 @@ import { IcaiConnector } from './icai.connector.js';
 import { XmlFeedConnector } from './xml-feed.connector.js';
 import { CareerjetConnector } from './careerjet.connector.js';
 import { StructuredLdJsonConnector } from './structured-ld-json.connector.js';
+import { MultiPortalScraperConnector } from './multi-portal-scraper.connector.js';
 
 @Injectable()
 export class JobSourceRegistryService {
@@ -37,6 +38,7 @@ export class JobSourceRegistryService {
       new IcaiConnector(),
       new XmlFeedConnector(),
       new StructuredLdJsonConnector(),
+      new MultiPortalScraperConnector(),
     ];
 
     for (const connector of defaultConnectors) {
@@ -158,6 +160,8 @@ export class JobSourceRegistryService {
         return 'Authentic XML/RSS Job Feeds (ICAI, Big 4, Direct Portals)';
       case 'ld_json_directory':
         return 'Schema.org JSON-LD & 5,000+ CA Firms Directory Extractor';
+      case 'multi_portal_scraper':
+        return 'Multi-Portal Scraper (ICAI Regional, Big 4, CAClubIndia, CA Dwar)';
       default:
         return id.toUpperCase();
     }
@@ -183,6 +187,8 @@ export class JobSourceRegistryService {
         return 'https://cajobs.icai.org/rss/latest_jobs.xml';
       case 'ld_json_directory':
         return 'https://schema.org/JobPosting (5,000 CA Firm Directory Endpoints)';
+      case 'multi_portal_scraper':
+        return 'https://eirc-icai.org, https://wirc-icai.org, https://caclubindia.com';
       default:
         return 'https://api.external.com';
     }
