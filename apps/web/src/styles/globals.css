@@ -658,8 +658,6 @@ p {
   top: 0;
   z-index: 10;
 }
-  z-index: 10;
-}
 
 .app-content {
   padding: 26px 32px;
