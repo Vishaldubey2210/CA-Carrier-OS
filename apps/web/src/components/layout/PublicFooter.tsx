@@ -7,10 +7,8 @@ export function PublicFooter() {
   return (
     <footer
       role="contentinfo"
-      className="border-t border-neutral-200 bg-white text-neutral-600 mt-auto"
+      className="border-t border-white/60 bg-white/40 backdrop-blur-md text-neutral-600 mt-auto"
       style={{
-        borderTop: '1px solid #E5E7EB',
-        backgroundColor: '#FFFFFF',
         padding: '3rem 1.5rem 2rem',
       }}
     >
@@ -23,7 +21,7 @@ export function PublicFooter() {
               className="inline-flex items-center gap-2 no-underline"
               aria-label="CharteredOS Home"
             >
-              <div className="w-8 h-8 rounded-md bg-black flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 rounded-lg bg-[#09090B] flex items-center justify-center text-white font-bold text-sm shadow-xs">
                 CO
               </div>
               <div className="flex flex-col">
@@ -63,7 +61,7 @@ export function PublicFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-neutral-600 hover:text-black transition-colors no-underline">
+                <Link href="/#pricing" className="text-neutral-600 hover:text-black transition-colors no-underline">
                   Pricing Plans (₹99 &amp; ₹199)
                 </Link>
               </li>
@@ -115,7 +113,7 @@ export function PublicFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-neutral-500">
+        <div className="pt-6 border-t border-white/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-neutral-500">
           <p className="m-0">
             © {new Date().getFullYear()} CharteredOS. Simple, verified CA Articleship &amp; Job discovery.
           </p>

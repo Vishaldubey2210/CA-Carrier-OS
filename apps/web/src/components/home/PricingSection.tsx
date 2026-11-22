@@ -54,7 +54,7 @@ export function PricingSection() {
     >
       {/* Section Header */}
       <div className="text-center max-w-[620px] mx-auto mb-12">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-neutral-100 border border-neutral-200 text-[11px] font-semibold tracking-wider uppercase text-neutral-700 mb-3">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill text-[11px] font-semibold tracking-wider uppercase text-neutral-700 mb-3">
           <span>Simple &amp; Honest Pricing</span>
         </div>
         <h2 className="text-[clamp(1.75rem,2.5vw,2.25rem)] font-extrabold text-[#09090B] tracking-tight mb-3">
@@ -65,7 +65,7 @@ export function PricingSection() {
         </p>
       </div>
 
-      {/* 2 Plans Grid */}
+      {/* 2 Plans Grid - Frosted Glass Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
         {plans.map((plan) => {
           const isPro = plan.popular;
@@ -73,14 +73,14 @@ export function PricingSection() {
           return (
             <div
               key={plan.id}
-              className={`rounded-lg border p-7 sm:p-8 flex flex-col justify-between transition-all bg-white shadow-xs ${
+              className={`glass-card p-7 sm:p-8 flex flex-col justify-between transition-all relative ${
                 isPro
-                  ? 'border-neutral-900 ring-1 ring-neutral-900 shadow-md relative'
-                  : 'border-neutral-200 hover:border-neutral-400'
+                  ? 'border-neutral-900/80 ring-1 ring-neutral-900/80 shadow-lg'
+                  : ''
               }`}
             >
               {isPro && (
-                <div className="absolute -top-3 right-6 bg-[#09090B] text-white text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full shadow-xs">
+                <div className="absolute -top-3 right-6 bg-[#09090B] text-white text-[11px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full shadow-md">
                   Most Popular
                 </div>
               )}
@@ -89,10 +89,10 @@ export function PricingSection() {
                 {/* Badge Header */}
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <span
-                    className={`text-[12px] font-semibold px-2.5 py-1 rounded border ${
+                    className={`text-[12px] font-semibold px-2.5 py-1 rounded-full glass-pill ${
                       isPro
-                        ? 'bg-neutral-100 text-neutral-900 border-neutral-300'
-                        : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        ? 'text-neutral-900 font-bold'
+                        : 'text-emerald-800 border-emerald-300/70 bg-emerald-50/80'
                     }`}
                   >
                     {plan.badge}
@@ -113,7 +113,7 @@ export function PricingSection() {
                   </span>
                 </div>
 
-                <p className="text-[14px] text-neutral-600 leading-relaxed mb-6 pb-6 border-b border-neutral-100">
+                <p className="text-[14px] text-neutral-600 leading-relaxed mb-6 pb-6 border-b border-white/60">
                   {plan.description}
                 </p>
 
@@ -137,10 +137,10 @@ export function PricingSection() {
               <div className="space-y-3">
                 <Link
                   href={plan.ctaHref}
-                  className={`w-full py-3 px-4 rounded-md text-[14px] font-semibold text-center flex items-center justify-center gap-2 transition-all no-underline ${
+                  className={`w-full py-3 px-4 rounded-lg text-[14px] font-semibold text-center flex items-center justify-center gap-2 transition-all no-underline ${
                     isPro
-                      ? 'bg-[#09090B] text-white hover:bg-neutral-800 shadow-sm'
-                      : 'bg-white text-black border border-neutral-300 hover:bg-neutral-50 shadow-xs'
+                      ? 'bg-[#09090B] text-white hover:bg-neutral-800 shadow-md'
+                      : 'glass-pill text-black hover:bg-white shadow-xs'
                   }`}
                 >
                   <span>{plan.ctaText}</span>

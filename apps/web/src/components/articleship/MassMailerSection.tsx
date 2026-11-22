@@ -386,7 +386,7 @@ export function MassMailerSection() {
   return (
     <div className="flex flex-col gap-5 text-black">
       {/* 1. Executive Masthead & 450 Daily Limit Banner */}
-      <div className="bg-[#09090B] text-white rounded-lg p-5 sm:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="glass-dark-card rounded-xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="max-w-[720px]">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="bg-emerald-500 text-black text-[11px] font-extrabold px-2.5 py-0.5 rounded tracking-wide">
@@ -406,7 +406,7 @@ export function MassMailerSection() {
 
         {/* Quota & Connection Badge */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-md p-3 min-w-[160px]">
+          <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-xl p-3 min-w-[160px]">
             <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">
               Daily Safe Quota
             </div>
@@ -423,7 +423,7 @@ export function MassMailerSection() {
           </div>
 
           {savedConfig ? (
-            <div className="flex items-center gap-2 bg-neutral-900 border border-emerald-900/60 p-3 rounded-md">
+            <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md border border-emerald-500/40 p-3 rounded-xl">
               <ShieldCheck size={18} className="text-emerald-400 shrink-0" />
               <div>
                 <div className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
@@ -433,7 +433,7 @@ export function MassMailerSection() {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 p-3 rounded-md">
+            <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md border border-white/10 p-3 rounded-xl">
               <AlertCircle size={18} className="text-amber-400 shrink-0" />
               <div>
                 <div className="text-[10px] font-semibold text-amber-400 uppercase tracking-wider">
@@ -447,7 +447,7 @@ export function MassMailerSection() {
       </div>
 
       {/* 2. Step-by-Step Guide on How to Get Keys / 16-Letter Google App Password */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+      <div className="glass-card rounded-xl p-5">
         <div className="flex items-center justify-between mb-3 cursor-pointer" onClick={() => setShowGuide(!showGuide)}>
           <div className="flex items-center gap-2">
             <BookOpen size={16} className="text-emerald-600" />
@@ -465,14 +465,14 @@ export function MassMailerSection() {
         </div>
 
         {showGuide && (
-          <div className="space-y-4 pt-2 border-t border-neutral-100">
+          <div className="space-y-4 pt-2 border-t border-white/60">
             <p className="text-[13px] text-neutral-600 m-0">
               Google requires a 16-character <strong>App Password</strong> instead of your normal Gmail password. This allows CharteredOS to securely dispatch your applications directly from your email without ever exposing your main Google Account password.
             </p>
 
             {/* 5 Visual Steps */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+              <div className="p-3 glass-pill rounded-xl flex flex-col gap-1.5">
                 <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
                   1
                 </div>
@@ -491,7 +491,7 @@ export function MassMailerSection() {
                 </a>
               </div>
 
-              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+              <div className="p-3 glass-pill rounded-xl flex flex-col gap-1.5">
                 <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
                   2
                 </div>
@@ -501,7 +501,7 @@ export function MassMailerSection() {
                 </div>
               </div>
 
-              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+              <div className="p-3 glass-pill rounded-xl flex flex-col gap-1.5">
                 <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
                   3
                 </div>
@@ -520,7 +520,7 @@ export function MassMailerSection() {
                 </a>
               </div>
 
-              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5">
+              <div className="p-3 glass-pill rounded-xl flex flex-col gap-1.5">
                 <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center">
                   4
                 </div>
@@ -530,7 +530,7 @@ export function MassMailerSection() {
                 </div>
               </div>
 
-              <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 flex flex-col gap-1.5 bg-emerald-50/50 border-emerald-200">
+              <div className="p-3 glass-pill rounded-xl flex flex-col gap-1.5 bg-emerald-50/70 border-emerald-300/70">
                 <div className="w-5 h-5 rounded-full bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center">
                   5
                 </div>
@@ -542,7 +542,7 @@ export function MassMailerSection() {
             </div>
 
             {/* Safety & Spam Prevention Note */}
-            <div className="p-3 rounded-md bg-neutral-50 border border-neutral-200 text-[12px] text-neutral-700 flex items-start gap-2">
+            <div className="p-3 rounded-xl glass-pill text-[12px] text-neutral-700 flex items-start gap-2">
               <ShieldCheck size={16} className="text-emerald-600 shrink-0 mt-0.5" />
               <span>
                 <strong>Zero Spam Reputation Risk:</strong> Google restricts personal accounts to 500 emails/day. Our automated system limits outreach to <strong>450 emails daily</strong> with randomized 1.5s - 2.5s delay pacing, ensuring your Gmail account stays 100% compliant with Google sending limits.
@@ -557,7 +557,7 @@ export function MassMailerSection() {
         {/* Left Column (6 cols): Credentials, Candidate Profile & Generic Templates */}
         <div className="lg:col-span-6 flex flex-col gap-5">
           {/* STEP 1: Enter Keys & Gmail */}
-          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+          <div className="glass-card rounded-xl p-5">
             <div className="flex justify-between items-start mb-3">
               <div>
                 <h3 className="text-[15px] font-bold text-black m-0 flex items-center gap-1.5">
@@ -590,7 +590,7 @@ export function MassMailerSection() {
                   placeholder="e.g. yourname.ca2026@gmail.com"
                   value={smtpEmail}
                   onChange={(e) => setSmtpEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-[13px] text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black transition-all"
+                  className="w-full px-3 py-2 text-[13px] text-black glass-input rounded-lg placeholder:text-neutral-400"
                 />
               </div>
 
@@ -605,7 +605,7 @@ export function MassMailerSection() {
                     placeholder={savedConfig ? '•••••••••••••••• (Saved in DB)' : 'e.g. abcd efgh ijkl mnop'}
                     value={appPassword}
                     onChange={(e) => setAppPassword(e.target.value)}
-                    className="w-full pl-3 pr-10 py-2 text-[13px] font-mono text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black transition-all"
+                    className="w-full pl-3 pr-10 py-2 text-[13px] font-mono text-black glass-input rounded-lg placeholder:text-neutral-400"
                   />
                   <button
                     type="button"
@@ -626,7 +626,7 @@ export function MassMailerSection() {
                   placeholder="e.g. Rahul Sharma (CA Inter)"
                   value={senderName}
                   onChange={(e) => setSenderName(e.target.value)}
-                  className="w-full px-3 py-2 text-[13px] text-black bg-white border border-neutral-300 rounded-md focus:outline-none focus:border-black transition-all"
+                  className="w-full px-3 py-2 text-[13px] text-black glass-input rounded-lg placeholder:text-neutral-400"
                 />
               </div>
 
@@ -642,14 +642,14 @@ export function MassMailerSection() {
                 </button>
 
                 {showAdvancedSmtp && (
-                  <div className="grid grid-cols-2 gap-2 mt-2 p-2 bg-neutral-50 rounded-md border border-neutral-200">
+                  <div className="grid grid-cols-2 gap-2 mt-2 p-2.5 glass-pill rounded-lg">
                     <div>
                       <label className="text-[10px] text-neutral-500 block">Host</label>
                       <input
                         type="text"
                         value={smtpHost}
                         onChange={(e) => setSmtpHost(e.target.value)}
-                        className="w-full px-2 py-1 text-[12px] bg-white border border-neutral-300 rounded"
+                        className="w-full px-2 py-1 text-[12px] glass-input rounded"
                       />
                     </div>
                     <div>
@@ -658,7 +658,7 @@ export function MassMailerSection() {
                         type="number"
                         value={smtpPort}
                         onChange={(e) => setSmtpPort(Number(e.target.value))}
-                        className="w-full px-2 py-1 text-[12px] bg-white border border-neutral-300 rounded"
+                        className="w-full px-2 py-1 text-[12px] glass-input rounded"
                       />
                     </div>
                   </div>
@@ -667,10 +667,10 @@ export function MassMailerSection() {
 
               {smtpMessage && (
                 <div
-                  className={`p-2.5 rounded-md text-[12px] flex items-center gap-2 ${
+                  className={`p-2.5 rounded-lg text-[12px] flex items-center gap-2 ${
                     smtpMessage.type === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                      : 'bg-red-50 text-red-800 border border-red-200'
+                      ? 'bg-emerald-50/80 text-emerald-800 border border-emerald-300/70 glass-pill'
+                      : 'bg-red-50/80 text-red-800 border border-red-300/70 glass-pill'
                   }`}
                 >
                   {smtpMessage.type === 'success' ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
@@ -681,7 +681,7 @@ export function MassMailerSection() {
               <button
                 type="submit"
                 disabled={isVerifyingSmtp}
-                className="mt-1 w-full py-2.5 px-4 rounded-md bg-black text-white hover:bg-neutral-800 font-semibold text-[13px] flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs"
+                className="mt-1 w-full py-2.5 px-4 rounded-lg bg-black text-white hover:bg-neutral-800 font-semibold text-[13px] flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-sm"
               >
                 {isVerifyingSmtp ? (
                   <>
@@ -699,7 +699,7 @@ export function MassMailerSection() {
           </div>
 
           {/* STEP 2: Candidate Details */}
-          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+          <div className="glass-card rounded-xl p-5">
             <h3 className="text-[15px] font-bold text-black m-0 mb-3">
               2. Candidate Profile (Auto-Fills Template Placeholders)
             </h3>
@@ -711,7 +711,7 @@ export function MassMailerSection() {
                   type="text"
                   value={candidateName}
                   onChange={(e) => setCandidateName(e.target.value)}
-                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 />
               </div>
 
@@ -722,7 +722,7 @@ export function MassMailerSection() {
                   value={icaiRegNo}
                   onChange={(e) => setIcaiRegNo(e.target.value)}
                   placeholder="e.g. WRO0786542"
-                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 />
               </div>
 
@@ -731,7 +731,7 @@ export function MassMailerSection() {
                 <select
                   value={interStatus}
                   onChange={(e) => setInterStatus(e.target.value)}
-                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 >
                   <option value="Both Groups Cleared (1st Attempt)">Both Groups Cleared (1st Attempt)</option>
                   <option value="Both Groups Cleared">Both Groups Cleared</option>
@@ -747,7 +747,7 @@ export function MassMailerSection() {
                   type="text"
                   value={candidateCity}
                   onChange={(e) => setCandidateCity(e.target.value)}
-                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 />
               </div>
 
@@ -757,7 +757,7 @@ export function MassMailerSection() {
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 />
               </div>
 
@@ -768,14 +768,14 @@ export function MassMailerSection() {
                   value={linkedinUrl}
                   onChange={(e) => setLinkedinUrl(e.target.value)}
                   placeholder="https://drive.google.com/..."
-                  className="w-full px-2.5 py-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 />
               </div>
             </div>
           </div>
 
           {/* STEP 3: Generic Template Selector */}
-          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+          <div className="glass-card rounded-xl p-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
               <div>
                 <h3 className="text-[15px] font-bold text-black m-0">
@@ -790,8 +790,8 @@ export function MassMailerSection() {
                 <button
                   type="button"
                   onClick={() => setActivePreviewTab('EDIT')}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded ${
-                    activePreviewTab === 'EDIT' ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700'
+                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all ${
+                    activePreviewTab === 'EDIT' ? 'bg-black text-white shadow-xs' : 'glass-pill text-neutral-700'
                   }`}
                 >
                   Edit Copy
@@ -799,8 +799,8 @@ export function MassMailerSection() {
                 <button
                   type="button"
                   onClick={() => setActivePreviewTab('PREVIEW')}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded flex items-center gap-1 ${
-                    activePreviewTab === 'PREVIEW' ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700'
+                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-md flex items-center gap-1 transition-all ${
+                    activePreviewTab === 'PREVIEW' ? 'bg-black text-white shadow-xs' : 'glass-pill text-neutral-700'
                   }`}
                 >
                   <Eye size={11} />
@@ -818,10 +818,10 @@ export function MassMailerSection() {
                     key={key}
                     type="button"
                     onClick={() => handleTemplateSwitch(key)}
-                    className={`p-2.5 text-left rounded border transition-all cursor-pointer text-[12px] leading-tight ${
+                    className={`p-2.5 text-left rounded-lg transition-all cursor-pointer text-[12px] leading-tight ${
                       isSelected
-                        ? 'border-black bg-neutral-100 font-bold text-black ring-1 ring-black'
-                        : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
+                        ? 'bg-black text-white font-bold shadow-xs'
+                        : 'glass-pill hover:bg-white text-neutral-700'
                     }`}
                   >
                     {key === 'ARTICLESHIP' && 'Articleship (Form 102/103)'}
@@ -842,7 +842,7 @@ export function MassMailerSection() {
                     type="text"
                     value={subjectTemplate}
                     onChange={(e) => setSubjectTemplate(e.target.value)}
-                    className="w-full px-3 py-1.5 font-mono text-[12px] border border-neutral-300 rounded bg-white text-black"
+                    className="w-full px-3 py-1.5 font-mono text-[12px] glass-input rounded text-black"
                   />
                 </div>
 
@@ -854,13 +854,13 @@ export function MassMailerSection() {
                     rows={8}
                     value={bodyTemplate}
                     onChange={(e) => setBodyTemplate(e.target.value)}
-                    className="w-full p-3 font-mono text-[12px] leading-relaxed border border-neutral-300 rounded bg-white text-black"
+                    className="w-full p-3 font-mono text-[12px] leading-relaxed glass-input rounded text-black"
                   />
                 </div>
               </div>
             ) : (
-              <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-md text-[12px]">
-                <div className="pb-2 mb-2 border-b border-neutral-200 text-neutral-600">
+              <div className="p-4 glass-pill rounded-lg text-[12px]">
+                <div className="pb-2 mb-2 border-b border-white/60 text-neutral-600">
                   <div><strong>TO:</strong> {previewData.firm.firmName} &lt;{previewData.firm.email}&gt;</div>
                   <div className="mt-1"><strong>SUBJECT:</strong> {previewData.subject}</div>
                 </div>
@@ -875,7 +875,7 @@ export function MassMailerSection() {
         {/* Right Column (6 cols): Target Firms, Batch Control & Terminal Monitor */}
         <div className="lg:col-span-6 flex flex-col gap-5">
           {/* STEP 4: Target Selection & Daily Batch Limit */}
-          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+          <div className="glass-card rounded-xl p-5">
             <div className="flex justify-between items-center mb-3">
               <div>
                 <h3 className="text-[15px] font-bold text-black m-0 flex items-center gap-1.5">
@@ -903,7 +903,7 @@ export function MassMailerSection() {
                 <select
                   value={filterRegion}
                   onChange={(e) => setFilterRegion(e.target.value)}
-                  className="w-full p-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full p-1.5 glass-input rounded text-black"
                 >
                   <option value="ALL">All Regions (5,000)</option>
                   <option value="WIRC">WIRC (Mumbai, Pune, Guj)</option>
@@ -919,7 +919,7 @@ export function MassMailerSection() {
                 <select
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full p-1.5 border border-neutral-300 rounded bg-white text-black"
+                  className="w-full p-1.5 glass-input rounded text-black"
                 >
                   <option value="ALL">All Major Cities</option>
                   <option value="Mumbai">Mumbai</option>
@@ -939,7 +939,7 @@ export function MassMailerSection() {
                 <select
                   value={selectedBatchLimit}
                   onChange={(e) => setSelectedBatchLimit(Number(e.target.value))}
-                  className="w-full p-1.5 border border-neutral-300 rounded bg-white text-black font-semibold"
+                  className="w-full p-1.5 glass-input rounded text-black font-semibold"
                 >
                   <option value={25}>25 Firms (Quick Test)</option>
                   <option value={50}>50 Firms (Recommended)</option>
@@ -952,14 +952,14 @@ export function MassMailerSection() {
 
             {/* Recipient Drawer */}
             {showFirmsDrawer && (
-              <div className="max-h-[180px] overflow-y-auto border border-neutral-200 rounded bg-neutral-50 p-2 text-[11px] mb-3">
+              <div className="max-h-[180px] overflow-y-auto glass-pill rounded-lg p-2 text-[11px] mb-3">
                 {isLoadingFirms ? (
                   <div className="text-center py-4 text-neutral-500">Loading firms...</div>
                 ) : (
                   targetFirms.map((f, i) => (
                     <div
                       key={i}
-                      className="flex justify-between py-1 border-b border-neutral-200 last:border-b-0"
+                      className="flex justify-between py-1 border-b border-white/50 last:border-b-0"
                     >
                       <div className="font-semibold text-black">{f.firmName} ({f.primaryCity || f.region})</div>
                       <div className="font-mono text-neutral-600">{f.email}</div>
@@ -970,7 +970,7 @@ export function MassMailerSection() {
             )}
 
             {/* Delay Slider */}
-            <div className="flex justify-between items-center pt-2 border-t border-neutral-100 text-[12px]">
+            <div className="flex justify-between items-center pt-2 border-t border-white/60 text-[12px]">
               <span className="text-neutral-600 flex items-center gap-1">
                 <Clock size={13} /> Gmail Pacing Delay:
               </span>
@@ -990,7 +990,7 @@ export function MassMailerSection() {
           </div>
 
           {/* STEP 5: Execution Trigger & KPI Bar */}
-          <div className="bg-white border border-neutral-200 rounded-lg p-5 shadow-xs">
+          <div className="glass-card rounded-xl p-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <div>
                 <h3 className="text-[16px] font-bold text-black m-0">
@@ -1005,7 +1005,7 @@ export function MassMailerSection() {
                 type="button"
                 onClick={handleStartCampaign}
                 disabled={isSending || targetFirms.length === 0}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-md bg-[#09090B] hover:bg-neutral-800 text-white font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-[#09090B] hover:bg-neutral-800 text-white font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSending ? (
                   <>
@@ -1023,17 +1023,17 @@ export function MassMailerSection() {
 
             {/* KPI Counters */}
             <div className="grid grid-cols-3 gap-2.5">
-              <div className="p-3 rounded border border-neutral-200 bg-neutral-50 text-center">
+              <div className="p-3 rounded-lg glass-pill text-center">
                 <div className="text-[10px] font-bold text-neutral-500 uppercase">Total Selected</div>
                 <div className="text-[20px] font-black text-black">{targetFirms.length}</div>
               </div>
 
-              <div className="p-3 rounded border border-emerald-200 bg-emerald-50 text-center">
+              <div className="p-3 rounded-lg glass-pill border-emerald-300/70 bg-emerald-50/80 text-center">
                 <div className="text-[10px] font-bold text-emerald-800 uppercase">Delivered</div>
                 <div className="text-[20px] font-black text-emerald-700">{sentCount}</div>
               </div>
 
-              <div className="p-3 rounded border border-neutral-200 bg-neutral-50 text-center">
+              <div className="p-3 rounded-lg glass-pill text-center">
                 <div className="text-[10px] font-bold text-neutral-500 uppercase">Remaining Quota</div>
                 <div className="text-[20px] font-black text-black">{remainingDailyQuota}</div>
               </div>
@@ -1041,7 +1041,7 @@ export function MassMailerSection() {
           </div>
 
           {/* STEP 6: Interactive Terminal Output */}
-          <div className="bg-[#09090B] border border-neutral-800 rounded-lg p-4 flex flex-col min-h-[380px] shadow-inner font-mono">
+          <div className="glass-dark-card rounded-xl p-4 flex flex-col min-h-[380px] shadow-2xl font-mono">
             {/* Terminal Top Bar */}
             <div className="flex justify-between items-center border-b border-neutral-800 pb-2 mb-3">
               <div className="flex items-center gap-2">

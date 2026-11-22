@@ -102,13 +102,13 @@ function DashboardContent() {
   return (
     <div className="flex flex-col gap-6 max-w-[1140px] mx-auto w-full text-black">
       {/* 1. Dashboard Masthead & Tab Switcher */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-neutral-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-white/60">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-[22px] font-bold text-black tracking-tight m-0">
               Welcome, {candidateName}
             </h1>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-neutral-100 text-neutral-800 border border-neutral-300">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full glass-pill text-neutral-800">
               {activeWorkspace?.name || 'Personal Workspace'}
             </span>
           </div>
@@ -117,12 +117,12 @@ function DashboardContent() {
           </p>
         </div>
 
-        {/* View Toggle Tabs */}
-        <div className="inline-flex items-center gap-1 bg-neutral-100 p-1 rounded-md border border-neutral-200 text-[13px]">
+        {/* View Toggle Tabs - Frosted Glass Container */}
+        <div className="inline-flex items-center gap-1 glass-pill p-1 text-[13px]">
           <button
             type="button"
             onClick={() => setMainView('OVERVIEW')}
-            className={`px-3 py-1.5 rounded font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               mainView === 'OVERVIEW'
                 ? 'bg-black text-white shadow-xs'
                 : 'text-neutral-700 hover:text-black'
@@ -134,13 +134,13 @@ function DashboardContent() {
           <button
             type="button"
             onClick={() => setMainView('OUTREACH')}
-            className={`px-3 py-1.5 rounded font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
               mainView === 'OUTREACH'
                 ? 'bg-black text-white shadow-xs'
                 : 'text-neutral-700 hover:text-black'
             }`}
           >
-            <Mail size={14} className="text-emerald-500" />
+            <Mail size={14} className="text-emerald-400" />
             <span>⚡ Mass Outreach (450/day)</span>
           </button>
         </div>
@@ -167,16 +167,16 @@ function DashboardContent() {
       ) : (
         /* Overview: Opportunities & Tracker */
         <div className="flex flex-col gap-6">
-          {/* Prominent Mass Mailing Teaser Card */}
-          <div className="p-4 sm:p-5 bg-white border border-neutral-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs hover:border-neutral-400 transition-colors">
+          {/* Prominent Frosted Glass Teaser Card */}
+          <div className="p-4 sm:p-5 glass-card rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start sm:items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-[#09090B] text-white flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-[#09090B] text-white flex items-center justify-center shrink-0 shadow-xs">
                 <Send size={18} className="text-emerald-400" />
               </div>
               <div>
                 <div className="text-[15px] font-bold text-black flex items-center gap-2 flex-wrap">
                   <span>Automated 1-Click Mass Mailing &amp; Outreach</span>
-                  <span className="text-[11px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
+                  <span className="text-[11px] font-extrabold bg-emerald-50/80 text-emerald-800 border border-emerald-300/70 px-2.5 py-0.5 rounded-full glass-pill">
                     450 Emails / Day Safe Limit
                   </span>
                 </div>
@@ -189,18 +189,18 @@ function DashboardContent() {
             <button
               type="button"
               onClick={() => setMainView('OUTREACH')}
-              className="px-4 py-2 bg-black text-white text-[13px] font-semibold rounded-md hover:bg-neutral-800 transition-colors shrink-0 shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 bg-black text-white text-[13px] font-semibold rounded-lg hover:bg-neutral-800 transition-colors shrink-0 shadow-md flex items-center gap-1.5 cursor-pointer"
             >
               <span>Open Mass Mailer</span>
               <ArrowRight size={13} />
             </button>
           </div>
 
-          {/* Key Metrics Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 border border-neutral-200 rounded-lg overflow-hidden bg-white shadow-xs">
+          {/* Key Metrics Strip - Frosted Glass Card */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 glass-card rounded-xl overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-white/60">
             <Link
               href="/articleship"
-              className="p-5 border-b sm:border-b-0 sm:border-r border-neutral-200 hover:bg-neutral-50 transition-colors no-underline text-inherit"
+              className="p-5 hover:bg-white/60 transition-colors no-underline text-inherit"
             >
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
                 Articleship &amp; Trainees
@@ -215,7 +215,7 @@ function DashboardContent() {
 
             <Link
               href="/jobs"
-              className="p-5 border-b sm:border-b-0 sm:border-r border-neutral-200 hover:bg-neutral-50 transition-colors no-underline text-inherit"
+              className="p-5 hover:bg-white/60 transition-colors no-underline text-inherit"
             >
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
                 Qualified CA Jobs
@@ -228,7 +228,7 @@ function DashboardContent() {
               </span>
             </Link>
 
-            <div className="p-5 hover:bg-neutral-50 transition-colors">
+            <div className="p-5 hover:bg-white/60 transition-colors">
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
                 Tracked Applications
               </span>
@@ -256,13 +256,13 @@ function DashboardContent() {
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="inline-flex items-center gap-1 bg-neutral-100 p-1 rounded-md text-[12px]">
+                <div className="inline-flex items-center gap-1 glass-pill p-1 text-[12px]">
                   <button
                     type="button"
                     onClick={() => setSelectedJobFilter('ALL')}
                     className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
                       selectedJobFilter === 'ALL'
-                        ? 'bg-black text-white'
+                        ? 'bg-black text-white shadow-xs'
                         : 'text-neutral-700 hover:text-black'
                     }`}
                   >
@@ -273,7 +273,7 @@ function DashboardContent() {
                     onClick={() => setSelectedJobFilter('ARTICLESHIP')}
                     className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
                       selectedJobFilter === 'ARTICLESHIP'
-                        ? 'bg-black text-white'
+                        ? 'bg-black text-white shadow-xs'
                         : 'text-neutral-700 hover:text-black'
                     }`}
                   >
@@ -284,7 +284,7 @@ function DashboardContent() {
                     onClick={() => setSelectedJobFilter('JOBS')}
                     className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
                       selectedJobFilter === 'JOBS'
-                        ? 'bg-black text-white'
+                        ? 'bg-black text-white shadow-xs'
                         : 'text-neutral-700 hover:text-black'
                     }`}
                   >
@@ -294,11 +294,11 @@ function DashboardContent() {
               </div>
 
               {displayedJobs.length === 0 ? (
-                <div className="bg-white rounded-lg border border-neutral-200 p-8 text-center text-neutral-500 text-[13px]">
+                <div className="glass-card rounded-xl p-8 text-center text-neutral-500 text-[13px]">
                   No listings currently match this filter.
                 </div>
               ) : (
-                <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden divide-y divide-neutral-200 shadow-xs">
+                <div className="glass-card rounded-xl overflow-hidden divide-y divide-white/50">
                   {displayedJobs.slice(0, 8).map((job) => {
                     const targetUrl = job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#';
                     const isTrainee =
@@ -310,15 +310,15 @@ function DashboardContent() {
                     return (
                       <div
                         key={job.id}
-                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-neutral-50 transition-colors"
+                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/60 backdrop-blur-xs transition-colors"
                       >
                         <div className="space-y-1 min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span
                               className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${
                                 isTrainee
-                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                                  : 'border-neutral-200 bg-neutral-100 text-neutral-800'
+                                  ? 'border-emerald-200/80 bg-emerald-50/80 text-emerald-800'
+                                  : 'border-neutral-200/80 bg-neutral-100/80 text-neutral-800'
                               }`}
                             >
                               {isTrainee ? 'Articleship' : 'Qualified CA'}
@@ -344,7 +344,7 @@ function DashboardContent() {
                           )}
                         </div>
 
-                        <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
+                        <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/50">
                           {job.salaryDisclosed && job.salaryMin && job.salaryMax && (
                             <span className="text-[13px] font-bold text-black">
                               ₹{(job.salaryMin / 100000).toFixed(0)}L – ₹{(job.salaryMax / 100000).toFixed(0)}L
@@ -355,7 +355,7 @@ function DashboardContent() {
                             href={targetUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded bg-black text-white hover:bg-neutral-800 transition-colors no-underline"
+                            className="inline-flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded-md bg-black text-white hover:bg-neutral-800 transition-colors no-underline"
                           >
                             <span>Apply</span>
                             <ExternalLink size={11} />
@@ -371,7 +371,7 @@ function DashboardContent() {
             {/* Right Column (4 cols): Application Tracker & Quick Portals */}
             <div className="lg:col-span-4 flex flex-col gap-4">
               {/* Quick Hub Navigation */}
-              <div className="bg-white rounded-lg border border-neutral-200 p-4 shadow-xs">
+              <div className="glass-card rounded-xl p-4">
                 <h3 className="text-[12px] font-bold uppercase tracking-wider text-neutral-500 mb-3 m-0">
                   Quick Portals
                 </h3>
@@ -379,7 +379,7 @@ function DashboardContent() {
                   <button
                     type="button"
                     onClick={() => setMainView('OUTREACH')}
-                    className="flex items-center justify-between p-2.5 rounded-md bg-neutral-50 hover:bg-neutral-100 transition-colors text-black no-underline text-[13px] font-bold border border-neutral-200 cursor-pointer text-left"
+                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-bold cursor-pointer text-left"
                   >
                     <div className="flex items-center gap-2">
                       <Mail size={16} className="text-emerald-600" />
@@ -390,7 +390,7 @@ function DashboardContent() {
 
                   <Link
                     href="/articleship"
-                    className="flex items-center justify-between p-2.5 rounded-md hover:bg-neutral-50 transition-colors text-black no-underline text-[13px] font-semibold border border-neutral-100"
+                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
                   >
                     <div className="flex items-center gap-2">
                       <GraduationCap size={16} />
@@ -401,7 +401,7 @@ function DashboardContent() {
 
                   <Link
                     href="/jobs"
-                    className="flex items-center justify-between p-2.5 rounded-md hover:bg-neutral-50 transition-colors text-black no-underline text-[13px] font-semibold border border-neutral-100"
+                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
                   >
                     <div className="flex items-center gap-2">
                       <Briefcase size={15} />
@@ -413,7 +413,7 @@ function DashboardContent() {
               </div>
 
               {/* Applications Card */}
-              <div className="bg-white rounded-lg border border-neutral-200 p-4 shadow-xs">
+              <div className="glass-card rounded-xl p-4">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="text-[12px] font-bold uppercase tracking-wider text-neutral-500 m-0">
                     Your Applications
@@ -424,7 +424,7 @@ function DashboardContent() {
                 </div>
 
                 {applications.length === 0 ? (
-                  <div className="p-4 text-center text-neutral-500 text-[13px] bg-neutral-50 rounded-md">
+                  <div className="p-4 text-center text-neutral-500 text-[13px] glass-pill rounded-lg">
                     <p className="m-0 mb-2">No active applications tracked yet.</p>
                     <Link
                       href="/articleship"
@@ -436,7 +436,7 @@ function DashboardContent() {
                 ) : (
                   <div className="flex flex-col gap-2">
                     {applications.slice(0, 4).map((app) => (
-                      <div key={app.id} className="p-2.5 bg-neutral-50 rounded-md border border-neutral-100 text-[12px]">
+                      <div key={app.id} className="p-2.5 glass-pill rounded-lg text-[12px]">
                         <div className="font-bold text-black">{app.roleTitle || 'CA Opening'}</div>
                         <div className="text-neutral-500">{app.companyName || 'Firm'}</div>
                       </div>

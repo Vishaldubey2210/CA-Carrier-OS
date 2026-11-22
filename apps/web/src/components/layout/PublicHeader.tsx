@@ -62,7 +62,7 @@ export function PublicHeader() {
         role="banner"
         className={`sticky top-0 z-50 transition-all duration-200 ${
           isScrolled
-            ? 'bg-[#FBFBFA]/95 backdrop-blur-md border-b border-neutral-200/80 shadow-xs py-3'
+            ? 'glass-header py-3'
             : 'bg-transparent border-b border-transparent py-4'
         }`}
       >

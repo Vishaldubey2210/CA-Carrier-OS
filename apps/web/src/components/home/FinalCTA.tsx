@@ -7,8 +7,8 @@ import { GraduationCap, Briefcase, CheckCircle2 } from 'lucide-react';
 export function FinalCTA() {
   return (
     <section className="max-w-[1080px] mx-auto px-4 sm:px-6 py-16 sm:py-20 w-full">
-      <div className="bg-white border border-neutral-200 rounded-lg p-8 sm:p-12 text-center flex flex-col items-center gap-5 shadow-xs">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-neutral-100 border border-neutral-200 text-[11px] font-semibold tracking-wider uppercase text-neutral-700">
+      <div className="glass-card p-8 sm:p-12 text-center flex flex-col items-center gap-5">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill text-[11px] font-semibold tracking-wider uppercase text-neutral-700">
           <span>Get Started Today</span>
         </div>
 
@@ -24,7 +24,7 @@ export function FinalCTA() {
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Link
             href="/articleship"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#09090B] hover:bg-neutral-800 text-white text-[14px] font-semibold transition-all shadow-sm no-underline"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#09090B] hover:bg-neutral-800 text-white text-[14px] font-semibold transition-all shadow-md no-underline"
           >
             <GraduationCap size={16} />
             <span>Browse Articleship (₹99)</span>
@@ -32,7 +32,7 @@ export function FinalCTA() {
 
           <Link
             href="/jobs"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-white hover:bg-neutral-50 text-[#09090B] border border-neutral-300 text-[14px] font-semibold transition-all shadow-xs no-underline"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-pill text-[#09090B] hover:bg-white text-[14px] font-semibold transition-all no-underline"
           >
             <Briefcase size={15} />
             <span>Explore CA Jobs (₹199)</span>

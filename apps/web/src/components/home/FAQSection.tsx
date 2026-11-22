@@ -54,7 +54,7 @@ export function FAQSection() {
   return (
     <section
       id="faq"
-      className="py-16 sm:py-20 px-4 sm:px-6 max-w-[800px] mx-auto w-full"
+      className="py-16 sm:py-20 px-4 sm:px-6 max-w-[820px] mx-auto w-full"
     >
       <script
         type="application/ld+json"
@@ -63,6 +63,9 @@ export function FAQSection() {
 
       {/* Section Header */}
       <div className="text-center max-w-[600px] mx-auto mb-10">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill text-[11px] font-semibold tracking-wider uppercase text-neutral-700 mb-3">
+          <span>Got Questions?</span>
+        </div>
         <h2 className="text-[clamp(1.75rem,2.5vw,2.25rem)] font-bold text-black tracking-tight leading-snug mb-3">
           Frequently Asked Questions
         </h2>
@@ -71,7 +74,7 @@ export function FAQSection() {
         </p>
       </div>
 
-      {/* Accordion List */}
+      {/* Accordion List - Frosted Glass Panels */}
       <div className="flex flex-col gap-3">
         {FAQS.map((faq, idx) => {
           const isOpen = activeFaq === idx;
@@ -81,10 +84,10 @@ export function FAQSection() {
           return (
             <div
               key={idx}
-              className={`rounded-md border transition-colors overflow-hidden bg-white ${
+              className={`rounded-xl transition-all overflow-hidden glass-card ${
                 isOpen
-                  ? 'border-black'
-                  : 'border-neutral-200 hover:border-neutral-400'
+                  ? 'border-black/70 shadow-md'
+                  : ''
               }`}
             >
               <button
@@ -117,7 +120,7 @@ export function FAQSection() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
                   >
-                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 text-[14px] text-neutral-600 leading-relaxed border-t border-neutral-100">
+                    <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 text-[14px] text-neutral-600 leading-relaxed border-t border-white/60">
                       {faq.a}
                     </div>
                   </motion.div>

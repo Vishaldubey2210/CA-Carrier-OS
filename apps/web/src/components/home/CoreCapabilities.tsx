@@ -16,7 +16,7 @@ export function CoreCapabilities() {
     <section id="features" className="w-full max-w-[1080px] mx-auto px-4 sm:px-6 py-16 sm:py-20">
       {/* Header */}
       <div className="max-w-[660px] mb-12">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-neutral-100 border border-neutral-200 text-[11px] font-semibold tracking-wider uppercase text-neutral-700 mb-3">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill text-[11px] font-semibold tracking-wider uppercase text-neutral-700 mb-3">
           <span>Focused Architecture</span>
         </div>
         <h2 className="text-[clamp(1.75rem,2.5vw,2.25rem)] font-extrabold text-[#09090B] tracking-tight leading-snug mb-3">
@@ -27,16 +27,16 @@ export function CoreCapabilities() {
         </p>
       </div>
 
-      {/* 2 Focused Capability Columns */}
+      {/* 2 Focused Capability Columns - Frosted Glass Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Card 1: Articleship */}
-        <div className="bg-white border border-neutral-200 rounded-lg p-6 sm:p-7 flex flex-col justify-between hover:border-neutral-400 transition-all shadow-xs">
+        <div className="glass-card p-6 sm:p-7 flex flex-col justify-between transition-all">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-md bg-neutral-100 border border-neutral-200 flex items-center justify-center text-black">
+              <div className="w-10 h-10 rounded-lg glass-pill flex items-center justify-center text-black">
                 <GraduationCap size={20} />
               </div>
-              <span className="text-[12px] font-bold px-2.5 py-1 rounded border border-emerald-200 bg-emerald-50 text-emerald-800">
+              <span className="text-[12px] font-bold px-2.5 py-1 rounded-full glass-pill border-emerald-300/70 bg-emerald-50/80 text-emerald-800">
                 ₹99 One-Time Pass
               </span>
             </div>
@@ -69,7 +69,7 @@ export function CoreCapabilities() {
             </ul>
           </div>
 
-          <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
+          <div className="pt-4 border-t border-white/60 flex items-center justify-between">
             <Link
               href="/articleship"
               className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-black hover:text-emerald-700 transition-colors"
@@ -81,13 +81,13 @@ export function CoreCapabilities() {
         </div>
 
         {/* Card 2: CA Jobs */}
-        <div className="bg-white border border-neutral-200 rounded-lg p-6 sm:p-7 flex flex-col justify-between hover:border-neutral-400 transition-all shadow-xs">
+        <div className="glass-card p-6 sm:p-7 flex flex-col justify-between transition-all">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-md bg-neutral-100 border border-neutral-200 flex items-center justify-center text-black">
+              <div className="w-10 h-10 rounded-lg glass-pill flex items-center justify-center text-black">
                 <Briefcase size={20} />
               </div>
-              <span className="text-[12px] font-bold px-2.5 py-1 rounded border border-neutral-200 bg-neutral-100 text-neutral-800">
+              <span className="text-[12px] font-bold px-2.5 py-1 rounded-full glass-pill text-neutral-800">
                 ₹199 Pro Pass
               </span>
             </div>
@@ -120,7 +120,7 @@ export function CoreCapabilities() {
             </ul>
           </div>
 
-          <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
+          <div className="pt-4 border-t border-white/60 flex items-center justify-between">
             <Link
               href="/jobs"
               className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-black hover:text-emerald-700 transition-colors"

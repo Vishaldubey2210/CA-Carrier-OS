@@ -6,15 +6,33 @@
 
 :root {
   /* =========================================================================
-     CA Career OS — Executive Monochrome & Chartered Emerald Design System
-     High legibility, architectural paper tint, deep obsidian, prestigious emerald
+     CA Career OS — Executive Frosted Glassmorphism Design System
+     Translucent frosted surfaces, specular highlights, ambient luminous refraction,
+     deep obsidian typography, and chartered emerald verified accents
      ========================================================================= */
-  --page-background: #FBFBFA;     /* Warm Architectural Paper Tint */
-  --sidebar-background: #FFFFFF;
-  --surface-primary: #FFFFFF;     /* Crisp Pure White Surface */
-  --surface-secondary: #F4F4F5;
-  --surface-hover: #EDEDF0;
-  --surface-card: #FFFFFF;
+  --page-background: #F8FAFC;
+  --glass-canvas-bg:
+    radial-gradient(circle at 12% 10%, rgba(5, 150, 105, 0.09) 0%, transparent 40%),
+    radial-gradient(circle at 88% 18%, rgba(99, 102, 241, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 75% 90%, rgba(217, 119, 6, 0.04) 0%, transparent 40%),
+    #F8FAFC;
+  --sidebar-background: rgba(255, 255, 255, 0.78);
+  --surface-primary: rgba(255, 255, 255, 0.76);
+  --surface-secondary: rgba(244, 244, 245, 0.65);
+  --surface-hover: rgba(255, 255, 255, 0.90);
+  --surface-card: rgba(255, 255, 255, 0.78);
+
+  --glass-surface: rgba(255, 255, 255, 0.74);
+  --glass-surface-hover: rgba(255, 255, 255, 0.88);
+  --glass-surface-subtle: rgba(255, 255, 255, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-border-subtle: rgba(228, 228, 231, 0.60);
+  --glass-border-strong: rgba(255, 255, 255, 0.90);
+  --glass-blur: 16px;
+  --glass-blur-lg: 24px;
+  --glass-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.85);
+  --glass-shadow-hover: 0 12px 36px -4px rgba(0, 0, 0, 0.08), inset 0 1px 2px 0 rgba(255, 255, 255, 0.95);
 
   /* Typography Colors (Executive High-Contrast) */
   --text-primary: #09090B;       /* Deep Obsidian Black */
@@ -26,39 +44,39 @@
   --brand-primary: #09090B;       /* Solid Carbon Black */
   --brand-primary-hover: #18181B; /* Hover Deep Charcoal */
   --brand-interactive: #09090B;
-  --brand-soft: #F4F4F5;
+  --brand-soft: rgba(244, 244, 245, 0.7);
   --brand-teal: #059669;
-  --brand-teal-soft: #ECFDF5;
+  --brand-teal-soft: rgba(236, 253, 245, 0.8);
 
   /* Chartered Emerald (ICAI Audit Sign-Off Green & Verification) */
   --accent-emerald: #059669;
   --accent-emerald-dark: #047857;
-  --accent-emerald-surface: #ECFDF5;
-  --accent-emerald-border: #A7F3D0;
+  --accent-emerald-surface: rgba(236, 253, 245, 0.8);
+  --accent-emerald-border: rgba(167, 243, 208, 0.7);
   --accent-emerald-text: #065F46;
 
   /* Warm Gold / Brass Accent (Premium Status & Deadlines) */
   --accent-amber: #D97706;
-  --accent-amber-surface: #FEF3C7;
-  --accent-amber-border: #FDE68A;
+  --accent-amber-surface: rgba(254, 243, 199, 0.8);
+  --accent-amber-border: rgba(253, 230, 138, 0.7);
   --accent-amber-text: #92400E;
 
   /* Borders & Dividers */
-  --border-subtle: #E4E4E7;
-  --border-strong: #D4D4D8;
+  --border-subtle: rgba(228, 228, 231, 0.7);
+  --border-strong: rgba(212, 212, 216, 0.8);
   --border-active: #09090B;
   --border-glow: none;
 
   /* Semantic Status Colors */
   --success-text: #065F46;
-  --success-surface: #ECFDF5;
-  --success-border: #A7F3D0;
+  --success-surface: rgba(236, 253, 245, 0.8);
+  --success-border: rgba(167, 243, 208, 0.7);
   --warning-text: #92400E;
-  --warning-surface: #FEF3C7;
-  --warning-border: #FDE68A;
+  --warning-surface: rgba(254, 243, 199, 0.8);
+  --warning-border: rgba(253, 230, 138, 0.7);
   --danger-text: #991B1B;
-  --danger-surface: #FEF2F2;
-  --danger-border: #FECACA;
+  --danger-surface: rgba(254, 242, 242, 0.8);
+  --danger-border: rgba(254, 202, 202, 0.7);
   --focus-ring: #09090B;
 
   /* Aliases for Full Backward Compatibility */
@@ -163,7 +181,8 @@
 html,
 body {
   min-height: 100vh;
-  background-color: var(--page-background);
+  background: var(--glass-canvas-bg);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -191,28 +210,69 @@ p {
   font-weight: 700;
 }
 
-
-/* Full-page grid lines removed in favor of calm, clean background */
-.bg-mesh {
-  display: none;
+/* Glassmorphism Primitives */
+.glass-panel,
+.glass-card {
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  transition: all var(--duration-fast) var(--ease-snappy);
 }
 
-/* Clean Professional Surface Card */
-.glass-panel {
-  background: var(--surface-primary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--duration-fast) var(--ease-snappy);
-}
-
-.glass-panel:hover {
-  border-color: var(--border-strong);
+.glass-panel:hover,
+.glass-card:hover {
+  background: var(--glass-surface-hover);
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-hover);
 }
 
 .glass-panel-interactive:hover {
   border-color: var(--border-active);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.glass-header {
+  background: rgba(248, 250, 252, 0.78);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.025);
+}
+
+.glass-dark-card {
+  background: rgba(9, 9, 11, 0.88);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(228, 228, 231, 0.75);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all var(--duration-fast) var(--ease-snappy);
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #09090B;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  outline: none;
 }
 
 /* Standardized Buttons - Clean, Human-Designed SaaS */
@@ -236,25 +296,31 @@ p {
 .btn-primary {
   background: var(--brand-primary);
   color: #FFFFFF;
-  border-color: var(--brand-primary);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.25);
 }
 
 .btn-primary:hover {
   background: var(--brand-primary-hover);
-  border-color: var(--brand-primary-hover);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: var(--surface-primary);
+  background: var(--glass-surface);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   color: var(--text-primary);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.85);
 }
 
 .btn-secondary:hover {
-  background: var(--surface-secondary);
-  border-color: var(--border-strong);
+  background: var(--glass-surface-hover);
+  border-color: var(--glass-border-strong);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
 }
 
 .btn-ghost {
@@ -514,9 +580,12 @@ p {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: var(--surface-primary);
-  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  box-shadow: var(--glass-shadow);
 }
 
 .metric-strip-item {
@@ -555,7 +624,9 @@ p {
 .app-sidebar {
   width: 224px;
   background: var(--sidebar-background);
-  border-right: 1px solid var(--border-subtle);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-right: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -570,7 +641,7 @@ p {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: var(--page-background);
+  background: transparent;
 }
 
 .app-header {
@@ -579,10 +650,14 @@ p {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-subtle);
-  background: var(--surface-primary);
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
   position: sticky;
   top: 0;
+  z-index: 10;
+}
   z-index: 10;
 }
 
@@ -762,10 +837,12 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: var(--surface-primary);
-  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow);
 }
 
 .editorial-metric-item {
