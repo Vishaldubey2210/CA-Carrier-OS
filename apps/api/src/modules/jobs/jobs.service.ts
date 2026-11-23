@@ -99,8 +99,8 @@ export class JobsService {
         job.normalizedTitle,
         job.locationCity
       );
-      const exists = Array.from(this.memJobs.values()).some((j) => j.fingerprint === fingerprint);
-      if (!exists) {
+      const existing = Array.from(this.memJobs.values()).find((j) => j.fingerprint === fingerprint);
+      if (!existing) {
         const id = randomUUID();
         this.memJobs.set(id, {
           id,
@@ -109,6 +109,12 @@ export class JobsService {
           expiresAt: expires.toISOString(),
           fingerprint,
         });
+      } else if (job.channel === 'ENTERPRISE') {
+        // Guarantee curated Enterprise attributes and rich matching taxonomy are preserved
+        existing.channel = 'ENTERPRISE';
+        existing.opportunityType = job.opportunityType;
+        existing.structuredRequirements = job.structuredRequirements;
+        existing.caPathway = job.caPathway;
       }
     }
 

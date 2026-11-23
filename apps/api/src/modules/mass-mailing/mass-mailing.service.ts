@@ -21,28 +21,29 @@ export class MassMailingService {
     this.ensureDataDir();
   }
 
-  private getConfigPath(): string {
+  private getUnifiedDataDir(): string {
     const candidates = [
-      path.resolve(process.cwd(), 'data', 'user_smtp_config.json'),
-      path.resolve(process.cwd(), '..', '..', 'data', 'user_smtp_config.json'),
-      path.resolve(process.cwd(), '..', 'data', 'user_smtp_config.json'),
+      path.resolve(process.cwd(), 'data'),
+      path.resolve(process.cwd(), '..', 'data'),
+      path.resolve(process.cwd(), '..', '..', 'data'),
     ];
-    for (const p of candidates) {
-      if (fs.existsSync(p)) return p;
+    for (const d of candidates) {
+      if (fs.existsSync(path.join(d, 'ca_articleship_firms_5000.csv'))) {
+        return d;
+      }
+    }
+    for (const d of candidates) {
+      if (fs.existsSync(d)) return d;
     }
     return candidates[0];
   }
 
+  private getConfigPath(): string {
+    return path.join(this.getUnifiedDataDir(), 'user_smtp_config.json');
+  }
+
   private getCsvPath(): string {
-    const candidates = [
-      path.resolve(process.cwd(), 'data', 'ca_articleship_firms_5000.csv'),
-      path.resolve(process.cwd(), '..', '..', 'data', 'ca_articleship_firms_5000.csv'),
-      path.resolve(process.cwd(), '..', 'data', 'ca_articleship_firms_5000.csv'),
-    ];
-    for (const p of candidates) {
-      if (fs.existsSync(p)) return p;
-    }
-    return candidates[0];
+    return path.join(this.getUnifiedDataDir(), 'ca_articleship_firms_5000.csv');
   }
 
   private ensureDataDir() {
@@ -203,7 +204,11 @@ export class MassMailingService {
       lastUsedAt: new Date().toISOString(),
     };
 
-    fs.writeFileSync(this.getConfigPath(), JSON.stringify(record, null, 2), 'utf-8');
+    const configPath = this.getConfigPath();
+    fs.writeFileSync(configPath, JSON.stringify(record, null, 2), { encoding: 'utf-8', mode: 0o600 });
+    try {
+      fs.chmodSync(configPath, 0o600);
+    } catch {}
     this.logger.log(`Saved verified and AES-256-GCM encrypted SMTP configuration for ${record.maskedEmail}`);
 
     return {
@@ -260,6 +265,14 @@ export class MassMailingService {
     if (!fs.existsSync(p)) return null;
     try {
       const data = JSON.parse(fs.readFileSync(p, 'utf-8'));
+      // Auto-encrypt legacy plain password if detected in storage
+      if (data.appPassword && !data.appPassword.startsWith('enc:')) {
+        data.appPassword = this.encryptPassword(data.appPassword);
+        try {
+          fs.writeFileSync(p, JSON.stringify(data, null, 2), { encoding: 'utf-8', mode: 0o600 });
+          fs.chmodSync(p, 0o600);
+        } catch {}
+      }
       return {
         email: data.email,
         appPassword: this.decryptPassword(data.appPassword),

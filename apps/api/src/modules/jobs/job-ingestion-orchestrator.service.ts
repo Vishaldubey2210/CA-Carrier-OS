@@ -19,7 +19,26 @@ import { EmailService } from '../email/email.service.js';
 @Injectable()
 export class JobIngestionOrchestratorService {
   private readonly logger = new Logger(JobIngestionOrchestratorService.name);
-  private readonly storageFile = path.resolve(process.cwd(), 'data', 'jobs_store.json');
+  private getStorageFilePath(): string {
+    const candidates = [
+      path.resolve(process.cwd(), 'data'),
+      path.resolve(process.cwd(), '..', 'data'),
+      path.resolve(process.cwd(), '..', '..', 'data'),
+    ];
+    for (const d of candidates) {
+      if (fs.existsSync(path.join(d, 'ca_articleship_firms_5000.csv'))) {
+        return path.join(d, 'jobs_store.json');
+      }
+    }
+    for (const d of candidates) {
+      if (fs.existsSync(d)) return path.join(d, 'jobs_store.json');
+    }
+    return path.resolve(process.cwd(), 'data', 'jobs_store.json');
+  }
+
+  private get storageFile(): string {
+    return this.getStorageFilePath();
+  }
 
   // Distributed run lock to prevent overlapping sync executions (serverless safe)
   private isSyncRunning = false;

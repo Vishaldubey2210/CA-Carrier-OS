@@ -80,7 +80,26 @@ const VALID_TRANSITIONS: Record<ApplicationStatus, ApplicationStatus[]> = {
 @Injectable()
 export class ApplicationsService implements OnModuleInit {
   private readonly logger = new Logger(ApplicationsService.name);
-  private readonly storageFile = path.resolve(process.cwd(), 'data', 'applications_store.json');
+  private getStorageFilePath(): string {
+    const candidates = [
+      path.resolve(process.cwd(), 'data'),
+      path.resolve(process.cwd(), '..', 'data'),
+      path.resolve(process.cwd(), '..', '..', 'data'),
+    ];
+    for (const d of candidates) {
+      if (fs.existsSync(path.join(d, 'ca_articleship_firms_5000.csv'))) {
+        return path.join(d, 'applications_store.json');
+      }
+    }
+    for (const d of candidates) {
+      if (fs.existsSync(d)) return path.join(d, 'applications_store.json');
+    }
+    return path.resolve(process.cwd(), 'data', 'applications_store.json');
+  }
+
+  private get storageFile(): string {
+    return this.getStorageFilePath();
+  }
 
   // In-memory fallback stores: applicationId -> ApplicationRecord
   private readonly memApplications = new Map<string, ApplicationRecord>();
