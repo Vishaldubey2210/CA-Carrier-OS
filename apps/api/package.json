@@ -6,6 +6,7 @@
     "dev": "tsc && node --watch dist/main.js",
     "watch": "tsc -w --preserveWatchOutput",
     "prebuild": "pnpm --filter @ca-career-os/shared build && prisma generate",
+    "pretypecheck": "pnpm --filter @ca-career-os/shared build && prisma generate",
     "build": "tsc",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",

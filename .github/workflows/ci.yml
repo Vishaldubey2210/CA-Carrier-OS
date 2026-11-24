@@ -60,6 +60,12 @@ jobs:
           DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
         run: pnpm --filter @ca-career-os/api prisma migrate deploy
 
+      - name: Generate Prisma Client & Build Shared Package
+        env:
+          DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+          DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+        run: pnpm --filter @ca-career-os/shared build && pnpm --filter @ca-career-os/api prisma generate
+
       - name: TypeScript Typecheck
         run: pnpm typecheck
 
