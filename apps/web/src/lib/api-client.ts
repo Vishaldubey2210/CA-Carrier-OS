@@ -5,6 +5,8 @@
  * timeout controls, safe idempotent retries, and offline detection.
  */
 
+import { logger } from './logger';
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -132,6 +134,7 @@ class ApiClient {
     }
 
     let attempt = 0;
+    const reqStartTime = Date.now();
     while (true) {
       attempt++;
 
@@ -149,6 +152,7 @@ class ApiClient {
       }
 
       try {
+        logger.debug('ApiClient', `Outgoing ${method} ${url}`, { attempt }, undefined);
         const response = await fetch(url, {
           ...restOptions,
           headers: defaultHeaders,
@@ -167,6 +171,7 @@ class ApiClient {
         const isJson = contentType.includes('application/json');
 
         if (!response.ok) {
+          logger.warn('ApiClient', `${method} ${url} returned ${response.status}`, { status: response.status, attempt }, correlationId, Date.now() - reqStartTime);
           // Transparent 401 recovery for demo sessions: automatically acquire fresh demo token and retry once
           if (response.status === 401 && attempt === 1 && typeof window !== 'undefined') {
             try {
@@ -259,6 +264,8 @@ class ApiClient {
           );
         }
 
+        logger.info('ApiClient', `${method} ${url} -> ${response.status}`, { status: response.status }, correlationId, Date.now() - reqStartTime);
+
         if (isJson) {
           const payload = await response.json();
           if (typeof payload?.success === 'boolean') {
@@ -280,6 +287,8 @@ class ApiClient {
         };
       } catch (err: any) {
         clearTimeout(timeoutId);
+
+        logger.error('ApiClient', `${method} ${url} request failed: ${err.message}`, { error: err.message }, undefined, Date.now() - reqStartTime);
 
         if (err instanceof ApiError) {
           throw err;

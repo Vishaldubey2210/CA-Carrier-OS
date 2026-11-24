@@ -640,10 +640,10 @@ export default function AdminPortalPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
             {[
               {
-                name: 'Priya Sharma Candidate Workspace',
+                name: 'Candidate Personal Workspace',
                 id: '00000000-0000-0000-0000-0000000001w1',
                 type: 'PERSONAL',
-                owner: 'candidate.priya@cacareeros.com',
+                owner: 'candidate@cacareeros.com',
                 isolationLevel: 'CRYPTOGRAPHIC_USER_BOUNDED',
               },
               {

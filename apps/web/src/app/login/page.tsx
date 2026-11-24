@@ -343,7 +343,7 @@ export default function LoginPage() {
                     <span>CA Candidate Portal</span>
                   </div>
                   <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
-                    Priya Sharma • Statutory Audit Track
+                    CA Candidate • Statutory Audit Track
                   </div>
                 </div>
                 {isDemoLoading === 'CANDIDATE' ? (
@@ -377,7 +377,7 @@ export default function LoginPage() {
                     <span>Recruiter / Partner Workspace</span>
                   </div>
                   <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
-                    Vikram Mehta • Deloitte Partner & Hiring Manager
+                    Talent Partner • Hiring & Advisory Workspace
                   </div>
                 </div>
                 {isDemoLoading === 'RECRUITER' ? (
@@ -411,7 +411,7 @@ export default function LoginPage() {
                     <span>Platform Admin Portal</span>
                   </div>
                   <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
-                    Rajesh Gupta • Full Governance & Oversight
+                    System Admin • Full Governance & Oversight
                   </div>
                 </div>
                 {isDemoLoading === 'PLATFORM_ADMIN' ? (
