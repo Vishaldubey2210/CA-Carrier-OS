@@ -1,6 +1,37 @@
 import nodemailer from 'nodemailer';
 import crypto from 'node:crypto';
-import { logger } from './logger';
+
+// High-performance Zero-PII structured logger for auth operations
+const logStructured = (
+  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG',
+  context: string,
+  message: string,
+  meta?: Record<string, any>,
+  correlationId?: string
+) => {
+  const payload = {
+    timestamp: new Date().toISOString(),
+    level,
+    context,
+    message,
+    ...(correlationId ? { correlationId } : {}),
+    ...(meta ? { meta } : {}),
+  };
+  if (level === 'ERROR') {
+    console.error(JSON.stringify(payload));
+  } else if (level === 'WARN') {
+    console.warn(JSON.stringify(payload));
+  } else {
+    console.log(JSON.stringify(payload));
+  }
+};
+
+const logger = {
+  info: (ctx: string, msg: string, meta?: any, corr?: string) => logStructured('INFO', ctx, msg, meta, corr),
+  warn: (ctx: string, msg: string, meta?: any, corr?: string) => logStructured('WARN', ctx, msg, meta, corr),
+  error: (ctx: string, msg: string, meta?: any, corr?: string) => logStructured('ERROR', ctx, msg, meta, corr),
+  debug: (ctx: string, msg: string, meta?: any, corr?: string) => logStructured('DEBUG', ctx, msg, meta, corr),
+};
 
 export interface ChallengeRecord {
   id: string;
