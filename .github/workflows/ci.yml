@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -60,11 +60,11 @@ jobs:
           DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
         run: pnpm --filter @ca-career-os/api prisma migrate deploy
 
-      - name: Generate Prisma Client & Build Shared Package
+      - name: Generate Prisma Client & Build Monorepo (Shared & API)
         env:
           DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
           DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
-        run: pnpm --filter @ca-career-os/shared build && pnpm --filter @ca-career-os/api prisma generate
+        run: pnpm --filter @ca-career-os/shared build && pnpm --filter @ca-career-os/api prisma generate && pnpm --filter @ca-career-os/api build
 
       - name: TypeScript Typecheck
         run: pnpm typecheck
@@ -77,6 +77,8 @@ jobs:
 
       - name: Run Full Monorepo Test Suite (163 Tests)
         env:
+          DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+          DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
           NODE_ENV: test
         run: pnpm test
 
