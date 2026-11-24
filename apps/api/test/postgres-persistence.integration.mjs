@@ -106,7 +106,7 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
     assert.equal(prismaService.isDatabaseConnected(), true, 'PrismaService must be connected to PostgreSQL');
 
     workspaceService = new WorkspaceService(prismaService);
-    authService = new AuthService(prismaService, jwtSecret, workspaceService);
+    authService = new AuthService(prismaService, workspaceService);
     careerService = new CareerService(prismaService);
     jobsService = new JobsService(prismaService);
     applicationsService = new ApplicationsService(prismaService, jobsService);

@@ -102,11 +102,23 @@ export class AuthService implements OnModuleInit {
   private readonly memChallenges = new Map<string, InMemoryChallenge>();
   private readonly memEmailTokens = new Map<string, InMemoryEmailVerification>();
 
+  private readonly workspaceService: WorkspaceService;
+  private readonly emailService: EmailService;
+
   constructor(
     private readonly prisma: PrismaService,
-    private readonly workspaceService: WorkspaceService,
-    @Optional() private readonly emailService: EmailService = new EmailService()
-  ) {}
+    workspaceServiceOrSecret: any,
+    @Optional() workspaceServiceOrEmail?: any,
+    @Optional() emailService: EmailService = new EmailService()
+  ) {
+    if (typeof workspaceServiceOrSecret === 'string') {
+      this.workspaceService = workspaceServiceOrEmail;
+      this.emailService = emailService || new EmailService();
+    } else {
+      this.workspaceService = workspaceServiceOrSecret;
+      this.emailService = (workspaceServiceOrEmail instanceof EmailService ? workspaceServiceOrEmail : emailService) || new EmailService();
+    }
+  }
 
   async onModuleInit(): Promise<void> {
     await this.seedDemoUsers();
