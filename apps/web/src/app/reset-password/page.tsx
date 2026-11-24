@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Lock, Key, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Lock, Key, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { apiClient } from '../../lib/api-client';
 
 function ResetPasswordContent() {
@@ -13,6 +13,8 @@ function ResetPasswordContent() {
   const [token, setToken] = useState(initialToken);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -186,14 +188,14 @@ function ResetPasswordContent() {
               <div style={{ position: 'relative' }}>
                 <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)' }} />
                 <input
-                  type="password"
+                  type={showNewPassword ? 'text' : 'password'}
                   required
                   placeholder="Enter 12+ character password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '0.625rem 0.875rem 0.625rem 2.5rem',
+                    padding: '0.625rem 2.5rem 0.625rem 2.5rem',
                     borderRadius: 'var(--radius-md)',
                     background: 'var(--surface-secondary)',
                     border: '1px solid var(--border-subtle)',
@@ -201,6 +203,27 @@ function ResetPasswordContent() {
                     fontSize: '0.875rem',
                   }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
@@ -211,14 +234,14 @@ function ResetPasswordContent() {
               <div style={{ position: 'relative' }}>
                 <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)' }} />
                 <input
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   required
                   placeholder="Re-enter new password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '0.625rem 0.875rem 0.625rem 2.5rem',
+                    padding: '0.625rem 2.5rem 0.625rem 2.5rem',
                     borderRadius: 'var(--radius-md)',
                     background: 'var(--surface-secondary)',
                     border: '1px solid var(--border-subtle)',
@@ -226,6 +249,27 @@ function ResetPasswordContent() {
                     fontSize: '0.875rem',
                   }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 

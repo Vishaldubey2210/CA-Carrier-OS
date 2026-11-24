@@ -18,6 +18,8 @@ import {
   KeyRound,
   RefreshCw,
   ArrowLeft,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 export default function RegisterPage() {
@@ -35,6 +37,7 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>(UserRole.CANDIDATE);
   const [organizationName, setOrganizationName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +46,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'FORM' | 'OTP'>('FORM');
   const [challengeId, setChallengeId] = useState<string>('');
   const [maskedEmail, setMaskedEmail] = useState<string>('');
+  const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
@@ -100,6 +104,7 @@ export default function RegisterPage() {
       setChallengeId(res.challengeId);
       setMaskedEmail(res.maskedEmail || email);
       setResendCooldown(res.resendCooldownSeconds || 60);
+      setDeliveryNote(res.deliveryNote || null);
       setStep('OTP');
       setError(null);
     } else {
@@ -167,6 +172,7 @@ export default function RegisterPage() {
     if (res.success) {
       setResendCooldown(60);
       setResendSuccess(res.message || 'A fresh verification code has been dispatched to your email.');
+      setDeliveryNote(res.deliveryNote || null);
       setOtpDigits(['', '', '', '', '', '']);
       digitRefs[0]?.current?.focus();
     } else {
@@ -453,14 +459,14 @@ export default function RegisterPage() {
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 12 characters"
                     required
                     style={{
                       width: '100%',
-                      padding: '0.55rem 0.75rem 0.55rem 2.25rem',
+                      padding: '0.55rem 2.5rem 0.55rem 2.25rem',
                       borderRadius: '6px',
                       background: 'var(--surface-secondary, #f8fafc)',
                       border: password.length > 0 && password.length < 12 ? '1px solid #f87171' : '1px solid var(--border-subtle, #cbd5e1)',
@@ -474,6 +480,27 @@ export default function RegisterPage() {
                     color="var(--text-muted, #94a3b8)"
                     style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '0.65rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'transparent',
+                      border: 'none',
+                      padding: '4px',
+                      cursor: 'pointer',
+                      color: 'var(--text-muted, #94a3b8)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.375rem', fontSize: '0.75rem', color: password.length >= 12 ? '#059669' : 'var(--text-muted, #94a3b8)' }}>
                   <CheckCircle2 size={13} />
@@ -529,6 +556,27 @@ export default function RegisterPage() {
         {/* STEP 2: SLEEK 3+3 COMPACT OTP VERIFICATION */}
         {step === 'OTP' && (
           <form onSubmit={handleOtpSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {deliveryNote && (
+              <div
+                style={{
+                  padding: '0.75rem 0.875rem',
+                  borderRadius: '8px',
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  color: '#b45309',
+                  fontSize: '0.8125rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.5rem',
+                  lineHeight: 1.4,
+                  textAlign: 'left',
+                }}
+              >
+                <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+                <span>{deliveryNote}</span>
+              </div>
+            )}
+
             <div style={{ textAlign: 'center' }}>
               <label
                 style={{

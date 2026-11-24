@@ -69,10 +69,10 @@ export function getSmtpConfig() {
   const host = process.env.SMTP_HOST?.trim() || 'smtp.gmail.com';
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
   const secure = process.env.SMTP_SECURE === 'true' || port === 465;
-  const user = process.env.SMTP_USER?.trim() || '';
-  const pass = process.env.SMTP_PASS?.trim() || '';
-  const fromEmail = process.env.SMTP_FROM_EMAIL?.trim() || user;
-  const fromName = process.env.SMTP_FROM_NAME?.trim() || 'CharteredOS — CA Career OS';
+  const user = process.env.SMTP_USER?.replace(/^["']|["']$/g, '').trim() || '';
+  const pass = process.env.SMTP_PASS?.replace(/^["']|["']$/g, '').trim() || '';
+  const fromEmail = process.env.SMTP_FROM_EMAIL?.replace(/^["']|["']$/g, '').trim() || user;
+  const fromName = process.env.SMTP_FROM_NAME?.replace(/^["']|["']$/g, '').trim() || 'CharteredOS — CA Career OS';
 
   return { host, port, secure, user, pass, fromEmail, fromName };
 }
@@ -191,7 +191,7 @@ export async function sendOtpViaSmtp(
     console.log(`========================================================================\n`);
 
     const note = err.message?.includes('534')
-      ? 'Google SMTP security challenge (534 WebLoginRequired). Visit https://accounts.google.com/DisplayUnlockCaptcha or generate an App Password in your Google Account.'
+      ? 'Google SMTP security notice (534 WebLoginRequired): Gmail requires a 16-character Google App Password with 2-Step Verification enabled. Normal account passwords are not accepted by Google for SMTP.'
       : err.message;
 
     return {
@@ -264,7 +264,7 @@ export async function createOtpChallenge(
     maskedEmail: maskEmail(email),
     expiresInSeconds,
     resendCooldownSeconds,
-    deliveryNote: process.env.NODE_ENV === 'test' ? dispatch.note : undefined,
+    deliveryNote: dispatch.note || undefined,
     previewCode: process.env.NODE_ENV === 'test' ? otpCode : undefined,
   };
 }
@@ -312,7 +312,7 @@ export async function resendOtpChallenge(
     message: 'A fresh verification code has been dispatched.',
     expiresInSeconds: 300,
     resendCooldownSeconds: 60,
-    deliveryNote: process.env.NODE_ENV === 'test' ? dispatch.note : undefined,
+    deliveryNote: dispatch.note || undefined,
     previewCode: process.env.NODE_ENV === 'test' ? otpCode : undefined,
   };
 }
