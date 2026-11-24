@@ -43,8 +43,6 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'FORM' | 'OTP'>('FORM');
   const [challengeId, setChallengeId] = useState<string>('');
   const [maskedEmail, setMaskedEmail] = useState<string>('');
-  const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
-  const [previewCode, setPreviewCode] = useState<string | null>(null);
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
@@ -59,7 +57,7 @@ export default function RegisterPage() {
     useRef<HTMLInputElement>(null),
   ];
 
-  // Cooldown countdown timer
+  // Resend cooldown countdown timer
   useEffect(() => {
     if (resendCooldown <= 0) return;
     const timer = setInterval(() => {
@@ -68,7 +66,7 @@ export default function RegisterPage() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  // Focus first digit box when switching to OTP
+  // Auto-focus first digit box when transitioning to OTP
   useEffect(() => {
     if (step === 'OTP') {
       digitRefs[0]?.current?.focus();
@@ -80,7 +78,7 @@ export default function RegisterPage() {
     setError(null);
 
     if (password.length < 12) {
-      setError('Password must be at least 12 characters long for enterprise security.');
+      setError('Password must contain at least 12 characters to meet regulatory security standards.');
       return;
     }
 
@@ -94,7 +92,7 @@ export default function RegisterPage() {
     });
 
     if (!res.success) {
-      setError(res.error || 'Registration failed. Please check your details.');
+      setError(res.error || 'Registration failed. Please check your details and try again.');
       return;
     }
 
@@ -102,8 +100,6 @@ export default function RegisterPage() {
       setChallengeId(res.challengeId);
       setMaskedEmail(res.maskedEmail || email);
       setResendCooldown(res.resendCooldownSeconds || 60);
-      setDeliveryNote(res.deliveryNote || null);
-      setPreviewCode(res.previewCode || null);
       setStep('OTP');
       setError(null);
     } else {
@@ -144,7 +140,7 @@ export default function RegisterPage() {
     e.preventDefault();
     const code = otpDigits.join('');
     if (code.length !== 6) {
-      setError('Please enter all 6 digits of your verification code.');
+      setError('Please enter all 6 digits of the verification code sent to your email.');
       return;
     }
 
@@ -158,7 +154,7 @@ export default function RegisterPage() {
     if (res.success) {
       router.push('/dashboard');
     } else {
-      setError(res.error || 'Verification code failed. Please check the code and try again.');
+      setError(res.error || 'Invalid or expired verification code. Please check and try again.');
     }
   };
 
@@ -170,13 +166,11 @@ export default function RegisterPage() {
     const res = await resendOtp(challengeId);
     if (res.success) {
       setResendCooldown(60);
-      setResendSuccess(res.message || 'A fresh verification code has been dispatched.');
-      if (res.deliveryNote) setDeliveryNote(res.deliveryNote);
-      if (res.previewCode) setPreviewCode(res.previewCode);
+      setResendSuccess(res.message || 'A fresh verification code has been dispatched to your email.');
       setOtpDigits(['', '', '', '', '', '']);
       digitRefs[0]?.current?.focus();
     } else {
-      setError(res.error || 'Failed to resend verification code. Please try again.');
+      setError(res.error || 'Failed to resend code. Please wait a moment and try again.');
     }
   };
 
@@ -194,49 +188,57 @@ export default function RegisterPage() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 'calc(100vh - 120px)',
-        padding: '2rem 1.5rem',
+        padding: '2rem 1rem',
       }}
     >
       <div
         className="glass-panel"
         style={{
           width: '100%',
-          maxWidth: '500px',
-          padding: '2.5rem 2rem',
+          maxWidth: '450px',
+          padding: '2.25rem 2rem',
           position: 'relative',
-          overflow: 'hidden',
-          background: 'var(--surface-primary)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-md)',
+          background: 'var(--surface-primary, #ffffff)',
+          border: '1px solid var(--border-subtle, #e2e8f0)',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
         }}
       >
+        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'var(--brand-primary)',
+              width: '44px',
+              height: '44px',
+              borderRadius: '10px',
+              background: 'var(--brand-primary, #0284c7)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
               fontWeight: 800,
-              fontSize: '1.25rem',
+              fontSize: '1.125rem',
               marginBottom: '0.75rem',
-              boxShadow: 'var(--shadow-sm)',
+              boxShadow: '0 2px 4px rgba(2, 132, 199, 0.2)',
             }}
           >
             CA
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
-            {step === 'FORM' ? 'Create Your Account' : 'Verify Your Email'}
+          <h1
+            style={{
+              fontSize: '1.375rem',
+              fontWeight: 700,
+              color: 'var(--text-primary, #0f172a)',
+              letterSpacing: '-0.02em',
+              marginBottom: '0.25rem',
+            }}
+          >
+            {step === 'FORM' ? 'Create your account' : 'Check your email'}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+          <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
             {step === 'FORM'
-              ? 'Join the Chartered Accountancy Operating System'
-              : `Security code dispatched to ${maskedEmail}`}
+              ? 'Sovereign career platform for Chartered Accountants'
+              : `We sent a 6-digit verification code to ${maskedEmail}`}
           </p>
         </div>
 
@@ -244,19 +246,20 @@ export default function RegisterPage() {
         {error && (
           <div
             style={{
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#fca5a5',
+              padding: '0.75rem 0.875rem',
+              borderRadius: '8px',
+              background: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              color: '#dc2626',
               fontSize: '0.8125rem',
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               gap: '0.5rem',
               marginBottom: '1.25rem',
+              lineHeight: 1.4,
             }}
           >
-            <AlertCircle size={16} style={{ flexShrink: 0 }} />
+            <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
             <span>{error}</span>
           </div>
         )}
@@ -265,11 +268,11 @@ export default function RegisterPage() {
         {resendSuccess && (
           <div
             style={{
-              padding: '0.75rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              background: 'rgba(16, 185, 129, 0.12)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              color: '#6ee7b7',
+              padding: '0.75rem 0.875rem',
+              borderRadius: '8px',
+              background: 'rgba(16, 185, 129, 0.08)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              color: '#059669',
               fontSize: '0.8125rem',
               display: 'flex',
               alignItems: 'center',
@@ -282,35 +285,35 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* STEP 1: REGISTRATION FORM */}
+        {/* STEP 1: REGISTRATION DETAILS FORM */}
         {step === 'FORM' && (
           <>
-            {/* Role Selector Tabs */}
+            {/* Role Selector Segmented Control */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gap: '0.5rem',
+                gap: '0.25rem',
                 padding: '0.25rem',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--surface-secondary)',
-                border: '1px solid var(--border-subtle)',
-                marginBottom: '1.5rem',
+                borderRadius: '8px',
+                background: 'var(--surface-secondary, #f1f5f9)',
+                border: '1px solid var(--border-subtle, #e2e8f0)',
+                marginBottom: '1.25rem',
               }}
             >
               <button
                 type="button"
                 onClick={() => setRole(UserRole.CANDIDATE)}
                 style={{
-                  padding: '0.5rem',
-                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.45rem',
+                  borderRadius: '6px',
                   border: 'none',
                   cursor: 'pointer',
                   fontWeight: 600,
                   fontSize: '0.8125rem',
-                  transition: 'all 0.2s ease',
-                  background: role === UserRole.CANDIDATE ? 'var(--brand-primary)' : 'transparent',
-                  color: role === UserRole.CANDIDATE ? '#ffffff' : 'var(--text-secondary)',
+                  transition: 'all 0.15s ease',
+                  background: role === UserRole.CANDIDATE ? 'var(--brand-primary, #0284c7)' : 'transparent',
+                  color: role === UserRole.CANDIDATE ? '#ffffff' : 'var(--text-secondary, #64748b)',
                 }}
               >
                 CA Candidate
@@ -319,62 +322,62 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setRole(UserRole.RECRUITER)}
                 style={{
-                  padding: '0.5rem',
-                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.45rem',
+                  borderRadius: '6px',
                   border: 'none',
                   cursor: 'pointer',
                   fontWeight: 600,
                   fontSize: '0.8125rem',
-                  transition: 'all 0.2s ease',
-                  background: role === UserRole.RECRUITER ? 'var(--brand-primary)' : 'transparent',
-                  color: role === UserRole.RECRUITER ? '#ffffff' : 'var(--text-secondary)',
+                  transition: 'all 0.15s ease',
+                  background: role === UserRole.RECRUITER ? 'var(--brand-primary, #0284c7)' : 'transparent',
+                  color: role === UserRole.RECRUITER ? '#ffffff' : 'var(--text-secondary, #64748b)',
                 }}
               >
-                Employer / Recruiter
+                Employer / Firm
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.375rem' }}>
-                    First Name
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary, #475569)', marginBottom: '0.375rem' }}>
+                    First name
                   </label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Rohan"
+                    placeholder="e.g. Rohan"
                     required
                     style={{
                       width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
+                      padding: '0.55rem 0.75rem',
+                      borderRadius: '6px',
+                      background: 'var(--surface-secondary, #f8fafc)',
+                      border: '1px solid var(--border-subtle, #cbd5e1)',
+                      color: 'var(--text-primary, #0f172a)',
                       fontSize: '0.875rem',
                       outline: 'none',
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.375rem' }}>
-                    Last Name
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary, #475569)', marginBottom: '0.375rem' }}>
+                    Last name
                   </label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Sharma"
+                    placeholder="e.g. Sharma"
                     required
                     style={{
                       width: '100%',
-                      padding: '0.625rem 0.875rem',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
+                      padding: '0.55rem 0.75rem',
+                      borderRadius: '6px',
+                      background: 'var(--surface-secondary, #f8fafc)',
+                      border: '1px solid var(--border-subtle, #cbd5e1)',
+                      color: 'var(--text-primary, #0f172a)',
                       fontSize: '0.875rem',
                       outline: 'none',
                     }}
@@ -383,30 +386,30 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.375rem' }}>
-                  Email Address
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary, #475569)', marginBottom: '0.375rem' }}>
+                  Email address
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="rohan.sharma@example.com"
+                    placeholder="name@example.com"
                     required
                     style={{
                       width: '100%',
-                      padding: '0.625rem 0.875rem 0.625rem 2.25rem',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
+                      padding: '0.55rem 0.75rem 0.55rem 2.25rem',
+                      borderRadius: '6px',
+                      background: 'var(--surface-secondary, #f8fafc)',
+                      border: '1px solid var(--border-subtle, #cbd5e1)',
+                      color: 'var(--text-primary, #0f172a)',
                       fontSize: '0.875rem',
                       outline: 'none',
                     }}
                   />
                   <Mail
-                    size={16}
-                    color="var(--text-muted)"
+                    size={15}
+                    color="var(--text-muted, #94a3b8)"
                     style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
                   />
                 </div>
@@ -414,30 +417,30 @@ export default function RegisterPage() {
 
               {role === UserRole.RECRUITER && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.375rem' }}>
-                    Organization / Firm Name
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary, #475569)', marginBottom: '0.375rem' }}>
+                    Firm or company name
                   </label>
                   <div style={{ position: 'relative' }}>
                     <input
                       type="text"
                       value={organizationName}
                       onChange={(e) => setOrganizationName(e.target.value)}
-                      placeholder="KPMG Global Services"
+                      placeholder="e.g. Grant Thornton Bharat"
                       required
                       style={{
                         width: '100%',
-                        padding: '0.625rem 0.875rem 0.625rem 2.25rem',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'var(--surface-secondary)',
-                        border: '1px solid var(--border-subtle)',
-                        color: 'var(--text-primary)',
+                        padding: '0.55rem 0.75rem 0.55rem 2.25rem',
+                        borderRadius: '6px',
+                        background: 'var(--surface-secondary, #f8fafc)',
+                        border: '1px solid var(--border-subtle, #cbd5e1)',
+                        color: 'var(--text-primary, #0f172a)',
                         fontSize: '0.875rem',
                         outline: 'none',
                       }}
                     />
                     <Building
-                      size={16}
-                      color="var(--text-muted)"
+                      size={15}
+                      color="var(--text-muted, #94a3b8)"
                       style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
                     />
                   </div>
@@ -445,36 +448,36 @@ export default function RegisterPage() {
               )}
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.375rem' }}>
-                  Password (minimum 12 characters)
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary, #475569)', marginBottom: '0.375rem' }}>
+                  Password
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
+                    placeholder="At least 12 characters"
                     required
                     style={{
                       width: '100%',
-                      padding: '0.625rem 0.875rem 0.625rem 2.25rem',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-secondary)',
-                      border: password.length > 0 && password.length < 12 ? '1px solid var(--accent-rose)' : '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
+                      padding: '0.55rem 0.75rem 0.55rem 2.25rem',
+                      borderRadius: '6px',
+                      background: 'var(--surface-secondary, #f8fafc)',
+                      border: password.length > 0 && password.length < 12 ? '1px solid #f87171' : '1px solid var(--border-subtle, #cbd5e1)',
+                      color: 'var(--text-primary, #0f172a)',
                       fontSize: '0.875rem',
                       outline: 'none',
                     }}
                   />
                   <Lock
-                    size={16}
-                    color="var(--text-muted)"
+                    size={15}
+                    color="var(--text-muted, #94a3b8)"
                     style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
                   />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.375rem', fontSize: '0.75rem', color: password.length >= 12 ? 'var(--accent-emerald)' : 'var(--text-muted)' }}>
-                  <CheckCircle2 size={12} />
-                  <span>{password.length >= 12 ? 'Security criteria met (12+ characters)' : `${Math.max(0, 12 - password.length)} more characters needed`}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.375rem', fontSize: '0.75rem', color: password.length >= 12 ? '#059669' : 'var(--text-muted, #94a3b8)' }}>
+                  <CheckCircle2 size={13} />
+                  <span>{password.length >= 12 ? '12+ character security requirement met' : `${Math.max(0, 12 - password.length)} more characters required`}</span>
                 </div>
               </div>
 
@@ -482,151 +485,177 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={isLoading}
                 className="btn btn-primary"
-                style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', opacity: isLoading ? 0.7 : 1 }}
+                style={{
+                  width: '100%',
+                  padding: '0.7rem',
+                  marginTop: '0.5rem',
+                  borderRadius: '6px',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  background: 'var(--brand-primary, #0284c7)',
+                  color: '#ffffff',
+                  border: 'none',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  opacity: isLoading ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                }}
               >
                 {isLoading ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    <span>Dispatching OTP via SMTP...</span>
+                    <span>Sending verification code...</span>
                   </>
                 ) : (
                   <>
-                    <span>Create Account &amp; Get Code</span>
+                    <span>Create account &amp; verify email</span>
                     <ArrowRight size={16} />
                   </>
                 )}
               </button>
             </form>
 
-            <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+            <div style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-secondary, #64748b)' }}>
               Already have an account?{' '}
-              <Link href="/login" style={{ color: 'var(--brand-primary)', fontWeight: 600, textDecoration: 'none' }}>
+              <Link href="/login" style={{ color: 'var(--brand-primary, #0284c7)', fontWeight: 600, textDecoration: 'none' }}>
                 Sign in
               </Link>
             </div>
           </>
         )}
 
-        {/* STEP 2: OTP VERIFICATION FORM */}
+        {/* STEP 2: SLEEK 3+3 COMPACT OTP VERIFICATION */}
         {step === 'OTP' && (
           <form onSubmit={handleOtpSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Sandbox / SMTP Notice pill if present */}
-            {previewCode && (
-              <div
+            <div style={{ textAlign: 'center' }}>
+              <label
                 style={{
-                  padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(59, 130, 246, 0.08)',
-                  border: '1px solid rgba(59, 130, 246, 0.25)',
-                  color: 'var(--text-primary)',
+                  display: 'block',
                   fontSize: '0.8125rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '0.5rem',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary, #475569)',
+                  marginBottom: '0.75rem',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <ShieldCheck size={16} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
-                  <span>
-                    Verification Code: <strong>{previewCode}</strong>
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const chars = previewCode.slice(0, 6).split('');
-                    setOtpDigits(chars);
-                    digitRefs[5]?.current?.focus();
-                  }}
-                  style={{
-                    background: 'var(--brand-primary)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: '#ffffff',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    padding: '0.25rem 0.625rem',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Auto-Fill
-                </button>
-              </div>
-            )}
+                Enter 6-digit code
+              </label>
 
-            <div>
+              {/* Compact, beautifully proportioned 3+3 OTP Input boxes */}
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: '0.625rem',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  margin: '0.5rem 0',
                 }}
               >
-                <label
+                {/* First 3 digits */}
+                {otpDigits.slice(0, 3).map((digit, i) => {
+                  const idx = i;
+                  return (
+                    <input
+                      key={idx}
+                      ref={digitRefs[idx]}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(idx, e)}
+                      aria-label={`Digit ${idx + 1}`}
+                      style={{
+                        width: '44px',
+                        height: '48px',
+                        textAlign: 'center',
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                        fontVariantNumeric: 'tabular-nums',
+                        borderRadius: '8px',
+                        background: 'var(--surface-secondary, #f8fafc)',
+                        border: digit ? '1.5px solid var(--brand-primary, #0284c7)' : '1px solid var(--border-subtle, #cbd5e1)',
+                        color: 'var(--text-primary, #0f172a)',
+                        outline: 'none',
+                        boxShadow: digit ? '0 1px 2px rgba(2, 132, 199, 0.08)' : 'none',
+                        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                      }}
+                    />
+                  );
+                })}
+
+                {/* Subtle center dash separator */}
+                <div
                   style={{
-                    fontSize: '0.8125rem',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
+                    width: '8px',
+                    height: '2px',
+                    background: 'var(--border-subtle, #cbd5e1)',
+                    borderRadius: '1px',
+                    margin: '0 0.125rem',
+                    flexShrink: 0,
                   }}
-                >
-                  Enter 6-Digit Verification Code
-                </label>
-                <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-                  Expires in 5 mins
-                </span>
+                />
+
+                {/* Second 3 digits */}
+                {otpDigits.slice(3, 6).map((digit, i) => {
+                  const idx = i + 3;
+                  return (
+                    <input
+                      key={idx}
+                      ref={digitRefs[idx]}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(idx, e)}
+                      aria-label={`Digit ${idx + 1}`}
+                      style={{
+                        width: '44px',
+                        height: '48px',
+                        textAlign: 'center',
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                        fontVariantNumeric: 'tabular-nums',
+                        borderRadius: '8px',
+                        background: 'var(--surface-secondary, #f8fafc)',
+                        border: digit ? '1.5px solid var(--brand-primary, #0284c7)' : '1px solid var(--border-subtle, #cbd5e1)',
+                        color: 'var(--text-primary, #0f172a)',
+                        outline: 'none',
+                        boxShadow: digit ? '0 1px 2px rgba(2, 132, 199, 0.08)' : 'none',
+                        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                      }}
+                    />
+                  );
+                })}
               </div>
 
-              {/* 6 Digit Inputs */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(6, 1fr)',
-                  gap: '0.5rem',
-                }}
-              >
-                {otpDigits.map((digit, idx) => (
-                  <input
-                    key={idx}
-                    ref={digitRefs[idx]}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(idx, e)}
-                    aria-label={`Digit ${idx + 1}`}
-                    style={{
-                      height: '52px',
-                      textAlign: 'center',
-                      fontSize: '1.25rem',
-                      fontWeight: 700,
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
-                      outline: 'none',
-                      transition: 'border-color 0.15s ease',
-                    }}
-                  />
-                ))}
-              </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.5rem', marginBottom: 0 }}>
+                Verification code expires in 5 minutes
+              </p>
             </div>
 
-            {/* Resend Action & Timer */}
+            {/* Resend Action & Cooldown */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                fontSize: '0.75rem',
-                color: 'var(--text-muted)',
+                fontSize: '0.8125rem',
+                color: 'var(--text-muted, #64748b)',
+                padding: '0 0.25rem',
               }}
             >
-              <span>Didn&apos;t receive code?</span>
+              <span>Didn&apos;t receive it?</span>
               {resendCooldown > 0 ? (
-                <span style={{ color: 'var(--text-muted)' }}>
+                <span style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '0.75rem' }}>
                   Resend available in {resendCooldown}s
                 </span>
               ) : (
@@ -636,22 +665,23 @@ export default function RegisterPage() {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: 'var(--brand-primary)',
+                    color: 'var(--brand-primary, #0284c7)',
                     cursor: 'pointer',
                     fontWeight: 600,
                     padding: 0,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.25rem',
+                    fontSize: '0.8125rem',
                   }}
                 >
                   <RefreshCw size={12} />
-                  <span>Resend Code</span>
+                  <span>Resend code</span>
                 </button>
               )}
             </div>
 
-            {/* Submit Verification */}
+            {/* Submit Verification Button */}
             <button
               type="submit"
               disabled={isVerifying || otpDigits.join('').length !== 6}
@@ -659,43 +689,55 @@ export default function RegisterPage() {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                marginTop: '0.5rem',
-                opacity: isVerifying || otpDigits.join('').length !== 6 ? 0.6 : 1,
+                borderRadius: '6px',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                background: 'var(--brand-primary, #0284c7)',
+                color: '#ffffff',
+                border: 'none',
+                cursor: isVerifying || otpDigits.join('').length !== 6 ? 'not-allowed' : 'pointer',
+                opacity: isVerifying || otpDigits.join('').length !== 6 ? 0.5 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                transition: 'opacity 0.15s ease',
               }}
             >
               {isVerifying ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  <span>Verifying &amp; Saving Account...</span>
+                  <span>Activating account...</span>
                 </>
               ) : (
                 <>
                   <KeyRound size={16} />
-                  <span>Verify &amp; Launch Workspace</span>
+                  <span>Verify email &amp; enter workspace</span>
                 </>
               )}
             </button>
 
             {/* Back to Edit Details */}
-            <button
-              type="button"
-              onClick={handleBackToForm}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                fontSize: '0.8125rem',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.375rem',
-                marginTop: '0.25rem',
-              }}
-            >
-              <ArrowLeft size={14} />
-              <span>Change email or details</span>
-            </button>
+            <div style={{ textAlign: 'center', marginTop: '0.25rem' }}>
+              <button
+                type="button"
+                onClick={handleBackToForm}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted, #64748b)',
+                  fontSize: '0.8125rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  padding: '0.25rem 0.5rem',
+                }}
+              >
+                <ArrowLeft size={13} />
+                <span>Use a different email</span>
+              </button>
+            </div>
           </form>
         )}
       </div>

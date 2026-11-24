@@ -145,8 +145,11 @@ export async function sendOtpViaSmtp(
         user: smtp.user,
         pass: smtp.pass,
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 5000,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      connectionTimeout: 12000,
+      greetingTimeout: 6000,
       socketTimeout: 15000,
     });
 
@@ -254,8 +257,8 @@ export async function createOtpChallenge(
     maskedEmail: maskEmail(email),
     expiresInSeconds,
     resendCooldownSeconds,
-    deliveryNote: dispatch.note,
-    previewCode: dispatch.simulated ? otpCode : undefined,
+    deliveryNote: process.env.NODE_ENV === 'test' ? dispatch.note : undefined,
+    previewCode: process.env.NODE_ENV === 'test' ? otpCode : undefined,
   };
 }
 
@@ -302,8 +305,8 @@ export async function resendOtpChallenge(
     message: 'A fresh verification code has been dispatched.',
     expiresInSeconds: 300,
     resendCooldownSeconds: 60,
-    deliveryNote: dispatch.note,
-    previewCode: dispatch.simulated ? otpCode : undefined,
+    deliveryNote: process.env.NODE_ENV === 'test' ? dispatch.note : undefined,
+    previewCode: process.env.NODE_ENV === 'test' ? otpCode : undefined,
   };
 }
 

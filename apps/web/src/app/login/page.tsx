@@ -36,7 +36,6 @@ export default function LoginPage() {
   const [step, setStep] = useState<'CREDENTIALS' | 'OTP'>('CREDENTIALS');
   const [challengeId, setChallengeId] = useState<string>('');
   const [maskedEmail, setMaskedEmail] = useState<string>('');
-  const [previewCode, setPreviewCode] = useState<string | null>(null);
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
@@ -86,7 +85,6 @@ export default function LoginPage() {
       setChallengeId(res.challengeId);
       setMaskedEmail(res.maskedEmail || email);
       setResendCooldown(res.resendCooldownSeconds || 60);
-      if (res.previewCode) setPreviewCode(res.previewCode);
       setStep('OTP');
       setError(null);
     } else {
@@ -157,7 +155,6 @@ export default function LoginPage() {
     if (res.success) {
       setResendCooldown(60);
       setResendSuccess(res.message || 'A fresh verification code has been dispatched.');
-      if (res.previewCode) setPreviewCode(res.previewCode);
       setOtpDigits(['', '', '', '', '', '']);
       digitRefs[0]?.current?.focus();
     } else {
@@ -388,108 +385,117 @@ export default function LoginPage() {
         {/* STEP 2: EMAIL OTP VERIFICATION FORM */}
         {step === 'OTP' && (
           <form onSubmit={handleOtpSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Sandbox / SMTP Notice pill if present */}
-            {previewCode && (
-              <div
+            <div style={{ textAlign: 'center' }}>
+              <label
                 style={{
-                  padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(59, 130, 246, 0.08)',
-                  border: '1px solid rgba(59, 130, 246, 0.25)',
-                  color: 'var(--text-primary)',
+                  display: 'block',
                   fontSize: '0.8125rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '0.5rem',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary, #475569)',
+                  marginBottom: '0.75rem',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <ShieldCheck size={16} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
-                  <span>
-                    Verification Code: <strong>{previewCode}</strong>
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const chars = previewCode.slice(0, 6).split('');
-                    setOtpDigits(chars);
-                    digitRefs[5]?.current?.focus();
-                  }}
-                  style={{
-                    background: 'var(--brand-primary)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: '#ffffff',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    padding: '0.25rem 0.625rem',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Auto-Fill
-                </button>
-              </div>
-            )}
+                Enter 6-digit verification code
+              </label>
 
-            <div>
+              {/* Compact, beautifully proportioned 3+3 OTP Input boxes */}
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: '0.625rem',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  margin: '0.5rem 0',
                 }}
               >
-                <label
+                {/* First 3 digits */}
+                {otpDigits.slice(0, 3).map((digit, i) => {
+                  const idx = i;
+                  return (
+                    <input
+                      key={idx}
+                      ref={digitRefs[idx]}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(idx, e)}
+                      aria-label={`Digit ${idx + 1}`}
+                      style={{
+                        width: '44px',
+                        height: '48px',
+                        textAlign: 'center',
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                        fontVariantNumeric: 'tabular-nums',
+                        borderRadius: '8px',
+                        background: 'var(--surface-secondary, #f8fafc)',
+                        border: digit ? '1.5px solid var(--brand-primary, #0284c7)' : '1px solid var(--border-subtle, #cbd5e1)',
+                        color: 'var(--text-primary, #0f172a)',
+                        outline: 'none',
+                        boxShadow: digit ? '0 1px 2px rgba(2, 132, 199, 0.08)' : 'none',
+                        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                      }}
+                    />
+                  );
+                })}
+
+                {/* Subtle center dash separator */}
+                <div
                   style={{
-                    fontSize: '0.8125rem',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
+                    width: '8px',
+                    height: '2px',
+                    background: 'var(--border-subtle, #cbd5e1)',
+                    borderRadius: '1px',
+                    margin: '0 0.125rem',
+                    flexShrink: 0,
                   }}
-                >
-                  Enter 6-Digit Verification Code
-                </label>
-                <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-                  Expires in 5 mins
-                </span>
+                />
+
+                {/* Second 3 digits */}
+                {otpDigits.slice(3, 6).map((digit, i) => {
+                  const idx = i + 3;
+                  return (
+                    <input
+                      key={idx}
+                      ref={digitRefs[idx]}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(idx, e)}
+                      aria-label={`Digit ${idx + 1}`}
+                      style={{
+                        width: '44px',
+                        height: '48px',
+                        textAlign: 'center',
+                        fontSize: '1.25rem',
+                        fontWeight: 600,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                        fontVariantNumeric: 'tabular-nums',
+                        borderRadius: '8px',
+                        background: 'var(--surface-secondary, #f8fafc)',
+                        border: digit ? '1.5px solid var(--brand-primary, #0284c7)' : '1px solid var(--border-subtle, #cbd5e1)',
+                        color: 'var(--text-primary, #0f172a)',
+                        outline: 'none',
+                        boxShadow: digit ? '0 1px 2px rgba(2, 132, 199, 0.08)' : 'none',
+                        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+                      }}
+                    />
+                  );
+                })}
               </div>
 
-              {/* 6 Digit Inputs */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(6, 1fr)',
-                  gap: '0.5rem',
-                }}
-              >
-                {otpDigits.map((digit, idx) => (
-                  <input
-                    key={idx}
-                    ref={digitRefs[idx]}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(idx, e)}
-                    aria-label={`Digit ${idx + 1}`}
-                    style={{
-                      height: '52px',
-                      textAlign: 'center',
-                      fontSize: '1.25rem',
-                      fontWeight: 700,
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--surface-secondary)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)',
-                      outline: 'none',
-                      transition: 'border-color 0.15s ease',
-                    }}
-                  />
-                ))}
-              </div>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.5rem', marginBottom: 0 }}>
+                Verification code expires in 5 minutes
+              </p>
             </div>
 
             {/* Resend Action & Timer */}
