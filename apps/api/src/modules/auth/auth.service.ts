@@ -63,6 +63,10 @@ interface InMemoryUser {
 interface InMemoryChallenge {
   id: string;
   userId: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: UserRole;
   purpose: string;
   codeHash: string;
   salt: string;
@@ -92,7 +96,7 @@ interface InMemoryToken {
 }
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   // In-memory fallback stores when DB is offline
@@ -102,136 +106,11 @@ export class AuthService implements OnModuleInit {
   private readonly memChallenges = new Map<string, InMemoryChallenge>();
   private readonly memEmailTokens = new Map<string, InMemoryEmailVerification>();
 
-  private readonly workspaceService: WorkspaceService;
-  private readonly emailService: EmailService;
-
   constructor(
     private readonly prisma: PrismaService,
-    workspaceServiceOrSecret: any,
-    @Optional() workspaceServiceOrEmail?: any,
-    @Optional() emailService: EmailService = new EmailService()
-  ) {
-    if (typeof workspaceServiceOrSecret === 'string') {
-      this.workspaceService = workspaceServiceOrEmail;
-      this.emailService = emailService || new EmailService();
-    } else {
-      this.workspaceService = workspaceServiceOrSecret;
-      this.emailService = (workspaceServiceOrEmail instanceof EmailService ? workspaceServiceOrEmail : emailService) || new EmailService();
-    }
-  }
-
-  async onModuleInit(): Promise<void> {
-    await this.seedDemoUsers();
-  }
-
-  public async seedDemoUsers(): Promise<void> {
-    const demoHashedPassword = await hashPassword('DemoPassword123!');
-    const demoUsers = [
-      {
-        id: '00000000-0000-0000-0000-0000000000c1',
-        email: 'candidate.priya@cacareeros.com',
-        firstName: 'Priya',
-        lastName: 'Sharma (CA)',
-        role: UserRole.CANDIDATE,
-        workspaceId: '00000000-0000-0000-0000-0000000001w1',
-        workspaceName: "Priya's Personal Workspace",
-      },
-      {
-        id: '00000000-0000-0000-0000-0000000000r1',
-        email: 'recruiter.vikram@deloitte-partner.com',
-        firstName: 'Vikram',
-        lastName: 'Mehta (Partner)',
-        role: UserRole.RECRUITER,
-        workspaceId: '00000000-0000-0000-0000-0000000001w2',
-        workspaceName: 'Deloitte Advisory & Audit Workspace',
-      },
-      {
-        id: '00000000-0000-0000-0000-0000000000a1',
-        email: 'admin@cacareeros.com',
-        firstName: 'Rajesh',
-        lastName: 'Gupta (Admin)',
-        role: UserRole.PLATFORM_ADMIN,
-        workspaceId: '00000000-0000-0000-0000-0000000001w3',
-        workspaceName: 'CA Career OS Admin Portal',
-      },
-    ];
-
-    for (const d of demoUsers) {
-      this.memUsers.set(d.email, {
-        id: d.id,
-        email: d.email,
-        hashedPassword: demoHashedPassword,
-        firstName: d.firstName,
-        lastName: d.lastName,
-        role: d.role,
-        personalWorkspaceId: d.workspaceId,
-        emailVerified: true,
-      });
-
-      this.workspaceService.createPersonalWorkspace(d.id, d.firstName, d.workspaceId);
-
-      if (this.prisma && this.prisma.isDatabaseConnected()) {
-        try {
-          await this.prisma.user.upsert({
-            where: { email: d.email },
-            create: {
-              id: d.id,
-              email: d.email,
-              hashedPassword: demoHashedPassword,
-              firstName: d.firstName,
-              lastName: d.lastName,
-              role: d.role as any,
-              emailVerified: true,
-            },
-            update: {
-              role: d.role as any,
-              firstName: d.firstName,
-              lastName: d.lastName,
-            },
-          });
-        } catch (err: any) {
-          // Non-critical in test/offline runs
-        }
-      }
-    }
-  }
-
-  /**
-   * 1-Click Instant Demo Login (Candidate, Recruiter, Admin)
-   */
-  async demoLogin(roleParam = 'CANDIDATE'): Promise<AuthResponseData> {
-    await this.seedDemoUsers();
-    const roleUpper = (roleParam || '').toUpperCase();
-
-    let targetEmail = 'candidate.priya@cacareeros.com';
-    let defaultWorkspaceId = '00000000-0000-0000-0000-0000000001w1';
-
-    if (roleUpper.includes('RECRUIT') || roleUpper.includes('EMPLOYER')) {
-      targetEmail = 'recruiter.vikram@deloitte-partner.com';
-      defaultWorkspaceId = '00000000-0000-0000-0000-0000000001w2';
-    } else if (roleUpper.includes('ADMIN') || roleUpper.includes('PLATFORM') || roleUpper.includes('ORG')) {
-      targetEmail = 'admin@cacareeros.com';
-      defaultWorkspaceId = '00000000-0000-0000-0000-0000000001w3';
-    }
-
-    const memUser = this.memUsers.get(targetEmail);
-    if (!memUser) {
-      throw new NotFoundException(`Demo user for role ${roleParam} not found.`);
-    }
-
-    return await this.issueTokens(
-      {
-        id: memUser.id,
-        email: memUser.email,
-        firstName: memUser.firstName,
-        lastName: memUser.lastName,
-        role: memUser.role,
-      },
-      defaultWorkspaceId,
-      undefined,
-      30 * 24 * 3600 // 30 days for demo sessions
-    );
-  }
+    private readonly workspaceService: WorkspaceService,
+    @Optional() private readonly emailService: EmailService = new EmailService()
+  ) {}
 
   public getEmailService(): EmailService {
     return this.emailService;
@@ -435,6 +314,108 @@ export class AuthService implements OnModuleInit {
   }
 
   /**
+   * Request OTP code via email / SMTP (for passwordless login or registration verification)
+   */
+  async requestOtp(rawInput: { email: string; firstName?: string; lastName?: string; role?: UserRole }, clientIp = '127.0.0.1'): Promise<LoginOtpChallengeResponse> {
+    const normalizedEmail = rawInput.email.toLowerCase().trim();
+    const rateLimitKey = `${clientIp}:${normalizedEmail}`;
+    globalAuthRateLimiter.checkRateLimit(rateLimitKey);
+
+    let user: any = null;
+    if (this.prisma && this.prisma.isDatabaseConnected()) {
+      user = await this.prisma.user.findUnique({
+        where: { email: normalizedEmail },
+      });
+    } else {
+      user = this.memUsers.get(normalizedEmail) || null;
+    }
+
+    const userId = user?.id || randomUUID();
+    const firstName = user?.firstName || rawInput.firstName || normalizedEmail.split('@')[0];
+    const lastName = user?.lastName || rawInput.lastName || '';
+    const role = (user?.role || rawInput.role || UserRole.CANDIDATE) as UserRole;
+
+    const otpCode = crypto.randomInt(100000, 1000000).toString();
+    const salt = crypto.randomBytes(16).toString('hex');
+    const codeHash = crypto.createHmac('sha256', env.JWT_SECRET + salt).update(otpCode).digest('hex');
+    const challengeId = randomUUID();
+    const now = new Date();
+    const expiresInSeconds = 300;
+    const resendCooldownSeconds = 60;
+    const expiresAt = new Date(now.getTime() + expiresInSeconds * 1000);
+    const resendAfter = new Date(now.getTime() + resendCooldownSeconds * 1000);
+
+    if (this.prisma && this.prisma.isDatabaseConnected() && user) {
+      await this.prisma.authChallenge.updateMany({
+        where: { userId: user.id, verifiedAt: null },
+        data: { expiresAt: now },
+      }).catch(() => {});
+
+      try {
+        await this.prisma.authChallenge.create({
+          data: {
+            id: challengeId,
+            userId: user.id,
+            purpose: 'LOGIN_OTP',
+            codeHash,
+            salt,
+            attempts: 0,
+            maxAttempts: 5,
+            expiresAt,
+            resendAfter,
+            clientIp,
+          },
+        });
+      } catch (err: any) {
+        this.logger.warn(`Failed to persist challenge to DB, fallback to memory: ${err.message}`);
+      }
+    }
+
+    this.memChallenges.set(challengeId, {
+      id: challengeId,
+      userId,
+      email: normalizedEmail,
+      firstName,
+      lastName,
+      role,
+      purpose: 'LOGIN_OTP',
+      codeHash,
+      salt,
+      otpCode,
+      attempts: 0,
+      maxAttempts: 5,
+      expiresAt,
+      resendAfter,
+      verifiedAt: null,
+      clientIp,
+      createdAt: now,
+    });
+
+    this.logger.log(`[AuthService] Generated OTP for ${this.maskEmail(normalizedEmail)} (challenge: ${challengeId})`);
+    try {
+      this.logger.log(`[AuthService] Dispatching OTP email via SMTP to ${this.maskEmail(normalizedEmail)}`);
+      await this.emailService.sendLoginOtp(normalizedEmail, otpCode, firstName);
+      this.logger.log(`[AuthService] OTP email dispatched successfully via SMTP to ${this.maskEmail(normalizedEmail)}`);
+    } catch (err: any) {
+      if (this.prisma && this.prisma.isDatabaseConnected()) {
+        await this.prisma.authChallenge.delete({ where: { id: challengeId } }).catch(() => {});
+      }
+      this.memChallenges.delete(challengeId);
+      this.logger.error(`[AuthService] Failed to dispatch OTP email: ${err.message}`);
+      this.logger.warn(`[DEV/TEST OTP CODE] Verification code for ${normalizedEmail}: ${otpCode}`);
+      throw new ServiceUnavailableException('Failed to dispatch verification email. Please check your network or try again.');
+    }
+
+    return {
+      requiresOtp: true,
+      challengeId,
+      maskedEmail: this.maskEmail(normalizedEmail),
+      expiresInSeconds,
+      resendCooldownSeconds,
+    };
+  }
+
+  /**
    * Authenticate user credentials and issue OTP challenge
    * Never issues JWT or refresh token before OTP verification succeeds.
    */
@@ -445,6 +426,11 @@ export class AuthService implements OnModuleInit {
 
     // Rate limiting check
     globalAuthRateLimiter.checkRateLimit(rateLimitKey);
+
+    if (!input.password) {
+      // Passwordless email OTP authentication
+      return await this.requestOtp({ email: normalizedEmail }, clientIp);
+    }
 
     let user: {
       id: string;
@@ -480,8 +466,11 @@ export class AuthService implements OnModuleInit {
     }
 
     if (!user) {
-      globalAuthRateLimiter.recordFailure(rateLimitKey);
-      throw new UnauthorizedException('Invalid email or password');
+      if (input.password) {
+        globalAuthRateLimiter.recordFailure(rateLimitKey);
+        throw new UnauthorizedException('Invalid email or password');
+      }
+      return await this.requestOtp({ email: normalizedEmail }, clientIp);
     }
 
     const isValidPassword = await verifyPassword(input.password, user.hashedPassword);
@@ -493,92 +482,7 @@ export class AuthService implements OnModuleInit {
     // Reset rate limiter on successful password verification
     globalAuthRateLimiter.reset(rateLimitKey);
 
-    // Cryptographically secure 6-digit OTP generation
-    const otpCode = crypto.randomInt(100000, 1000000).toString();
-    const salt = crypto.randomBytes(16).toString('hex');
-    const codeHash = crypto.createHmac('sha256', env.JWT_SECRET + salt).update(otpCode).digest('hex');
-    const challengeId = randomUUID();
-    const now = new Date();
-    const expiresInSeconds = 300; // 5 minutes
-    const resendCooldownSeconds = 60; // 60 seconds
-    const expiresAt = new Date(now.getTime() + expiresInSeconds * 1000);
-    const resendAfter = new Date(now.getTime() + resendCooldownSeconds * 1000);
-
-    // Invalidate existing pending challenges for this user
-    if (this.prisma.isDatabaseConnected()) {
-      await this.prisma.authChallenge.updateMany({
-        where: { userId: user.id, verifiedAt: null },
-        data: { expiresAt: now },
-      }).catch(() => {});
-    } else {
-      for (const c of this.memChallenges.values()) {
-        if (c.userId === user.id && !c.verifiedAt) {
-          c.expiresAt = now;
-        }
-      }
-    }
-
-    // Persist new challenge
-    if (this.prisma.isDatabaseConnected()) {
-      try {
-        await this.prisma.authChallenge.create({
-          data: {
-            id: challengeId,
-            userId: user.id,
-            purpose: 'LOGIN_OTP',
-            codeHash,
-            salt,
-            attempts: 0,
-            maxAttempts: 5,
-            expiresAt,
-            resendAfter,
-            clientIp,
-          },
-        });
-      } catch (err: any) {
-        if (process.env.NODE_ENV === 'production') {
-          throw new ServiceUnavailableException('Authentication challenge storage failed. Persistent database unavailable.');
-        }
-        this.logger.warn(`Failed to persist challenge to DB, fallback to memory: ${err.message}`);
-      }
-    }
-
-    this.memChallenges.set(challengeId, {
-      id: challengeId,
-      userId: user.id,
-      purpose: 'LOGIN_OTP',
-      codeHash,
-      salt,
-      otpCode,
-      attempts: 0,
-      maxAttempts: 5,
-      expiresAt,
-      resendAfter,
-      verifiedAt: null,
-      clientIp,
-      createdAt: now,
-    });
-
-    // Send OTP via SMTP
-    try {
-      await this.emailService.sendLoginOtp(user.email, otpCode, user.firstName);
-    } catch (err: any) {
-      // Invalidate unusable challenge on delivery failure
-      if (this.prisma.isDatabaseConnected()) {
-        await this.prisma.authChallenge.delete({ where: { id: challengeId } }).catch(() => {});
-      }
-      this.memChallenges.delete(challengeId);
-      this.logger.error(`Failed to dispatch authentication OTP: ${err.message}`);
-      throw new ServiceUnavailableException('Failed to dispatch verification email. Please check your network or try again.');
-    }
-
-    return {
-      requiresOtp: true,
-      challengeId,
-      maskedEmail: this.maskEmail(user.email),
-      expiresInSeconds,
-      resendCooldownSeconds,
-    };
+    return await this.requestOtp({ email: normalizedEmail, firstName: user.firstName, lastName: user.lastName, role: user.role }, clientIp);
   }
 
   /**
@@ -689,12 +593,80 @@ export class AuthService implements OnModuleInit {
       }
     } else {
       for (const u of this.memUsers.values()) {
-        if (u.id === challenge.userId) {
+        if (u.id === challenge.userId || (memC?.email && u.email === memC.email)) {
           user = u;
           defaultWorkspaceId = u.personalWorkspaceId;
           break;
         }
       }
+    }
+
+    // If user does not exist in DB yet, create user & personal workspace ("db me save ho user ki info")
+    if (!user && memC?.email) {
+      const email = memC.email;
+      const newUserId = challenge.userId || randomUUID();
+      const firstName = memC.firstName || email.split('@')[0];
+      const lastName = memC.lastName || '';
+      const role = (memC.role || UserRole.CANDIDATE) as UserRole;
+      const randomPassHash = await hashPassword(crypto.randomBytes(32).toString('hex'));
+
+      if (this.prisma.isDatabaseConnected()) {
+        try {
+          const createdDbUser = await this.prisma.user.create({
+            data: {
+              id: newUserId,
+              email,
+              hashedPassword: randomPassHash,
+              firstName,
+              lastName,
+              role: role as any,
+              emailVerified: true,
+            },
+          });
+          const ws = await this.workspaceService.createPersonalWorkspace(createdDbUser.id, createdDbUser.firstName);
+          defaultWorkspaceId = ws.id;
+          user = {
+            id: createdDbUser.id,
+            email: createdDbUser.email,
+            firstName: createdDbUser.firstName,
+            lastName: createdDbUser.lastName,
+            role: createdDbUser.role as unknown as UserRole,
+          };
+          this.logger.log(`[AuthService] New verified user created and saved to database: ${user.email} (${user.id})`);
+        } catch (err: any) {
+          this.logger.warn(`Failed to create user in DB: ${err.message}`);
+        }
+      }
+
+      if (!user) {
+        const ws = await this.workspaceService.createPersonalWorkspace(newUserId, firstName);
+        defaultWorkspaceId = ws.id;
+        const memUser: InMemoryUser = {
+          id: newUserId,
+          email,
+          hashedPassword: randomPassHash,
+          firstName,
+          lastName,
+          role,
+          personalWorkspaceId: ws.id,
+          emailVerified: true,
+        };
+        this.memUsers.set(email, memUser);
+        user = {
+          id: memUser.id,
+          email: memUser.email,
+          firstName: memUser.firstName,
+          lastName: memUser.lastName,
+          role: memUser.role,
+        };
+        this.logger.log(`[AuthService] New verified user created in memory: ${user.email}`);
+      }
+    } else if (user && this.prisma.isDatabaseConnected()) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true, updatedAt: now },
+      }).catch(() => {});
+      this.logger.log(`[AuthService] Existing user updated in database: ${user.email}`);
     }
 
     if (!user) {

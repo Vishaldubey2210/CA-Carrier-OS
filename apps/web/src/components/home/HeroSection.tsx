@@ -89,7 +89,6 @@ const FEATURED_OPPORTUNITIES: SampleJob[] = [
 ];
 
 export function HeroSection() {
-  const { demoLogin } = useAuth();
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,17 +111,6 @@ export function HeroSection() {
       return true;
     });
   }, [searchQuery, selectedFilter]);
-
-  const handleLaunchDemo = async () => {
-    try {
-      const res = await demoLogin('CANDIDATE');
-      if (res.success) {
-        router.push('/dashboard');
-      }
-    } catch {
-      router.push('/dashboard');
-    }
-  };
 
   return (
     <section className="w-full max-w-[1080px] mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-16">
@@ -182,14 +170,13 @@ export function HeroSection() {
             <span>CA Jobs (₹199)</span>
           </Link>
 
-          <button
-            type="button"
-            onClick={handleLaunchDemo}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] text-neutral-600 hover:text-black transition-colors cursor-pointer"
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] text-neutral-600 hover:text-black transition-colors cursor-pointer no-underline"
           >
-            <span>Live Demo</span>
+            <span>Sign In</span>
             <ArrowRight size={13} />
-          </button>
+          </Link>
         </div>
       </div>
 

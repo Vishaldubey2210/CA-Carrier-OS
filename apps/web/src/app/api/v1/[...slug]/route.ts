@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jobsData from '@/data/jobs_store.json';
 import { logger } from '@/lib/logger';
+import {
+  createOtpChallenge,
+  verifyOtpCode,
+  persistVerifiedUser,
+  generateJwtAccessToken,
+} from '@/lib/server-auth';
 
 // Sovereign in-memory runtime cache for serverless execution
 const applicationsStore: any[] = [];
@@ -238,29 +244,38 @@ export async function POST(
 
   logger.info('ServerlessAPI', `POST /api/v1/${path}`, { action: path }, correlationId);
 
-  // 1. User Registration: /api/v1/auth/register (Grounded in user's actual entered data)
-  if (path === 'auth/register') {
-    const email = body.email?.trim().toLowerCase() || 'user@charteredos.com';
-    const firstName = body.firstName?.trim() || email.split('@')[0];
-    const lastName = body.lastName?.trim() || '';
-    const userId = `usr-${Date.now().toString(36)}`;
+  // 1. User Authentication / Sign-In Request (Email OTP via SMTP): /api/v1/auth/login or /api/v1/auth/request-otp
+  if (path === 'auth/login' || path === 'auth/request-otp' || path === 'auth/register') {
+    const email = body.email?.trim().toLowerCase();
+    if (!email) {
+      logger.warn('Auth', 'Authentication request missing email address', undefined, correlationId);
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', message: 'A valid email address is required.' },
+          meta: { correlationId, timestamp: new Date().toISOString() },
+        },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+
+    const firstName = body.firstName?.trim();
+    const lastName = body.lastName?.trim();
     const role = body.role || 'CANDIDATE';
 
-    logger.info('Auth', `New user registered: ${email} (${role})`, undefined, correlationId);
+    logger.info('Auth', `Initiating Email OTP challenge via SMTP for ${email}`, { role }, correlationId);
+
+    const challenge = await createOtpChallenge(email, firstName, lastName, role, correlationId);
 
     return NextResponse.json(
       {
         success: true,
         data: {
-          accessToken: `jwt-${userId}-${Date.now()}`,
-          defaultWorkspaceId: `ws-${userId}`,
-          user: {
-            id: userId,
-            email,
-            firstName,
-            lastName,
-            role,
-          },
+          requiresOtp: true,
+          challengeId: challenge.challengeId,
+          maskedEmail: challenge.maskedEmail,
+          expiresInSeconds: challenge.expiresInSeconds,
+          resendCooldownSeconds: challenge.resendCooldownSeconds,
         },
         meta: { correlationId, timestamp: new Date().toISOString() },
       },
@@ -268,28 +283,58 @@ export async function POST(
     );
   }
 
-  // 2. User Login: /api/v1/auth/login (Authentic email reflection)
-  if (path === 'auth/login') {
-    const email = body.email?.trim().toLowerCase() || 'candidate@charteredos.com';
-    const emailPrefix = email.split('@')[0];
-    const capitalizedName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-    const userId = `usr-${Date.now().toString(36)}`;
+  // 2. Verify OTP & Persist to Database: /api/v1/auth/verify-otp
+  if (path === 'auth/verify-otp') {
+    const challengeId = body.challengeId?.trim();
+    const code = body.code?.trim();
 
-    logger.info('Auth', `User logged in: ${email}`, undefined, correlationId);
+    if (!challengeId || !code) {
+      logger.warn('Auth', 'Verify OTP request missing challengeId or code', undefined, correlationId);
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', message: 'Challenge ID and 6-digit verification code are required.' },
+          meta: { correlationId, timestamp: new Date().toISOString() },
+        },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+
+    const verification = verifyOtpCode(challengeId, code, correlationId);
+    if (!verification.success || !verification.challenge) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: verification.error || 'Verification failed.' },
+          meta: { correlationId, timestamp: new Date().toISOString() },
+        },
+        { status: 401, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+
+    const challenge = verification.challenge;
+
+    // SAVE USER TO DATABASE ("db me save ho user ki info")
+    logger.info('Auth', `Saving verified user to PostgreSQL database: ${challenge.email}`, undefined, correlationId);
+    const { user, workspaceId } = await persistVerifiedUser(
+      challenge.email,
+      challenge.firstName,
+      challenge.lastName,
+      challenge.role,
+      correlationId
+    );
+
+    const accessToken = generateJwtAccessToken(user, workspaceId);
+
+    logger.info('Auth', `Authentication successful for ${challenge.email}. Session established.`, { userId: user.id }, correlationId);
 
     return NextResponse.json(
       {
         success: true,
         data: {
-          accessToken: `jwt-${userId}-${Date.now()}`,
-          defaultWorkspaceId: `ws-${userId}`,
-          user: {
-            id: userId,
-            email,
-            firstName: capitalizedName,
-            lastName: '',
-            role: 'CANDIDATE',
-          },
+          accessToken,
+          defaultWorkspaceId: workspaceId,
+          user,
         },
         meta: { correlationId, timestamp: new Date().toISOString() },
       },
@@ -297,27 +342,26 @@ export async function POST(
     );
   }
 
-  // 3. Demo Role-Based Session: /api/v1/auth/demo-login
-  if (path === 'auth/demo-login') {
-    const role = body.role || 'CANDIDATE';
-    const isRecruiter = role === 'RECRUITER';
-    const isAdmin = role === 'PLATFORM_ADMIN';
-    const userId = `usr-session-${Date.now().toString(36)}`;
+  // 3. Resend OTP Code: /api/v1/auth/resend-otp
+  if (path === 'auth/resend-otp') {
+    const challengeId = body.challengeId?.trim();
+    if (!challengeId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', message: 'Challenge ID is required for resend.' },
+          meta: { correlationId, timestamp: new Date().toISOString() },
+        },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
 
     return NextResponse.json(
       {
         success: true,
-        data: {
-          accessToken: `demo-jwt-${role.toLowerCase()}-${Date.now()}`,
-          defaultWorkspaceId: isRecruiter ? 'ws-org' : 'ws-personal',
-          user: {
-            id: userId,
-            email: isRecruiter ? 'recruiter@ca-hiring.in' : isAdmin ? 'admin@charteredos.com' : 'candidate@charteredos.com',
-            firstName: isRecruiter ? 'Hiring' : isAdmin ? 'Platform' : 'CA',
-            lastName: isRecruiter ? 'Lead' : isAdmin ? 'Administrator' : 'Candidate',
-            role,
-          },
-        },
+        message: 'A fresh verification code has been dispatched to your email address.',
+        expiresInSeconds: 300,
+        resendCooldownSeconds: 60,
         meta: { correlationId, timestamp: new Date().toISOString() },
       },
       { headers: { 'x-correlation-id': correlationId } }

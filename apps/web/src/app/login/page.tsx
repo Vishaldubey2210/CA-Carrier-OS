@@ -15,13 +15,11 @@ import {
   RefreshCw,
   ArrowLeft,
   CheckCircle2,
-  GraduationCap,
-  Briefcase,
 } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, demoLogin, verifyOtp, resendOtp, isLoading, isAuthenticated } = useAuth();
+  const { login, verifyOtp, resendOtp, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -33,25 +31,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isDemoLoading, setIsDemoLoading] = useState<string | null>(null);
-
-  const handleDemoLogin = async (role: string) => {
-    setIsDemoLoading(role);
-    setError(null);
-    const res = await demoLogin(role);
-    setIsDemoLoading(null);
-    if (res.success) {
-      if (role === 'RECRUITER') {
-        router.push('/jobs');
-      } else if (role === 'PLATFORM_ADMIN') {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
-    } else {
-      setError(res.error || 'Demo login failed');
-    }
-  };
 
   // Step 2: OTP State
   const [step, setStep] = useState<'CREDENTIALS' | 'OTP'>('CREDENTIALS');
@@ -91,14 +70,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password) {
-      setError('Please provide both email and password.');
+    if (!email) {
+      setError('Please provide your email address.');
       return;
     }
 
-    const res = await login(email, password);
+    const res = await login(email, password || undefined);
     if (!res.success) {
-      setError(res.error || 'Authentication failed. Please verify your credentials.');
+      setError(res.error || 'Authentication failed. Please verify your details.');
       return;
     }
 
@@ -296,139 +275,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* 1-CLICK INSTANT DEMO ACCOUNTS */}
-        {step === 'CREDENTIALS' && (
-          <div
-            style={{
-              padding: '1.25rem',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--brand-soft)',
-              border: '1px solid var(--border-subtle)',
-              marginBottom: '1.5rem',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-              <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--brand-primary)', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                <ShieldCheck size={16} /> 1-Click Demo Accounts
-              </span>
-              <span className="badge badge-emerald" style={{ fontSize: '0.65rem' }}>INSTANT LOGIN</span>
-            </div>
-
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.875rem', lineHeight: 1.4 }}>
-              Click any profile below to immediately access the respective command center without OTP:
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-              {/* Candidate Button */}
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('CANDIDATE')}
-                disabled={!!isDemoLoading}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.625rem 0.875rem',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'var(--surface-primary)',
-                  border: '1px solid var(--border-subtle)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    <GraduationCap size={16} color="var(--brand-primary)" />
-                    <span>CA Candidate Portal</span>
-                  </div>
-                  <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
-                    CA Candidate • Statutory Audit Track
-                  </div>
-                </div>
-                {isDemoLoading === 'CANDIDATE' ? (
-                  <Loader2 size={16} className="spin" color="var(--brand-primary)" />
-                ) : (
-                  <ArrowRight size={14} color="var(--text-secondary)" />
-                )}
-              </button>
-
-              {/* Recruiter Button */}
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('RECRUITER')}
-                disabled={!!isDemoLoading}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.625rem 0.875rem',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'var(--surface-primary)',
-                  border: '1px solid var(--border-subtle)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    <Briefcase size={16} color="var(--brand-teal)" />
-                    <span>Recruiter / Partner Workspace</span>
-                  </div>
-                  <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
-                    Talent Partner • Hiring & Advisory Workspace
-                  </div>
-                </div>
-                {isDemoLoading === 'RECRUITER' ? (
-                  <Loader2 size={16} className="spin" color="var(--brand-primary)" />
-                ) : (
-                  <ArrowRight size={14} color="var(--text-secondary)" />
-                )}
-              </button>
-
-              {/* Admin Portal Button */}
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('PLATFORM_ADMIN')}
-                disabled={!!isDemoLoading}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.625rem 0.875rem',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'var(--surface-primary)',
-                  border: '1px solid var(--border-subtle)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    <ShieldCheck size={16} color="var(--brand-primary)" />
-                    <span>Platform Admin Portal</span>
-                  </div>
-                  <div style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', paddingLeft: '1.5rem' }}>
-                    System Admin • Full Governance & Oversight
-                  </div>
-                </div>
-                {isDemoLoading === 'PLATFORM_ADMIN' ? (
-                  <Loader2 size={16} className="spin" color="var(--brand-primary)" />
-                ) : (
-                  <ArrowRight size={14} color="var(--text-secondary)" />
-                )}
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.75rem', paddingTop: '0.625rem', borderTop: '1px solid var(--border-subtle)', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-              <span>Or sign in with email:</span>
-              <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)', fontWeight: 600 }}>DemoPassword123!</span>
-            </div>
-          </div>
-        )}
-
         {/* STEP 1: CREDENTIALS FORM */}
         {step === 'CREDENTIALS' && (
           <form onSubmit={handleCredentialsSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -451,7 +297,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ca.candidate@example.com"
+                  placeholder="name@domain.com"
                   required
                   autoComplete="username"
                   style={{
@@ -479,7 +325,7 @@ export default function LoginPage() {
                   htmlFor="password"
                   style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)' }}
                 >
-                  Password
+                  Password <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: '0.75rem' }}>(Optional for Email OTP)</span>
                 </label>
                 <Link
                   href="/forgot-password"
@@ -495,7 +341,6 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  required
                   autoComplete="current-password"
                   style={{
                     width: '100%',
@@ -525,11 +370,11 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  <span>Validating Credentials...</span>
+                  <span>Dispatching OTP via SMTP...</span>
                 </>
               ) : (
                 <>
-                  <span>Continue to Security Verification</span>
+                  <span>Continue with Email OTP</span>
                   <ArrowRight size={16} />
                 </>
               )}

@@ -124,7 +124,7 @@ const INITIAL_JOBS: PendingJobAudit[] = [
 ];
 
 export default function AdminPortalPage() {
-  const { user, isAuthenticated, demoLogin } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'JOBS' | 'AUDIT_LOGS' | 'WORKSPACES' | 'AGGREGATOR'>('OVERVIEW');
   const [jobs, setJobs] = useState<PendingJobAudit[]>(INITIAL_JOBS);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
@@ -260,15 +260,14 @@ export default function AdminPortalPage() {
                 </div>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => demoLogin('PLATFORM_ADMIN')}
+              <Link
+                href="/login"
                 className="btn btn-primary"
-                style={{ padding: '0.55rem 1.25rem', fontSize: '0.8125rem' }}
+                style={{ padding: '0.55rem 1.25rem', fontSize: '0.8125rem', textDecoration: 'none' }}
               >
-                <span>⚡ Instant Admin Login</span>
+                <span>Sign In as Admin</span>
                 <ArrowRight size={14} />
-              </button>
+              </Link>
             )}
 
             <div style={{ display: 'flex', gap: '0.5rem' }}>

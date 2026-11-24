@@ -53,37 +53,18 @@ export class AuthController {
     @Req() req: Request
   ) {
     const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1';
-    // Returns OTP challenge. Never sets session cookie before OTP verification.
+    // Dispatches OTP via SMTP. Returns OTP challenge. Never sets session cookie before OTP verification.
     return await this.authService.login(body, clientIp);
   }
 
-  @Post('demo-login')
+  @Post('request-otp')
   @HttpCode(HttpStatus.OK)
-  async demoLogin(
-    @Body('role') role: string,
-    @Res({ passthrough: true }) res: Response
+  async requestOtp(
+    @Body() body: any,
+    @Req() req: Request
   ) {
-    const authData = await this.authService.demoLogin(role || 'CANDIDATE');
-
-    // Set secure HttpOnly cookie for refresh token
-    res.cookie('refreshToken', authData.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/api/v1/auth',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    // Set accessToken cookie for browser sessions
-    res.cookie('accessToken', authData.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 15 * 60 * 1000,
-    });
-
-    return authData;
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.ip || '127.0.0.1';
+    return await this.authService.requestOtp(body, clientIp);
   }
 
   @Post('verify-otp')

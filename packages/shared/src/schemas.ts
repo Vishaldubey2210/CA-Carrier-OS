@@ -103,9 +103,17 @@ export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 
 export const LoginRequestSchema = z.object({
   email: z.string().trim().toLowerCase().email({ message: 'A valid email address is required' }),
-  password: z.string().min(1, { message: 'Password is required' }),
+  password: z.string().optional(),
 });
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
+
+export const RequestOtpRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email({ message: 'A valid email address is required' }),
+  firstName: z.string().trim().optional(),
+  lastName: z.string().trim().optional(),
+  role: z.nativeEnum(UserRole).default(UserRole.CANDIDATE).optional(),
+});
+export type RequestOtpRequest = z.infer<typeof RequestOtpRequestSchema>;
 
 export const RefreshTokenRequestSchema = z.object({
   refreshToken: z.string().min(1, { message: 'Refresh token is required' }),
