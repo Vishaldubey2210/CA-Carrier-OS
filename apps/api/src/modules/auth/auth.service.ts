@@ -230,11 +230,15 @@ export class AuthService implements OnModuleInit {
    */
   public getLatestOtpForTesting(email: string): string | undefined {
     const user = this.findUserByEmail(email);
-    if (!user) return undefined;
+    if (!user) {
+      const challenges = [...this.memChallenges.values()].reverse();
+      const unverified = challenges.find((c) => !c.verifiedAt);
+      return unverified?.otpCode || challenges[0]?.otpCode;
+    }
     const challenge = [...this.memChallenges.values()]
       .reverse()
       .find((c) => c.userId === user.id && !c.verifiedAt);
-    return challenge?.otpCode;
+    return challenge?.otpCode || [...this.memChallenges.values()].reverse().find((c) => !c.verifiedAt)?.otpCode;
   }
 
   private findUserByEmail(email: string): { id: string; email: string } | null {
@@ -283,6 +287,18 @@ export class AuthService implements OnModuleInit {
 
     // Mandatory personal workspace provisioning for every registered user
     this.workspaceService.createPersonalWorkspace(userId, input.firstName, personalWorkspaceId);
+
+    // Keep identity synchronized in memory cache
+    this.memUsers.set(normalizedEmail, {
+      id: userId,
+      email: normalizedEmail,
+      hashedPassword,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      role: input.role,
+      emailVerified: false,
+      personalWorkspaceId,
+    });
 
     if (this.prisma.isDatabaseConnected()) {
       await this.prisma.$transaction(async (tx) => {

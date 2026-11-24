@@ -385,6 +385,20 @@ export class CareerService {
     );
 
     if (this.prisma.isDatabaseConnected()) {
+      // Normalize target pathway string to valid Prisma PostgreSQL CAPathway enum
+      const normalizePathway = (p: string): CAPathway => {
+        const upper = (p || '').toUpperCase();
+        if (upper.includes('AUDIT')) return CAPathway.AUDIT;
+        if (upper.includes('TAX')) return CAPathway.TAX;
+        if (upper.includes('FPA')) return CAPathway.FPA;
+        if (upper.includes('CORP')) return CAPathway.CORP_FIN;
+        if (upper.includes('IB') || upper.includes('BANK')) return CAPathway.IB;
+        if (upper.includes('CONSULT')) return CAPathway.CONSULTING;
+        if (upper.includes('PRACTICE')) return CAPathway.PRACTICE;
+        return CAPathway.AUDIT;
+      };
+      const validPathway = normalizePathway(targetPathway as string);
+
       // Clean up previous roadmaps for this profile to prevent task duplication
       await this.prisma.careerRoadmap.deleteMany({
         where: { candidateProfileId: profile.id },
@@ -395,7 +409,7 @@ export class CareerService {
           id: roadmapId,
           candidateProfileId: profile.id,
           workspaceId,
-          targetPathway,
+          targetPathway: validPathway,
           overallFitScore: fitScore,
           summary,
           tasks: {
