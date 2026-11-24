@@ -9,6 +9,9 @@ import {
   resendOtpChallenge,
 } from '@/lib/server-auth';
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
+
 // Sovereign in-memory runtime cache for serverless execution
 const applicationsStore: any[] = [];
 const savedJobsStore: Set<string> = new Set();

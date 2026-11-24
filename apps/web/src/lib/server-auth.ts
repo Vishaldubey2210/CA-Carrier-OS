@@ -148,18 +148,25 @@ export async function sendOtpViaSmtp(
       tls: {
         rejectUnauthorized: false,
       },
-      connectionTimeout: 12000,
-      greetingTimeout: 6000,
-      socketTimeout: 15000,
+      connectionTimeout: 4000,
+      greetingTimeout: 3000,
+      socketTimeout: 5000,
     });
 
-    const info = await transporter.sendMail({
+    const sendPromise = transporter.sendMail({
       from: fromAddress,
       to,
       subject: `[CA Career OS] ${otpCode} is your verification code`,
       html,
       text,
     });
+
+    // Guard against serverless function timeout by enforcing a strict 4.5s delivery budget
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('SMTP socket connection/dispatch timeout (exceeded 4.5s)')), 4500);
+    });
+
+    const info: any = await Promise.race([sendPromise, timeoutPromise]);
 
     logger.info(
       'SMTP',
