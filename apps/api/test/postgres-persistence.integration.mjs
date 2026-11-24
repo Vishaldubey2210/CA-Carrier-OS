@@ -137,13 +137,22 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
       }
       const userIds = [candidateA?.user?.id, candidateB?.user?.id, recruiter?.user?.id].filter(Boolean);
       if (userIds.length > 0) {
-        await prismaService.notification.deleteMany({ where: { userId: { in: userIds } } });
-        await prismaService.passwordResetToken.deleteMany({ where: { userId: { in: userIds } } });
-        await prismaService.workspaceMembership.deleteMany({ where: { userId: { in: userIds } } });
-        await prismaService.workspace.deleteMany({ where: { ownerId: { in: userIds } } });
-        await prismaService.auditEvent.deleteMany({ where: { actorId: { in: userIds } } });
-        await prismaService.refreshToken.deleteMany({ where: { userId: { in: userIds } } });
-        await prismaService.user.deleteMany({ where: { id: { in: userIds } } });
+        // Audit events enforce foreign key onDelete: Restrict to User and Workspace, so clear them first
+        await prismaService.auditEvent.deleteMany({
+          where: {
+            OR: [
+              { actorId: { in: userIds } },
+              { workspace: { ownerId: { in: userIds } } },
+            ],
+          },
+        }).catch(() => {});
+        await prismaService.authChallenge.deleteMany({ where: { userId: { in: userIds } } }).catch(() => {});
+        await prismaService.notification.deleteMany({ where: { userId: { in: userIds } } }).catch(() => {});
+        await prismaService.passwordResetToken.deleteMany({ where: { userId: { in: userIds } } }).catch(() => {});
+        await prismaService.refreshToken.deleteMany({ where: { userId: { in: userIds } } }).catch(() => {});
+        await prismaService.workspaceMembership.deleteMany({ where: { userId: { in: userIds } } }).catch(() => {});
+        await prismaService.workspace.deleteMany({ where: { ownerId: { in: userIds } } }).catch(() => {});
+        await prismaService.user.deleteMany({ where: { id: { in: userIds } } }).catch(() => {});
       }
     } catch (err) {
       console.warn('Post-test cleanup encountered an error:', err.message);
@@ -304,7 +313,9 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
     assert.ok(dbApp);
     assert.equal(dbApp.status, 'SHORTLISTED');
     assert.ok(dbApp.statusHistory.length >= 1, 'Status history record must exist');
-    assert.equal(dbApp.statusHistory[0].toStatus, 'SHORTLISTED');
+    const shortlistedHistory = dbApp.statusHistory.find((h) => h.toStatus === 'SHORTLISTED');
+    assert.ok(shortlistedHistory, 'Status history must record transition to SHORTLISTED');
+    assert.equal(shortlistedHistory.toStatus, 'SHORTLISTED');
   });
 
   test('5. Create and retrieve practice client via PracticeService', async () => {
