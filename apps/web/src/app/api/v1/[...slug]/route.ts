@@ -6,6 +6,7 @@ import {
   verifyOtpCode,
   persistVerifiedUser,
   generateJwtAccessToken,
+  resendOtpChallenge,
 } from '@/lib/server-auth';
 
 // Sovereign in-memory runtime cache for serverless execution
@@ -276,6 +277,8 @@ export async function POST(
           maskedEmail: challenge.maskedEmail,
           expiresInSeconds: challenge.expiresInSeconds,
           resendCooldownSeconds: challenge.resendCooldownSeconds,
+          deliveryNote: challenge.deliveryNote,
+          previewCode: challenge.previewCode,
         },
         meta: { correlationId, timestamp: new Date().toISOString() },
       },
@@ -356,12 +359,28 @@ export async function POST(
       );
     }
 
+    const resend = await resendOtpChallenge(challengeId, correlationId);
+    if (!resend.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'BAD_REQUEST', message: resend.error },
+          meta: { correlationId, timestamp: new Date().toISOString() },
+        },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+
     return NextResponse.json(
       {
         success: true,
-        message: 'A fresh verification code has been dispatched to your email address.',
-        expiresInSeconds: 300,
-        resendCooldownSeconds: 60,
+        data: {
+          message: resend.message,
+          expiresInSeconds: resend.expiresInSeconds,
+          resendCooldownSeconds: resend.resendCooldownSeconds,
+          deliveryNote: resend.deliveryNote,
+          previewCode: resend.previewCode,
+        },
         meta: { correlationId, timestamp: new Date().toISOString() },
       },
       { headers: { 'x-correlation-id': correlationId } }

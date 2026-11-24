@@ -17,6 +17,8 @@ export interface LoginResult {
   maskedEmail?: string;
   expiresInSeconds?: number;
   resendCooldownSeconds?: number;
+  deliveryNote?: string;
+  previewCode?: string;
   error?: string;
 }
 
@@ -28,7 +30,13 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, pass?: string) => Promise<LoginResult>;
   verifyOtp: (challengeId: string, code: string) => Promise<{ success: boolean; error?: string }>;
-  resendOtp: (challengeId: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  resendOtp: (challengeId: string) => Promise<{
+    success: boolean;
+    message?: string;
+    deliveryNote?: string;
+    previewCode?: string;
+    error?: string;
+  }>;
   verifyEmail: (token: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   register: (data: {
     email: string;
@@ -37,7 +45,7 @@ interface AuthContextType {
     lastName: string;
     role: UserRole;
     organizationName?: string;
-  }) => Promise<{ success: boolean; error?: string }>;
+  }) => Promise<LoginResult>;
   logout: () => Promise<void>;
   switchWorkspace: (workspaceId: string) => void;
 }
@@ -114,6 +122,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           maskedEmail: authData.maskedEmail,
           expiresInSeconds: authData.expiresInSeconds,
           resendCooldownSeconds: authData.resendCooldownSeconds,
+          deliveryNote: authData.deliveryNote,
+          previewCode: authData.previewCode,
         };
       }
 
@@ -210,7 +220,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /**
    * Resend login OTP
    */
-  const resendOtp = async (challengeId: string): Promise<{ success: boolean; message?: string; error?: string }> => {
+  const resendOtp = async (challengeId: string): Promise<{
+    success: boolean;
+    message?: string;
+    deliveryNote?: string;
+    previewCode?: string;
+    error?: string;
+  }> => {
     try {
       const res = await fetch('/api/v1/auth/resend-otp', {
         method: 'POST',
@@ -225,7 +241,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const envelope = await res.json();
-      return { success: true, message: envelope?.data?.message || 'Verification code resent.' };
+      return {
+        success: true,
+        message: envelope?.data?.message || envelope?.message || 'Verification code resent.',
+        deliveryNote: envelope?.data?.deliveryNote,
+        previewCode: envelope?.data?.previewCode,
+      };
     } catch {
       return { success: false, error: 'Network error requesting fresh verification code.' };
     }
@@ -262,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     lastName: string;
     role: UserRole;
     organizationName?: string;
-  }): Promise<{ success: boolean; error?: string }> => {
+  }): Promise<LoginResult> => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/v1/auth/register', {
@@ -281,34 +302,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const envelope = await res.json();
       const authData = envelope.data;
 
-      const newUser: AuthUserPayload = authData.user;
-      const userWorkspaces: WorkspaceSummary[] = [
-        {
-          id: authData.defaultWorkspaceId,
-          name: `${newUser.firstName}'s Personal Workspace`,
-          slug: `personal-${newUser.id.slice(0, 8)}`,
-          type: WorkspaceType.PERSONAL,
-          ownerId: newUser.id,
-          role: MemberRole.OWNER,
-          isDefault: true,
-          createdAt: new Date().toISOString(),
-        },
-      ];
+      setIsLoading(false);
 
-      setUser(newUser);
-      setWorkspaces(userWorkspaces);
-      setActiveWorkspace(userWorkspaces[0]);
-
-      localStorage.setItem('ca_os_user', JSON.stringify(newUser));
-      localStorage.setItem('ca_os_workspaces', JSON.stringify(userWorkspaces));
-      localStorage.setItem('ca_os_active_ws', JSON.stringify(userWorkspaces[0]));
-      if (authData?.accessToken) {
-        localStorage.setItem('ca_os_token', authData.accessToken);
+      if (authData?.requiresOtp) {
+        logger.info('AuthContext', `OTP challenge issued on registration for ${data.email}`, { challengeId: authData.challengeId });
+        return {
+          success: true,
+          requiresOtp: true,
+          challengeId: authData.challengeId,
+          maskedEmail: authData.maskedEmail,
+          expiresInSeconds: authData.expiresInSeconds,
+          resendCooldownSeconds: authData.resendCooldownSeconds,
+          deliveryNote: authData.deliveryNote,
+          previewCode: authData.previewCode,
+        };
       }
 
-      setIsLoading(false);
+      if (authData?.user) {
+        const newUser: AuthUserPayload = authData.user;
+        const userWorkspaces: WorkspaceSummary[] = [
+          {
+            id: authData.defaultWorkspaceId || `ws-${newUser.id}`,
+            name: `${newUser.firstName}'s Personal Workspace`,
+            slug: `personal-${newUser.id.slice(0, 8)}`,
+            type: WorkspaceType.PERSONAL,
+            ownerId: newUser.id,
+            role: MemberRole.OWNER,
+            isDefault: true,
+            createdAt: new Date().toISOString(),
+          },
+        ];
+
+        setUser(newUser);
+        setWorkspaces(userWorkspaces);
+        setActiveWorkspace(userWorkspaces[0]);
+
+        localStorage.setItem('ca_os_user', JSON.stringify(newUser));
+        localStorage.setItem('ca_os_workspaces', JSON.stringify(userWorkspaces));
+        localStorage.setItem('ca_os_active_ws', JSON.stringify(userWorkspaces[0]));
+        if (authData?.accessToken) {
+          localStorage.setItem('ca_os_token', authData.accessToken);
+        }
+
+        return { success: true };
+      }
+
       return { success: true };
     } catch (err: any) {
+      logger.error('AuthContext', `Registration error: ${err?.message}`);
       setIsLoading(false);
       return { success: false, error: 'Network error connecting to registration server.' };
     }

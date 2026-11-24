@@ -36,6 +36,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<'CREDENTIALS' | 'OTP'>('CREDENTIALS');
   const [challengeId, setChallengeId] = useState<string>('');
   const [maskedEmail, setMaskedEmail] = useState<string>('');
+  const [previewCode, setPreviewCode] = useState<string | null>(null);
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
@@ -85,6 +86,7 @@ export default function LoginPage() {
       setChallengeId(res.challengeId);
       setMaskedEmail(res.maskedEmail || email);
       setResendCooldown(res.resendCooldownSeconds || 60);
+      if (res.previewCode) setPreviewCode(res.previewCode);
       setStep('OTP');
       setError(null);
     } else {
@@ -155,6 +157,7 @@ export default function LoginPage() {
     if (res.success) {
       setResendCooldown(60);
       setResendSuccess(res.message || 'A fresh verification code has been dispatched.');
+      if (res.previewCode) setPreviewCode(res.previewCode);
       setOtpDigits(['', '', '', '', '', '']);
       digitRefs[0]?.current?.focus();
     } else {
@@ -385,6 +388,51 @@ export default function LoginPage() {
         {/* STEP 2: EMAIL OTP VERIFICATION FORM */}
         {step === 'OTP' && (
           <form onSubmit={handleOtpSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* Sandbox / SMTP Notice pill if present */}
+            {previewCode && (
+              <div
+                style={{
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(59, 130, 246, 0.08)',
+                  border: '1px solid rgba(59, 130, 246, 0.25)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.8125rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '0.5rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShieldCheck size={16} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
+                  <span>
+                    Verification Code: <strong>{previewCode}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const chars = previewCode.slice(0, 6).split('');
+                    setOtpDigits(chars);
+                    digitRefs[5]?.current?.focus();
+                  }}
+                  style={{
+                    background: 'var(--brand-primary)',
+                    border: 'none',
+                    borderRadius: '4px',
+                    color: '#ffffff',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    padding: '0.25rem 0.625rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Auto-Fill
+                </button>
+              </div>
+            )}
+
             <div>
               <div
                 style={{

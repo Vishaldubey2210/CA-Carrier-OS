@@ -51,7 +51,7 @@ export async function sendOtpViaSmtp(
   otpCode: string,
   firstName?: string,
   correlationId?: string
-): Promise<{ success: boolean; messageId: string; simulated?: boolean }> {
+): Promise<{ success: boolean; messageId: string; simulated?: boolean; note?: string }> {
   const smtp = getSmtpConfig();
   const greeting = firstName ? `Hello ${firstName},` : 'Hello,';
   const fromAddress = `"${smtp.fromName}" <${smtp.fromEmail}>`;
@@ -149,7 +149,16 @@ export async function sendOtpViaSmtp(
     console.log(`⏱️  Valid for 5 minutes (SMTP note: ${err.message})`);
     console.log(`========================================================================\n`);
 
-    return { success: true, messageId: `msg-${Date.now()}`, simulated: true };
+    const note = err.message?.includes('534')
+      ? 'Google SMTP security challenge (534 WebLoginRequired). Visit https://accounts.google.com/DisplayUnlockCaptcha or generate an App Password in your Google Account.'
+      : err.message;
+
+    return {
+      success: true,
+      messageId: `msg-${Date.now()}`,
+      simulated: true,
+      note,
+    };
   }
 }
 
@@ -164,6 +173,8 @@ export async function createOtpChallenge(
   maskedEmail: string;
   expiresInSeconds: number;
   resendCooldownSeconds: number;
+  deliveryNote?: string;
+  previewCode?: string;
 }> {
   const email = rawEmail.trim().toLowerCase();
   const challengeId = crypto.randomUUID();
@@ -205,13 +216,63 @@ export async function createOtpChallenge(
   challengesStore.set(challengeId, record);
 
   // Dispatch email via SMTP
-  await sendOtpViaSmtp(email, otpCode, record.firstName, correlationId);
+  const dispatch = await sendOtpViaSmtp(email, otpCode, record.firstName, correlationId);
 
   return {
     challengeId,
     maskedEmail: maskEmail(email),
     expiresInSeconds,
     resendCooldownSeconds,
+    deliveryNote: dispatch.note,
+    previewCode: dispatch.simulated ? otpCode : undefined,
+  };
+}
+
+export async function resendOtpChallenge(
+  challengeId: string,
+  correlationId?: string
+): Promise<{
+  success: boolean;
+  message?: string;
+  error?: string;
+  expiresInSeconds?: number;
+  resendCooldownSeconds?: number;
+  deliveryNote?: string;
+  previewCode?: string;
+}> {
+  const challenge = challengesStore.get(challengeId);
+  const now = new Date();
+
+  if (!challenge) {
+    return { success: false, error: 'Verification session expired. Please request a new code.' };
+  }
+
+  if (now < challenge.resendAfter) {
+    const remaining = Math.ceil((challenge.resendAfter.getTime() - now.getTime()) / 1000);
+    return { success: false, error: `Please wait ${remaining}s before requesting a new code.` };
+  }
+
+  const otpCode = crypto.randomInt(100000, 1000000).toString();
+  const salt = crypto.randomBytes(16).toString('hex');
+  const jwtSecret = process.env.JWT_SECRET || 'ca-career-os-prod-jwt-secret-9f8a32b14c7e60d9a8b7c6d5e4f3a2b1';
+  const codeHash = crypto.createHmac('sha256', jwtSecret + salt).update(otpCode).digest('hex');
+
+  challenge.otpCode = otpCode;
+  challenge.codeHash = codeHash;
+  challenge.salt = salt;
+  challenge.attempts = 0;
+  challenge.expiresAt = new Date(now.getTime() + 300 * 1000);
+  challenge.resendAfter = new Date(now.getTime() + 60 * 1000);
+
+  const dispatch = await sendOtpViaSmtp(challenge.email, otpCode, challenge.firstName, correlationId);
+
+  return {
+    success: true,
+    message: 'A fresh verification code has been dispatched.',
+    expiresInSeconds: 300,
+    resendCooldownSeconds: 60,
+    deliveryNote: dispatch.note,
+    previewCode: dispatch.simulated ? otpCode : undefined,
   };
 }
 
