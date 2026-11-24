@@ -539,11 +539,21 @@ describe('PostgreSQL Runtime Persistence Integration Suite', async () => {
       { name: 'BadRequestException' }
     );
 
-    // 6. Verify user can now authenticate with the new password
+    // 6. Verify user can now authenticate with the new password (Step 1: credentials -> OTP, Step 2: OTP verification)
     const loginRes = await authService.login({
       email: candidateA.user.email,
       password: newPassword,
     });
-    assert.ok(loginRes.accessToken, 'User must authenticate with new password');
+    assert.equal(loginRes.requiresOtp, true, 'Login requires OTP verification');
+    assert.ok(loginRes.challengeId, 'Login returns challengeId for 2FA');
+
+    const otpCode = authService.getLatestOtpForTesting(candidateA.user.email);
+    assert.ok(otpCode, 'Must have recorded latest OTP in test environment');
+
+    const verifyRes = await authService.verifyOtp({
+      challengeId: loginRes.challengeId,
+      code: otpCode,
+    });
+    assert.ok(verifyRes.accessToken, 'User must authenticate with new password');
   });
 });
