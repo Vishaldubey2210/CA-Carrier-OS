@@ -345,11 +345,20 @@ export class JobIngestionOrchestratorService {
   public async persistJobToDatabase(job: JobDetail): Promise<void> {
     if (this.prisma && this.prisma.isDatabaseConnected()) {
       try {
+        const isUuid = (val: unknown): val is string =>
+          typeof val === 'string' &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+        const jobId = isUuid(job.id) ? job.id : randomUUID();
+        const employerId = isUuid(job.employerId) ? job.employerId : '00000000-0000-0000-0000-0000000000e0';
+        const duplicateClusterId = isUuid(job.duplicateClusterId) ? job.duplicateClusterId : null;
+        const duplicateOfJobId = isUuid(job.duplicateOfJobId) ? job.duplicateOfJobId : null;
+
         await (this.prisma as any).job.upsert({
-          where: { id: job.id },
+          where: { id: jobId },
           create: {
-            id: job.id,
-            employerId: job.employerId || '00000000-0000-0000-0000-0000000000e0',
+            id: jobId,
+            employerId,
             title: job.title,
             normalizedTitle: job.normalizedTitle || job.title,
             companyName: job.companyName,
@@ -382,15 +391,14 @@ export class JobIngestionOrchestratorService {
             lastSeenAt: job.lastSeenAt ? new Date(job.lastSeenAt) : new Date(),
             lastVerifiedAt: job.lastVerifiedAt ? new Date(job.lastVerifiedAt) : new Date(),
             verificationStatus: job.verificationStatus || 'SOURCE_ACTIVE',
-            duplicateClusterId: job.duplicateClusterId || null,
+            duplicateClusterId,
             isDuplicate: job.isDuplicate || false,
-            duplicateOfJobId: job.duplicateOfJobId || null,
+            duplicateOfJobId,
           },
           update: {
             lastSeenAt: job.lastSeenAt ? new Date(job.lastSeenAt) : new Date(),
             lastVerifiedAt: job.lastVerifiedAt ? new Date(job.lastVerifiedAt) : new Date(),
             verificationStatus: job.verificationStatus || 'SOURCE_ACTIVE',
-            duplicateCount: job.duplicateCount || 0,
           },
         });
       } catch (dbErr: any) {

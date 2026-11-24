@@ -388,6 +388,9 @@ export class JobsService {
     };
 
     this.memJobs.set(newJob.id, newJob);
+    if (this.prisma && this.prisma.isDatabaseConnected()) {
+      await this.ingestionOrchestrator.persistJobToDatabase(newJob);
+    }
     this.logger.log(`Published verified enterprise job: ${newJob.title} at ${newJob.companyName}`);
     return newJob;
   }
