@@ -53,6 +53,13 @@ export class EmailService {
   }
 
   private initializeTransporter() {
+    if (process.env.NODE_ENV === 'test') {
+      this.isConfigured = false;
+      this.mockMode = true;
+      this.logger.log('EmailService initialized in MOCK mode (NODE_ENV=test).');
+      return;
+    }
+
     const host = process.env.SMTP_HOST?.trim();
     const port = parseInt(process.env.SMTP_PORT || '587', 10);
     const secure = process.env.SMTP_SECURE === 'true' || port === 465;

@@ -5,7 +5,26 @@
  * timeout controls, safe idempotent retries, and offline detection.
  */
 
-import { logger } from './logger';
+// Structured logging for client-side API telemetry
+const logApi = (level: 'info' | 'warn' | 'error' | 'debug', message: string, meta?: Record<string, any>) => {
+  if (level === 'debug' && process.env.NODE_ENV === 'production') return;
+  const payload = {
+    timestamp: new Date().toISOString(),
+    level: level.toUpperCase(),
+    context: 'ApiClient',
+    message,
+    ...meta,
+  };
+  if (typeof window === 'undefined' || process.env.NODE_ENV === 'production') {
+    const line = JSON.stringify(payload);
+    if (level === 'error') console.error(line);
+    else if (level === 'warn') console.warn(line);
+    else console.log(line);
+  } else {
+    const color = level === 'error' ? '#ef4444' : level === 'warn' ? '#f59e0b' : '#10b981';
+    console.log(`%c[${payload.level}] [ApiClient] ${message}`, `color: ${color}; font-weight: bold;`, meta || '');
+  }
+};
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -152,7 +171,7 @@ class ApiClient {
       }
 
       try {
-        logger.debug('ApiClient', `Outgoing ${method} ${url}`, { attempt }, undefined);
+        logApi('debug', `Outgoing ${method} ${url}`, { attempt });
         const response = await fetch(url, {
           ...restOptions,
           headers: defaultHeaders,
@@ -171,7 +190,7 @@ class ApiClient {
         const isJson = contentType.includes('application/json');
 
         if (!response.ok) {
-          logger.warn('ApiClient', `${method} ${url} returned ${response.status}`, { status: response.status, attempt }, correlationId, Date.now() - reqStartTime);
+          logApi('warn', `${method} ${url} returned ${response.status}`, { status: response.status, attempt, correlationId, durationMs: Date.now() - reqStartTime });
           // Transparent 401 recovery for demo sessions: automatically acquire fresh demo token and retry once
           if (response.status === 401 && attempt === 1 && typeof window !== 'undefined') {
             try {
@@ -264,7 +283,7 @@ class ApiClient {
           );
         }
 
-        logger.info('ApiClient', `${method} ${url} -> ${response.status}`, { status: response.status }, correlationId, Date.now() - reqStartTime);
+        logApi('info', `${method} ${url} -> ${response.status}`, { status: response.status, correlationId, durationMs: Date.now() - reqStartTime });
 
         if (isJson) {
           const payload = await response.json();
@@ -288,7 +307,7 @@ class ApiClient {
       } catch (err: any) {
         clearTimeout(timeoutId);
 
-        logger.error('ApiClient', `${method} ${url} request failed: ${err.message}`, { error: err.message }, undefined, Date.now() - reqStartTime);
+        logApi('error', `${method} ${url} request failed: ${err.message}`, { error: err.message, durationMs: Date.now() - reqStartTime });
 
         if (err instanceof ApiError) {
           throw err;

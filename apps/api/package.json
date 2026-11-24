@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/**/*.test.mjs",
+    "test": "NODE_ENV=test node --test test/**/*.test.mjs",
     "test:db": "node test/postgres-persistence.integration.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

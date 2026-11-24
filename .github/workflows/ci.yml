@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+      DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
 
     services:
       postgres:
@@ -50,11 +51,13 @@ jobs:
       - name: Validate Prisma Schema
         env:
           DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+          DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
         run: pnpm --filter @ca-career-os/api prisma validate
 
       - name: Apply Prisma Migrations to PostgreSQL
         env:
           DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+          DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
         run: pnpm --filter @ca-career-os/api prisma migrate deploy
 
       - name: TypeScript Typecheck
@@ -67,11 +70,14 @@ jobs:
         run: pnpm --filter @ca-career-os/web build
 
       - name: Run Full Monorepo Test Suite (163 Tests)
+        env:
+          NODE_ENV: test
         run: pnpm test
 
       - name: Execute Live PostgreSQL Persistence Workflows
         env:
           DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
+          DIRECT_URL: postgresql://postgres:postgrespassword@localhost:5432/ca_career_os_test
           CI: 'true'
           REQUIRE_DB: 'true'
         run: pnpm --filter @ca-career-os/api test:db
