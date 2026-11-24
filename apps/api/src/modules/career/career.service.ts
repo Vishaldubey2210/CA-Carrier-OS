@@ -240,13 +240,15 @@ export class CareerService {
       });
 
       if (dbRoadmap && dbRoadmap.tasks.length > 0) {
+        const mem = this.memRoadmaps.get(profile.id);
+        const resolvedPathway = (mem?.targetPathway || (dbRoadmap.targetPathway === 'AUDIT' ? 'AUDIT_ASSURANCE' : dbRoadmap.targetPathway)) as unknown as CAPathway;
         const completedTasks = dbRoadmap.tasks.filter((t) => t.status === 'COMPLETED').length;
         const total = dbRoadmap.tasks.length;
         return {
           id: dbRoadmap.id,
           candidateProfileId: dbRoadmap.candidateProfileId,
           workspaceId: dbRoadmap.workspaceId,
-          targetPathway: dbRoadmap.targetPathway as unknown as CAPathway,
+          targetPathway: resolvedPathway,
           overallFitScore: dbRoadmap.overallFitScore,
           summary: dbRoadmap.summary,
           tasks: dbRoadmap.tasks.map((t) => this.formatTaskWithMetadata(t)),
@@ -445,7 +447,7 @@ export class CareerService {
         id: created.id,
         candidateProfileId: created.candidateProfileId,
         workspaceId: created.workspaceId,
-        targetPathway: created.targetPathway as unknown as CAPathway,
+        targetPathway: targetPathway as unknown as CAPathway,
         overallFitScore: created.overallFitScore,
         summary: created.summary,
         tasks: created.tasks.map((t) => this.formatTaskWithMetadata(t)),
