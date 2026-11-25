@@ -141,8 +141,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>Support Desk</h3>
-                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>support@cacareeros.com</span>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>Candidate profiles, resume tailoring & billing issues</p>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>support@ezapply.work</span>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>Candidate profiles, resume tailoring &amp; billing issues</p>
               </div>
             </div>
 
@@ -151,9 +151,9 @@ export default function ContactPage() {
                 <ShieldCheck size={18} color="var(--accent-emerald)" />
               </div>
               <div>
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>Compliance & Ethics Review</h3>
-                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>compliance@cacareeros.com</span>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>ICAI Code of Ethics queries & employer verification disputes</p>
+                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>Compliance &amp; Verification</h3>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>compliance@ezapply.work</span>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>Employer verification &amp; listing integrity queries</p>
               </div>
             </div>
 

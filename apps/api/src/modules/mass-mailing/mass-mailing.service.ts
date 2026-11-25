@@ -508,7 +508,7 @@ export class MassMailingService {
           <br/><br/>
           <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;"/>
           <p style="font-size: 12px; color: #666; margin: 0;">
-            Sent by <strong>${req.candidateDetails.candidateName}</strong> (ICAI Reg: ${req.candidateDetails.icaiRegNo}) via CA Career OS Articleship Outreach Portal.
+            Sent by <strong>${req.candidateDetails.candidateName}</strong>${req.candidateDetails.icaiRegNo ? ` (${req.candidateDetails.icaiRegNo})` : ''} via EZapply Outreach Studio.
           </p>
         </div>
       `;

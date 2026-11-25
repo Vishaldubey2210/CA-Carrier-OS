@@ -135,7 +135,7 @@ export default function TermsOfServicePage() {
             Legal Questions
           </h2>
           <p style={{ margin: 0 }}>
-            For legal inquiries or statutory notices, please contact: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>legal@cacareeros.com</span>.
+            For legal inquiries or statutory notices, please contact: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>legal@ezapply.work</span>.
           </p>
         </section>
       </div>

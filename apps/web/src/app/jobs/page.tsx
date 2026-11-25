@@ -55,6 +55,7 @@ export default function JobsPage() {
   const [activeTab, setActiveTab] = useState<'EXPLORE' | 'SAVED' | 'APPLICATIONS'>('EXPLORE');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<'ALL' | 'ENTERPRISE' | 'EXTERNAL' | 'ARTICLESHIP'>('ALL');
+  const [selectedDomain, setSelectedDomain] = useState<string>('ALL');
   const [selectedOpportunityType, setSelectedOpportunityType] = useState<string>('ALL');
   const [selectedPathway, setSelectedPathway] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
@@ -118,7 +119,7 @@ export default function JobsPage() {
 
     // 1. Fetch public verified jobs catalog (non-blocking)
     try {
-      const jobsRes = await apiClient.get<JobDetail[]>('/jobs?limit=500');
+      const jobsRes = await apiClient.get<JobDetail[]>('/jobs?limit=1500');
       if (jobsRes.success && Array.isArray(jobsRes.data)) {
         setJobs(jobsRes.data);
       }
@@ -177,6 +178,23 @@ export default function JobsPage() {
       if (selectedChannel === 'EXTERNAL' && j.channel !== 'EXTERNAL') return false;
       if (selectedChannel === 'ARTICLESHIP' && j.opportunityType !== 'ARTICLESHIP' && j.opportunityType !== 'INDUSTRIAL_TRAINING') return false;
 
+      // Domain filter (Tech, Data & AI, Product, Finance & CA, Consulting, Marketing & Sales, Legal & HR)
+      if (selectedDomain !== 'ALL') {
+        const jobDomain = (j as any).domain;
+        if (jobDomain) {
+          if (jobDomain !== selectedDomain) return false;
+        } else {
+          const text = `${j.title} ${j.caPathway || ''}`.toLowerCase();
+          if (selectedDomain === 'TECH' && !/(software|engineer|developer|frontend|backend|fullstack|devops|sre|cloud)/i.test(text)) return false;
+          if (selectedDomain === 'DATA_AI' && !/(data|machine learning|ml |ai |genai|analytics)/i.test(text)) return false;
+          if (selectedDomain === 'PRODUCT_DESIGN' && !/(product|design|ux|ui|figma)/i.test(text)) return false;
+          if (selectedDomain === 'CONSULTING' && j.caPathway !== 'CONSULTING' && !/(consult|strategy|advisory)/i.test(text)) return false;
+          if (selectedDomain === 'MARKETING_SALES' && !/(marketing|sales|growth|account executive|partnerships|revenue)/i.test(text)) return false;
+          if (selectedDomain === 'LEGAL_OPS' && !/(legal|counsel|compliance|hr |people|operations)/i.test(text)) return false;
+          if (selectedDomain === 'FINANCE_CA' && !/(audit|tax|fp&a|finance|account|article|ca |treasury)/i.test(text)) return false;
+        }
+      }
+
       // Opportunity type filter
       if (selectedOpportunityType !== 'ALL') {
         if (selectedOpportunityType === 'TECH_ROLES') {
@@ -200,18 +218,19 @@ export default function JobsPage() {
           j.companyName.toLowerCase().includes(q) ||
           j.locationCity.toLowerCase().includes(q) ||
           (j.sourceProvider || '').toLowerCase().includes(q) ||
+          ((j as any).domainLabel || '').toLowerCase().includes(q) ||
           (j.structuredRequirements?.mandatorySkills || []).some((s) => s.toLowerCase().includes(q));
         if (!matchesQuery) return false;
       }
 
       if (selectedPathway !== 'ALL' && j.caPathway !== selectedPathway) return false;
-      if (selectedCity !== 'ALL' && j.locationCity.toLowerCase() !== selectedCity.toLowerCase())
+      if (selectedCity !== 'ALL' && !j.locationCity.toLowerCase().includes(selectedCity.toLowerCase()))
         return false;
       if (selectedArrangement !== 'ALL' && j.workArrangement !== selectedArrangement) return false;
 
       return true;
     });
-  }, [jobs, savedJobIds, activeTab, searchQuery, selectedChannel, selectedOpportunityType, selectedPathway, selectedCity, selectedArrangement]);
+  }, [jobs, savedJobIds, activeTab, searchQuery, selectedChannel, selectedDomain, selectedOpportunityType, selectedPathway, selectedCity, selectedArrangement]);
 
   // Performance: Lazy render jobs in batches of 24 to maintain 60fps scrolling
   const [visibleCount, setVisibleCount] = useState(24);
@@ -387,10 +406,10 @@ export default function JobsPage() {
       >
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.375rem' }}>
-            Job Directory
+            EZapply Universal Job Directory
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '640px', lineHeight: 1.5 }}>
-            Explore verified opportunities across accounting, audit, taxation, and corporate finance.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem', maxWidth: '680px', lineHeight: 1.5 }}>
+            Verified live openings across Tech &amp; AI, Product &amp; Design, Finance &amp; CA, Consulting, Marketing &amp; Sales, and Legal. Click any role to apply directly on the company&apos;s official career portal.
           </p>
         </div>
 
@@ -490,7 +509,7 @@ export default function JobsPage() {
                 className="btn btn-primary btn-pill"
                 style={{ fontSize: '0.875rem' }}
               >
-                Browse Verified CA Roles
+                Browse Verified Roles Across All Domains
               </button>
             </div>
           ) : (
@@ -721,6 +740,39 @@ export default function JobsPage() {
               ))}
             </div>
 
+            {/* Professional Domain Selector (Universal Multi-Domain Filter) */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', marginRight: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Domain:</span>
+              {[
+                { id: 'ALL', label: 'All Professions' },
+                { id: 'TECH', label: 'Tech & Engineering' },
+                { id: 'DATA_AI', label: 'Data & AI' },
+                { id: 'PRODUCT_DESIGN', label: 'Product & Design' },
+                { id: 'FINANCE_CA', label: 'Finance & CA' },
+                { id: 'CONSULTING', label: 'Consulting & Strategy' },
+                { id: 'MARKETING_SALES', label: 'Marketing & Sales' },
+                { id: 'LEGAL_OPS', label: 'Legal, HR & Ops' },
+              ].map((dom) => (
+                <button
+                  key={dom.id}
+                  onClick={() => setSelectedDomain(dom.id)}
+                  style={{
+                    padding: '0.32rem 0.72rem',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    borderRadius: '9999px',
+                    background: selectedDomain === dom.id ? '#09090B' : 'var(--surface-primary)',
+                    color: selectedDomain === dom.id ? '#ffffff' : 'var(--text-secondary)',
+                    border: selectedDomain === dom.id ? '1px solid #09090B' : '1px solid var(--border-subtle)',
+                    fontWeight: selectedDomain === dom.id ? 700 : 500,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {dom.label}
+                </button>
+              ))}
+            </div>
+
             {/* Role Level & Opportunity Type */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.625rem' }}>
               <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Discipline:</span>
@@ -850,6 +902,8 @@ export default function JobsPage() {
                 <button
                   onClick={() => {
                     setSearchQuery('');
+                    setSelectedDomain('ALL');
+                    setSelectedOpportunityType('ALL');
                     setSelectedPathway('ALL');
                     setSelectedCity('ALL');
                     setSelectedArrangement('ALL');
@@ -910,12 +964,21 @@ export default function JobsPage() {
                           </span>
                         )}
 
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                          {job.opportunityType === 'ARTICLESHIP' && 'Articleship'}
-                          {job.opportunityType === 'INDUSTRIAL_TRAINING' && 'Industrial Training'}
-                          {job.opportunityType === 'CA_FRESHER' && 'CA Fresher'}
-                          {job.opportunityType === 'QUALIFIED_CA' && 'Qualified CA'}
-                          {job.opportunityType === 'FINANCE_EXECUTIVE' && 'FP&A / Corporate Finance'}
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {(job as any).domainLabel ||
+                            (job.opportunityType === 'ARTICLESHIP'
+                              ? 'CA Articleship'
+                              : job.opportunityType === 'INDUSTRIAL_TRAINING'
+                              ? 'Industrial Training'
+                              : job.opportunityType === 'CA_FRESHER'
+                              ? 'CA Fresher'
+                              : job.opportunityType === 'QUALIFIED_CA'
+                              ? 'Qualified CA'
+                              : job.opportunityType === 'FINANCE_EXECUTIVE'
+                              ? 'Finance & Corporate'
+                              : job.opportunityType === 'INTERNSHIP'
+                              ? 'Internship'
+                              : 'Professional Role')}
                         </span>
                       </div>
 
@@ -1047,7 +1110,7 @@ export default function JobsPage() {
                           alignItems: 'center',
                           gap: '0.375rem',
                         }}
-                        title="Record application in your personal CA Career tracker"
+                        title="Record application in your personal EZapply tracker"
                       >
                         <Send size={12} /> Track
                       </button>

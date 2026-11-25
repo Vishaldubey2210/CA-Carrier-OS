@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
             5. Your Rights: Access, Export & Deletion
           </h2>
           <p>
-            Under applicable digital data privacy principles, you have full ownership over your professional information. You may at any time export your verified resume history or request permanent deletion of your account and personal workspace by contacting <a href="mailto:privacy@cacareeros.com" style={{ color: 'var(--accent-cyan)' }}>privacy@cacareeros.com</a>.
+            Under applicable digital data privacy principles, you have full ownership over your professional information. You may at any time export your verified resume history or request permanent deletion of your account and personal workspace by contacting <a href="mailto:privacy@ezapply.work" style={{ color: 'var(--accent-cyan)' }}>privacy@ezapply.work</a>.
           </p>
         </section>
 
@@ -144,7 +144,7 @@ export default function PrivacyPolicyPage() {
             Contact the Data Protection Officer
           </h2>
           <p style={{ margin: 0 }}>
-            For privacy inquiries or audit rights, please email: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>privacy@cacareeros.com</span> or submit a structured ticket through our <Link href="/contact" style={{ color: 'var(--accent-cyan)' }}>Contact Desk</Link>.
+            For privacy inquiries or audit rights, please email: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>privacy@ezapply.work</span> or submit a structured ticket through our <Link href="/contact" style={{ color: 'var(--accent-cyan)' }}>Contact Desk</Link>.
           </p>
         </section>
       </div>

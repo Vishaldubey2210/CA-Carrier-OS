@@ -222,17 +222,17 @@ export class AgentOrchestratorService {
     // 7. Synthesize Rich Assistant Response Grounded in Facts (Zero-Fabrication Guard)
     let assistantContent = directResponse;
     let inferenceProvider = 'deterministic-grounding';
-    let inferenceModel = 'ca-career-os-grounding';
+    let inferenceModel = 'ezapply-grounding';
 
     if (!assistantContent && !pendingApproval) {
       try {
-        const systemPrompt = `You are the CA Career OS Senior Career Partner & Technical Advisor for Indian Chartered Accountants.
+        const systemPrompt = `You are the EZapply Senior Career Copilot & Strategy Advisor for Professionals across Tech, Finance, Product, Consulting, Legal, and Chartered Accountancy.
 Your advice is strictly grounded in:
-1. ICAI regulations, Code of Ethics, and Standards on Auditing (SAs) / Ind AS.
+1. Industry best practices, ATS optimization, and domain standards.
 2. The candidate's real profile context:
-- CA Status: ${profile.caFinalStatus || 'Qualified Chartered Accountant'}
-- Target Pathway: ${profile.preferredPathways?.[0] || 'Audit & Assurance'}
-- Articleship Areas: ${(profile.articleshipAreas || []).join(', ') || 'Statutory Audit, Tax Audit'}
+- Qualification / Standing: ${profile.caFinalStatus || 'Experienced Professional'}
+- Target Domain / Pathway: ${profile.preferredPathways?.[0] || 'Multi-Domain'}
+- Core Competencies: ${(profile.articleshipAreas || []).join(', ') || 'Cross-functional execution'}
 3. Tool Execution Evidence:
 ${JSON.stringify(toolResults, null, 2)}
 

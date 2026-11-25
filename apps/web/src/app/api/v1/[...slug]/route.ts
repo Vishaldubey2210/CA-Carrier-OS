@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
+import fs from 'node:fs';
+import path from 'node:path';
 import jobsData from '@/data/jobs_store.json';
 import { logger } from '@/lib/logger';
 import {
@@ -7,6 +10,7 @@ import {
   persistVerifiedUser,
   generateJwtAccessToken,
   resendOtpChallenge,
+  maskEmail,
 } from '@/lib/server-auth';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +21,41 @@ const applicationsStore: any[] = [];
 const savedJobsStore: Set<string> = new Set();
 const candidateProfilesStore: Map<string, any> = new Map();
 const userResumesStore: Map<string, any[]> = new Map();
+let savedSmtpConfig: { email: string; maskedEmail: string; senderName: string; host: string; port: number; isVerified: boolean; appPassword: string } | null = null;
+
+function loadDirectoryTargets() {
+  const candidates = [
+    path.resolve(process.cwd(), 'data/ca_articleship_firms_5000.csv'),
+    path.resolve(process.cwd(), '../../data/ca_articleship_firms_5000.csv'),
+  ];
+  for (const csvPath of candidates) {
+    if (fs.existsSync(csvPath)) {
+      const lines = fs.readFileSync(csvPath, 'utf8').split(/\r?\n/).slice(1);
+      const out: any[] = [];
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const cols = line.split(',').map((c) => c.replace(/^"|"$/g, '').trim());
+        if (cols[1] && cols[1].includes('@')) {
+          out.push({
+            firmName: cols[0] || 'Hiring Firm',
+            email: cols[1],
+            primaryCity: cols[2] || 'Mumbai',
+            region: cols[3] || 'WIRC',
+            category: cols[4] || 'Verified Firm',
+          });
+        }
+      }
+      if (out.length > 0) return out;
+    }
+  }
+  return [
+    { firmName: 'BSR & Co. LLP (KPMG)', email: 'articleship@bsraffiliates.com', primaryCity: 'Mumbai', region: 'WIRC', category: 'Big 4 Network' },
+    { firmName: 'Deloitte Haskins & Sells', email: 'campus@deloitte.com', primaryCity: 'Bengaluru', region: 'SIRC', category: 'Big 4 Network' },
+    { firmName: 'Singhi & Co.', email: 'careers@singhico.com', primaryCity: 'New Delhi', region: 'NIRC', category: 'National CA Firm' },
+    { firmName: 'Haribhakti & Co. LLP', email: 'hr@haribhakti.co.in', primaryCity: 'Mumbai', region: 'WIRC', category: 'National CA Firm' },
+    { firmName: 'Grant Thornton Bharat LLP', email: 'talent@in.gt.com', primaryCity: 'Gurugram', region: 'NIRC', category: 'Top 10 Advisory' },
+  ];
+}
 
 function getCorrelationId(request: NextRequest): string {
   return (
@@ -59,8 +98,9 @@ export async function GET(
 
   // 2. Verified Jobs search & filter: /api/v1/jobs
   if (path === 'jobs') {
-    const limit = parseInt(searchParams.get('limit') || '500', 10);
+    const limit = parseInt(searchParams.get('limit') || '1500', 10);
     const search = searchParams.get('search')?.toLowerCase() || searchParams.get('query')?.toLowerCase() || '';
+    const domain = searchParams.get('domain') || 'ALL';
     const opportunityType = searchParams.get('opportunityType') || 'ALL';
     const pathway = searchParams.get('pathway') || searchParams.get('caPathway') || 'ALL';
     const city = searchParams.get('city') || searchParams.get('locationCity') || 'ALL';
@@ -68,6 +108,9 @@ export async function GET(
 
     let filtered = jobsData as any[];
 
+    if (domain !== 'ALL') {
+      filtered = filtered.filter((j) => j.domain === domain);
+    }
     if (opportunityType !== 'ALL') {
       filtered = filtered.filter((j) => j.opportunityType === opportunityType);
     }
@@ -178,8 +221,8 @@ export async function GET(
           items: [
             {
               id: 'notif-system-01',
-              title: '5,000 Verified CA Firms Active',
-              message: 'ICAI articleship database loaded with authentic outreach directories.',
+              title: 'EZapply Multi-Domain Engine Active',
+              message: 'Verified openings across Tech, Data & AI, Product, Finance & CA, Consulting, and Legal ready for 1-click apply.',
               isRead: false,
               createdAt: new Date().toISOString(),
             },
@@ -187,6 +230,48 @@ export async function GET(
           unreadCount: 1,
         },
         meta: { correlationId, timestamp: new Date().toISOString() },
+      },
+      { headers: { 'x-correlation-id': correlationId } }
+    );
+  }
+
+  // 7b. Mass Mailing GET endpoints (Vercel Serverless compatibility)
+  if (path === 'mass-mailing/smtp-status') {
+    return NextResponse.json(
+      {
+        success: true,
+        data: savedSmtpConfig
+          ? {
+              email: savedSmtpConfig.email,
+              maskedEmail: savedSmtpConfig.maskedEmail,
+              senderName: savedSmtpConfig.senderName,
+              host: savedSmtpConfig.host,
+              port: savedSmtpConfig.port,
+              isVerified: savedSmtpConfig.isVerified,
+            }
+          : { configured: false },
+        meta: { correlationId },
+      },
+      { headers: { 'x-correlation-id': correlationId } }
+    );
+  }
+
+  if (path === 'mass-mailing/targets') {
+    const region = searchParams.get('region') || 'ALL';
+    const city = searchParams.get('city') || 'ALL';
+    const search = (searchParams.get('search') || '').toLowerCase();
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
+
+    let list = loadDirectoryTargets();
+    if (region !== 'ALL') list = list.filter((f) => f.region === region);
+    if (city !== 'ALL') list = list.filter((f) => f.primaryCity?.toLowerCase().includes(city.toLowerCase()));
+    if (search) list = list.filter((f) => f.firmName.toLowerCase().includes(search) || f.email.toLowerCase().includes(search));
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: { total: list.length, firms: list.slice(0, limit) },
+        meta: { correlationId },
       },
       { headers: { 'x-correlation-id': correlationId } }
     );
@@ -473,9 +558,128 @@ export async function POST(
     return NextResponse.json(
       {
         success: true,
-        message: 'Synchronized latest verified articleship and finance vacancies.',
+        message: 'Synchronized latest verified openings across all professional domains.',
         syncedCount: count,
         meta: { correlationId, timestamp: new Date().toISOString() },
+      },
+      { headers: { 'x-correlation-id': correlationId } }
+    );
+  }
+
+  // 9. Mass Mailing POST endpoints (Serverless SMTP verify, save, and live cold outreach send)
+  if (path === 'mass-mailing/verify-smtp' || path === 'mass-mailing/save-smtp') {
+    const email = (body.email || '').trim().toLowerCase();
+    const pass = (body.appPassword || '').replace(/\s+/g, '').trim();
+    const host = (body.host || 'smtp.gmail.com').trim();
+    const port = Number(body.port || 587);
+    const senderName = (body.senderName || 'EZapply Candidate').trim();
+
+    if (!email || !pass) {
+      return NextResponse.json(
+        { success: false, error: { code: 'BAD_REQUEST', message: 'Sender email and Google App Password are required.' } },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+
+    try {
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user: email, pass },
+        connectionTimeout: 6000,
+      });
+      await transporter.verify();
+      savedSmtpConfig = { email, maskedEmail: maskEmail(email), senderName, host, port, isVerified: true, appPassword: pass };
+      return NextResponse.json(
+        {
+          success: true,
+          data: { verified: true, isVerified: true, email, maskedEmail: maskEmail(email), senderName, host, port, message: 'SMTP handshake verified successfully.' },
+          meta: { correlationId },
+        },
+        { headers: { 'x-correlation-id': correlationId } }
+      );
+    } catch (err: any) {
+      return NextResponse.json(
+        { success: false, error: { code: 'SMTP_ERROR', message: err.message || 'SMTP verification failed. Verify your 16-letter App Password.' } },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+  }
+
+  if (path === 'mass-mailing/send') {
+    const recipients: any[] = Array.isArray(body.recipients) ? body.recipients : [];
+    const cfg = body.smtpConfig || savedSmtpConfig;
+    if (!cfg?.email || !cfg?.appPassword) {
+      return NextResponse.json(
+        { success: false, error: { code: 'BAD_REQUEST', message: 'Please verify your Gmail App Password before dispatching.' } },
+        { status: 400, headers: { 'x-correlation-id': correlationId } }
+      );
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: cfg.host || 'smtp.gmail.com',
+      port: Number(cfg.port || 587),
+      secure: Number(cfg.port || 587) === 465,
+      auth: { user: cfg.email, pass: cfg.appPassword.replace(/\s+/g, '') },
+    });
+
+    const cd = body.candidateDetails || {};
+    const logs: any[] = [];
+    let totalSent = 0;
+    let totalFailed = 0;
+    const cap = Math.min(recipients.length, 25); // Safe serverless execution cap per batch
+
+    for (let i = 0; i < cap; i++) {
+      const r = recipients[i];
+      const personalize = (txt: string) =>
+        (txt || '')
+          .replace(/{firm_name}/g, r.firmName || 'Hiring Team')
+          .replace(/{candidate_name}/g, cd.candidateName || cfg.senderName || 'Applicant')
+          .replace(/{cro_number}/g, cd.icaiRegNo || '')
+          .replace(/{inter_status}/g, cd.interStatus || '')
+          .replace(/{city}/g, r.primaryCity || cd.city || 'India')
+          .replace(/{candidate_city}/g, cd.city || 'India')
+          .replace(/{phone}/g, cd.phone || '')
+          .replace(/{linkedin_url}/g, cd.linkedinUrl || '');
+
+      const subj = personalize(body.subject);
+      const text = personalize(body.bodyTemplate);
+
+      try {
+        await transporter.sendMail({
+          from: `"${cfg.senderName || cd.candidateName || 'EZapply'}" <${cfg.email}>`,
+          to: r.email,
+          subject: subj,
+          text,
+        });
+        totalSent++;
+        logs.push({
+          id: `log-${i}`,
+          timestamp: new Date().toLocaleTimeString('en-IN'),
+          level: 'SUCCESS',
+          recipientEmail: r.email,
+          firmName: r.firmName,
+          message: `Dispatched to ${r.firmName} <${r.email}>`,
+        });
+      } catch (err: any) {
+        totalFailed++;
+        logs.push({
+          id: `log-${i}`,
+          timestamp: new Date().toLocaleTimeString('en-IN'),
+          level: 'ERROR',
+          recipientEmail: r.email,
+          firmName: r.firmName,
+          message: `Failed for ${r.email}: ${err.message}`,
+        });
+      }
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: { totalRequested: cap, totalSent, totalFailed, logs },
+        meta: { correlationId },
       },
       { headers: { 'x-correlation-id': correlationId } }
     );

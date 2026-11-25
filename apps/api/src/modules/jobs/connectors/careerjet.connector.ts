@@ -54,7 +54,7 @@ export class CareerjetConnector implements JobConnector {
       endpoint.searchParams.set('page_size', '20');
       endpoint.searchParams.set('locale_code', 'en_IN');
       endpoint.searchParams.set('user_ip', '127.0.0.1');
-      endpoint.searchParams.set('user_agent', 'CharteredOS-Career-Platform/2.0');
+      endpoint.searchParams.set('user_agent', 'EZapply-Career-Platform/2.0');
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);

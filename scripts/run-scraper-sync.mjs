@@ -117,9 +117,9 @@ async function runScraperSync() {
     if (j?.id) jobMap.set(j.id, j);
   }
 
-  // Filter out any non-CA or fake test fixture jobs
-  const bannedKeywords = ['software', 'engineer', 'developer', 'full stack', 'product manager', 'ai agent', 'machine learning', 'data science', 'sales', 'customer support', 'marketing', 'mobile', 'react', 'frontend', 'backend', 'gh-10', 'lev-20', 'example.com', 'placeholder'];
-  const bannedCompanies = ['binance', 'gitlab', 'canonical', 'reddit', 'twilio', 'stripe', 'clickup', 'dandy', 'phantom', 'liftoff', 'juniper square', 'zip', 'samsara', 'proper ai', 'certik', 'reedsy', 'serve robotics', 'thumbtack', 'kalshi', 'bjak', 'cloudbeds', 'hims & hers'];
+  // Filter out fake test fixtures and low-signal feeds while supporting all legitimate professional domains
+  const bannedKeywords = ['gh-10', 'lev-20', 'example.com', 'placeholder'];
+  const bannedCompanies = [];
 
   let newCount = 0;
   for (const nj of allScrapedJobs) {

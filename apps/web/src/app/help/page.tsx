@@ -17,15 +17,15 @@ import {
 export default function HelpKnowledgeBasePage() {
   const guideCategories = [
     {
-      title: 'Getting Started as a Candidate',
+      title: 'Getting Started on EZapply',
       icon: Compass,
-      description: 'How to map Form 108 articleship exposure, run 7-pathway career diagnostics, and set up your personal workspace.',
+      description: 'How to configure your professional domain, core skills, and personal career workspace across Tech, Finance, Consulting, Legal, or CA.',
       articles: [
-        'Setting up your candidate profile with ICAI credentials',
-        'How Form 108 weeks & firm tiers affect pathway matching',
-        'Understanding your 30/60/90-day post-qualification roadmap',
+        'Setting up your multi-domain profile in Onboarding',
+        'Filtering live ATS jobs across Greenhouse, Lever & Direct Portals',
+        'Launching 1-click cold email outreach from your Gmail',
       ],
-      linkHref: '/career',
+      linkHref: '/onboarding',
     },
     {
       title: 'Zero-Fabrication Resume Tailoring',

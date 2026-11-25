@@ -28,7 +28,7 @@ function DashboardContent() {
   const [mainView, setMainView] = useState<'OVERVIEW' | 'OUTREACH'>('OVERVIEW');
   const [applications, setApplications] = useState<any[]>([]);
   const [jobs, setJobs] = useState<JobDetail[]>([]);
-  const [selectedJobFilter, setSelectedJobFilter] = useState<'ALL' | 'ARTICLESHIP' | 'JOBS'>('ALL');
+  const [selectedJobFilter, setSelectedJobFilter] = useState<'ALL' | 'TECH' | 'FINANCE' | 'PRODUCT' | 'ARTICLESHIP'>('ALL');
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Sync query param tab
@@ -45,7 +45,7 @@ function DashboardContent() {
       try {
         const [appRes, jobRes] = await Promise.all([
           isAuthenticated ? apiClient.get('/applications').catch(() => null) : Promise.resolve(null),
-          apiClient.get<JobDetail[]>('/jobs?limit=20').catch(() => null),
+          apiClient.get<JobDetail[]>('/jobs?limit=300').catch(() => null),
         ]);
 
         if (isMounted) {
@@ -76,27 +76,32 @@ function DashboardContent() {
     return null;
   }
 
-  const candidateName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Candidate';
+  const candidateName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Professional';
   const articleships = jobs.filter(
     (j) =>
       j.opportunityType === 'ARTICLESHIP' ||
       j.opportunityType === 'INDUSTRIAL_TRAINING' ||
       j.title.toLowerCase().includes('article') ||
-      j.title.toLowerCase().includes('intern') ||
       j.title.toLowerCase().includes('trainee')
   );
-  const generalJobs = jobs.filter(
-    (j) =>
-      j.opportunityType !== 'ARTICLESHIP' &&
-      !j.title.toLowerCase().includes('article') &&
-      !j.title.toLowerCase().includes('intern')
+  const techJobs = jobs.filter((j: any) => j.domain === 'TECH' || j.domain === 'DATA_AI' || /(engineer|developer|software|data|ai |ml )/i.test(j.title));
+  const productJobs = jobs.filter((j: any) => j.domain === 'PRODUCT_DESIGN' || j.domain === 'MARKETING_SALES' || /(product|design|marketing|growth|sales)/i.test(j.title));
+  const financeJobs = jobs.filter(
+    (j: any) =>
+      j.domain === 'FINANCE_CA' ||
+      j.domain === 'CONSULTING' ||
+      (!techJobs.includes(j) && !productJobs.includes(j) && !articleships.includes(j))
   );
 
   const displayedJobs =
-    selectedJobFilter === 'ARTICLESHIP'
+    selectedJobFilter === 'TECH'
+      ? techJobs
+      : selectedJobFilter === 'FINANCE'
+      ? financeJobs
+      : selectedJobFilter === 'PRODUCT'
+      ? productJobs
+      : selectedJobFilter === 'ARTICLESHIP'
       ? articleships
-      : selectedJobFilter === 'JOBS'
-      ? generalJobs
       : jobs;
 
   return (
@@ -109,11 +114,11 @@ function DashboardContent() {
               Welcome, {candidateName}
             </h1>
             <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full glass-pill text-neutral-800">
-              {activeWorkspace?.name || 'Personal Workspace'}
+              {activeWorkspace?.name || 'EZapply Workspace'}
             </span>
           </div>
           <p className="text-[13px] text-neutral-600 m-0">
-            Apply to verified CA openings individually or launch 1-Click Mass Outreach to 5,000+ firms.
+            Apply across Tech, Product, Finance, Consulting, Legal &amp; CA — or launch 1-Click Cold Outreach from your own Gmail.
           </p>
         </div>
 
@@ -181,7 +186,7 @@ function DashboardContent() {
                   </span>
                 </div>
                 <div className="text-[13px] text-neutral-600 mt-0.5">
-                  Connect your Gmail App Password and dispatch personalized cover letters to 5,000+ CA firms in 1 click.
+                  Connect your Gmail App Password and dispatch personalized pitches to verified firms or custom recruiter lists in 1 click.
                 </div>
               </div>
             </div>
@@ -191,7 +196,7 @@ function DashboardContent() {
               onClick={() => setMainView('OUTREACH')}
               className="px-4 py-2 bg-black text-white text-[13px] font-semibold rounded-lg hover:bg-neutral-800 transition-colors shrink-0 shadow-md flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Open Mass Mailer</span>
+              <span>Open Cold Mailer</span>
               <ArrowRight size={13} />
             </button>
           </div>
@@ -199,32 +204,32 @@ function DashboardContent() {
           {/* Key Metrics Strip - Frosted Glass Card */}
           <div className="grid grid-cols-1 sm:grid-cols-3 glass-card rounded-xl overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-white/60">
             <Link
-              href="/articleship"
-              className="p-5 hover:bg-white/60 transition-colors no-underline text-inherit"
-            >
-              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
-                Articleship &amp; Trainees
-              </span>
-              <div className="text-[26px] font-extrabold text-black tracking-tight">
-                {articleships.length > 0 ? `${articleships.length} Openings` : '50+ Openings'}
-              </div>
-              <span className="text-[12px] text-neutral-600 font-medium">
-                Form 102/103 &amp; Form 104 Industrial Training
-              </span>
-            </Link>
-
-            <Link
               href="/jobs"
               className="p-5 hover:bg-white/60 transition-colors no-underline text-inherit"
             >
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
-                Qualified CA Jobs
+                All Professional Roles
               </span>
-              <div className="text-[26px] font-extrabold text-black tracking-tight">
-                {generalJobs.length > 0 ? `${generalJobs.length} Positions` : '200+ Positions'}
+              <div className="text-[26px] font-extrabold text-black tracking-tight tabular-nums">
+                {jobs.length > 0 ? `${jobs.length}+ Verified` : '1,200+ Verified'}
               </div>
               <span className="text-[12px] text-neutral-600 font-medium">
-                Statutory Audit, Direct Tax, FP&amp;A &amp; M&amp;A
+                Tech, AI, Product, Finance, Consulting &amp; Legal
+              </span>
+            </Link>
+
+            <Link
+              href="/articleship"
+              className="p-5 hover:bg-white/60 transition-colors no-underline text-inherit"
+            >
+              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
+                Articleship &amp; Traineeships
+              </span>
+              <div className="text-[26px] font-extrabold text-black tracking-tight tabular-nums">
+                {articleships.length > 0 ? `${articleships.length} Openings` : '120+ Openings'}
+              </div>
+              <span className="text-[12px] text-neutral-600 font-medium">
+                Form 102/103 &amp; Form 104 Industrial Training
               </span>
             </Link>
 
@@ -232,11 +237,11 @@ function DashboardContent() {
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
                 Tracked Applications
               </span>
-              <div className="text-[26px] font-extrabold text-black tracking-tight">
+              <div className="text-[26px] font-extrabold text-black tracking-tight tabular-nums">
                 {applications.length} Active
               </div>
               <span className="text-[12px] text-neutral-600 font-medium">
-                Direct firm submissions
+                Direct portal &amp; cold outreach pipeline
               </span>
             </div>
           </div>
@@ -248,48 +253,35 @@ function DashboardContent() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
                   <h2 className="text-[16px] font-bold text-black m-0">
-                    Verified Vacancies
+                    Verified Live Opportunities
                   </h2>
                   <span className="text-[12px] text-neutral-500">
-                    Direct postings from authorized career portals
+                    Direct postings from company ATS &amp; official portals
                   </span>
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="inline-flex items-center gap-1 glass-pill p-1 text-[12px]">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedJobFilter('ALL')}
-                    className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
-                      selectedJobFilter === 'ALL'
-                        ? 'bg-black text-white shadow-xs'
-                        : 'text-neutral-700 hover:text-black'
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedJobFilter('ARTICLESHIP')}
-                    className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
-                      selectedJobFilter === 'ARTICLESHIP'
-                        ? 'bg-black text-white shadow-xs'
-                        : 'text-neutral-700 hover:text-black'
-                    }`}
-                  >
-                    Articleships
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedJobFilter('JOBS')}
-                    className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
-                      selectedJobFilter === 'JOBS'
-                        ? 'bg-black text-white shadow-xs'
-                        : 'text-neutral-700 hover:text-black'
-                    }`}
-                  >
-                    CA Jobs
-                  </button>
+                <div className="inline-flex items-center gap-1 glass-pill p-1 text-[12px] flex-wrap">
+                  {[
+                    { id: 'ALL', label: 'All' },
+                    { id: 'TECH', label: 'Tech & AI' },
+                    { id: 'PRODUCT', label: 'Product & Growth' },
+                    { id: 'FINANCE', label: 'Finance & CA' },
+                    { id: 'ARTICLESHIP', label: 'Articleships' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setSelectedJobFilter(tab.id as any)}
+                      className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
+                        selectedJobFilter === tab.id
+                          ? 'bg-black text-white shadow-xs'
+                          : 'text-neutral-700 hover:text-black'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -299,13 +291,13 @@ function DashboardContent() {
                 </div>
               ) : (
                 <div className="glass-card rounded-xl overflow-hidden divide-y divide-white/50">
-                  {displayedJobs.slice(0, 8).map((job) => {
+                  {displayedJobs.slice(0, 10).map((job: any) => {
                     const targetUrl = job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#';
                     const isTrainee =
                       job.opportunityType === 'ARTICLESHIP' ||
                       job.opportunityType === 'INDUSTRIAL_TRAINING' ||
-                      job.title.toLowerCase().includes('article') ||
-                      job.title.toLowerCase().includes('intern');
+                      job.title.toLowerCase().includes('article');
+                    const badgeLabel = job.domainLabel || (isTrainee ? 'Articleship' : 'Professional');
 
                     return (
                       <div
@@ -321,7 +313,7 @@ function DashboardContent() {
                                   : 'border-neutral-200/80 bg-neutral-100/80 text-neutral-800'
                               }`}
                             >
-                              {isTrainee ? 'Articleship' : 'Qualified CA'}
+                              {badgeLabel}
                             </span>
                             <span className="text-[13px] font-semibold text-black flex items-center gap-1">
                               {job.companyName}
@@ -389,23 +381,45 @@ function DashboardContent() {
                   </button>
 
                   <Link
+                    href="/jobs"
+                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Briefcase size={15} />
+                      <span>Jobs Directory (All Domains)</span>
+                    </div>
+                    <ArrowRight size={13} className="text-neutral-400" />
+                  </Link>
+
+                  <Link
+                    href="/resumes"
+                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Zap size={15} />
+                      <span>Resume &amp; Cover Letter Studio</span>
+                    </div>
+                    <ArrowRight size={13} className="text-neutral-400" />
+                  </Link>
+
+                  <Link
+                    href="/interviews"
+                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock size={15} />
+                      <span>Interview Prep Studio</span>
+                    </div>
+                    <ArrowRight size={13} className="text-neutral-400" />
+                  </Link>
+
+                  <Link
                     href="/articleship"
                     className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
                   >
                     <div className="flex items-center gap-2">
                       <GraduationCap size={16} />
                       <span>Articleship Hub (Form 102/103)</span>
-                    </div>
-                    <ArrowRight size={13} className="text-neutral-400" />
-                  </Link>
-
-                  <Link
-                    href="/jobs"
-                    className="flex items-center justify-between p-2.5 rounded-lg glass-pill hover:bg-white transition-colors text-black no-underline text-[13px] font-semibold"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Briefcase size={15} />
-                      <span>CA Jobs &amp; Traineeships</span>
                     </div>
                     <ArrowRight size={13} className="text-neutral-400" />
                   </Link>
@@ -427,18 +441,18 @@ function DashboardContent() {
                   <div className="p-4 text-center text-neutral-500 text-[13px] glass-pill rounded-lg">
                     <p className="m-0 mb-2">No active applications tracked yet.</p>
                     <Link
-                      href="/articleship"
+                      href="/jobs"
                       className="text-black font-semibold text-[12px] hover:underline"
                     >
-                      Find Articleships →
+                      Explore Jobs →
                     </Link>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
                     {applications.slice(0, 4).map((app) => (
                       <div key={app.id} className="p-2.5 glass-pill rounded-lg text-[12px]">
-                        <div className="font-bold text-black">{app.roleTitle || 'CA Opening'}</div>
-                        <div className="text-neutral-500">{app.companyName || 'Firm'}</div>
+                        <div className="font-bold text-black">{app.roleTitle || 'Application'}</div>
+                        <div className="text-neutral-500">{app.companyName || 'Employer'}</div>
                       </div>
                     ))}
                   </div>

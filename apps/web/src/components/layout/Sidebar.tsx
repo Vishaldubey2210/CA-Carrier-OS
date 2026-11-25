@@ -25,10 +25,13 @@ import {
 import { WorkspaceType } from '@ca-career-os/shared';
 
 const CANDIDATE_NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard?tab=outreach', label: 'Mass Outreach (450/Day)', icon: Mail },
-  { href: '/jobs', label: 'Jobs (All Roles)', icon: Briefcase },
+  { href: '/dashboard', label: 'Command Center', icon: LayoutDashboard },
+  { href: '/jobs', label: 'Jobs (All Domains)', icon: Briefcase },
+  { href: '/dashboard?tab=outreach', label: 'Cold Mailer (450/Day)', icon: Mail },
+  { href: '/resumes', label: 'Resume & Pitch Studio', icon: FileText },
+  { href: '/interviews', label: 'Interview Prep', icon: MessageSquareCode },
   { href: '/articleship', label: 'Articleship & Internships', icon: GraduationCap },
+  { href: '/onboarding', label: 'Career Profile', icon: Compass },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

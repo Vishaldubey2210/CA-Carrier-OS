@@ -572,15 +572,15 @@ export default function AdminPortalPage() {
             {[
               {
                 action: 'AUTH_DEMO_LOGIN_SUCCEEDED',
-                actor: 'admin@cacareeros.com',
+                actor: 'admin@ezapply.work',
                 target: 'PLATFORM_ADMIN_PORTAL',
                 hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
                 time: '2 mins ago',
               },
               {
                 action: 'CANDIDATE_ATTESTATION_RECORDED',
-                actor: 'candidate.priya@cacareeros.com',
-                target: 'RESUME_ADR009_FORM108',
+                actor: 'candidate.priya@ezapply.work',
+                target: 'RESUME_PROFILE_VERIFIED',
                 hash: '8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4',
                 time: '14 mins ago',
               },

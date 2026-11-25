@@ -16,10 +16,11 @@ export function PublicHeader() {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
-    { href: '/jobs', label: 'All Jobs' },
-    { href: '/articleship', label: 'Articleship & Internships' },
+    { href: '/jobs', label: 'Explore Jobs' },
+    { href: '/resumes', label: 'Resume Studio' },
+    { href: '/interviews', label: 'Interview Prep' },
+    { href: '/articleship', label: 'Articleship & Interns' },
     { href: '/#pricing', label: 'Pricing' },
-    { href: '/#faq', label: 'FAQ' },
   ];
 
   useEffect(() => {

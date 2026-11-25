@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://cacareeros.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ezapply.work';
   const currentDate = new Date().toISOString();
 
   const publicRoutes = [

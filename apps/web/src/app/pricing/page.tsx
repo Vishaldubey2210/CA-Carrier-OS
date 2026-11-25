@@ -10,41 +10,40 @@ export default function PublicPricingPage() {
 
   const plans = [
     {
-      id: 'articleship-pass',
-      name: 'Articleship Pass',
-      badge: 'CA Students & Inter',
+      id: 'intern-pass',
+      name: 'Student & Intern Pass',
+      badge: 'Students, Interns & Articles',
       price: '₹99',
       period: '3 months access',
-      description: 'Built specifically for CA Intermediate cleared students looking for verified articleship training and industrial training vacancies.',
+      description: 'Built for students, fresh graduates, and CA Intermediate candidates seeking verified internships and articleship openings.',
       features: [
-        'Form 102/103 2-year articleship scheme vacancies',
-        'Corporate industrial training (Form 104) openings',
-        'Direct firm website links & partner contact details',
-        'Verified stipend transparency by city & tier',
+        'Tech, Finance, Consulting & Legal internships across India',
+        'Form 102/103 CA articleship & Form 104 industrial training',
+        '1-Click Cold Mailer with personal Gmail SMTP (450/day)',
+        'Direct company career portal links & partner contacts',
+        'ATS Resume Keyword Analyzer & Cover Pitch Studio',
         'Personal application status tracker',
-        'Filter by Big 4, Top 20 firms, and mid-size practices',
       ],
-      ctaText: 'Get Articleship Pass',
+      ctaText: 'Get Intern Pass',
       ctaHref: '/articleship',
       popular: false,
     },
     {
-      id: 'ca-pro-pass',
-      name: 'CA Career Pro',
-      badge: 'Semi-Qualified & Qualified CAs',
+      id: 'pro-pass',
+      name: 'Professional Pro Pass',
+      badge: 'All Working Professionals',
       price: '₹199',
       period: '6 months access',
-      description: 'Comprehensive access to all Qualified Chartered Accountant roles, corporate finance jobs, and articleship opportunities.',
+      description: 'Comprehensive access to verified jobs across Tech, Data & AI, Product, Finance, Consulting, Legal, and Chartered Accountancy.',
       features: [
-        'Everything included in the Articleship Pass',
-        'All Qualified & Semi-Qualified CA job vacancies',
-        'Direct recruiter and hiring partner contacts',
-        'CTC & compensation benchmark insights',
-        'Priority applicant visibility for hiring firms',
-        'Instant alerts for new Big 4, MNC, and startup openings',
-        'Audit, Tax, M&A, and FP&A role categorization',
+        'Everything included in the Student & Intern Pass',
+        'All verified openings across Tech, AI, Finance, Product & Legal',
+        'Unlimited 450/day Gmail cold outreach + custom HR email lists',
+        'Multi-domain Interview Prep & Resume Tailoring Studio',
+        'CTC & compensation benchmark insights by domain',
+        'Instant alerts for new Big 4, MNC, and high-growth startup roles',
       ],
-      ctaText: 'Get CA Career Pro',
+      ctaText: 'Get Professional Pro',
       ctaHref: '/jobs',
       popular: true,
     },
@@ -57,7 +56,7 @@ export default function PublicPricingPage() {
         <div className="text-center max-w-[620px] mx-auto mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded border border-neutral-300 text-[12px] font-semibold text-neutral-800 mb-4 bg-neutral-50">
             <ShieldCheck size={14} />
-            <span>Verified CA Opportunities</span>
+            <span>EZapply Transparent Access</span>
           </div>
           <h1 className="text-[clamp(2rem,3vw,2.75rem)] font-bold text-black tracking-tight leading-tight mb-4">
             Simple, Transparent Pricing

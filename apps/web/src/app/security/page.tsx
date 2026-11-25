@@ -143,10 +143,10 @@ export default function SecurityArchitecturePage() {
           Responsible Vulnerability Disclosure
         </h2>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-          We welcome responsible disclosure from security researchers and Chartered Accountants. If you discover a potential vulnerability in our authentication, tenant boundaries, or API endpoints, please report it directly:
+          We welcome responsible disclosure from security researchers and community members. If you discover a potential vulnerability in our authentication, tenant boundaries, or API endpoints, please report it directly:
         </p>
         <div style={{ display: 'inline-block', padding: '0.75rem 1.25rem', background: 'var(--surface-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', fontFamily: 'monospace', color: 'var(--brand-primary)', fontWeight: 600, fontSize: '0.9375rem' }}>
-          security@cacareeros.com
+          security@ezapply.work
         </div>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.75rem', margin: '0.75rem 0 0 0' }}>
           We commit to acknowledging all valid vulnerability submissions within 24 hours.

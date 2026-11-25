@@ -40,8 +40,8 @@ export default function BillingPage() {
   const plans: PlanCard[] = [
     {
       tier: 'FREE_CANDIDATE',
-      name: 'Free Candidate Tier',
-      description: 'Foundational career discovery, capability inventory, and verified job search forever free for all CAs.',
+      name: 'Free Explorer Tier',
+      description: 'Foundational career discovery, ATS resume matching, and verified job search across all professional domains.',
       priceMonthly: '₹0',
       priceAnnual: '₹0',
       features: [

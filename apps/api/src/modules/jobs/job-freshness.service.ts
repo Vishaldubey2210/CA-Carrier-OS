@@ -91,7 +91,7 @@ export class JobFreshnessService {
           method: 'HEAD',
           signal: controller.signal,
           headers: {
-            'User-Agent': 'CACareerOS-FreshnessBot/1.0 (+https://cacareeros.com/bot)',
+            'User-Agent': 'EZapply-FreshnessBot/2.0 (+https://ezapply.work/bot)',
           },
         }).finally(() => clearTimeout(timeout));
 

@@ -31,9 +31,11 @@ import { WorkspaceType } from '@ca-career-os/shared';
 import { apiClient } from '../../lib/api-client';
 
 const MOBILE_NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Command Center', icon: LayoutDashboard },
+  { href: '/jobs', label: 'All Jobs', icon: Briefcase },
+  { href: '/resumes', label: 'Resume Studio', icon: FileText },
+  { href: '/interviews', label: 'Interview Prep', icon: MessageSquareCode },
   { href: '/articleship', label: 'Articleship', icon: GraduationCap },
-  { href: '/jobs', label: 'Jobs', icon: Briefcase },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

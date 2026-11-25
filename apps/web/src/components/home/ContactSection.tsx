@@ -114,10 +114,10 @@ export function ContactSection() {
               <div>
                 <div className="text-[12px] text-[#64748B] font-medium">Direct Inquiries</div>
                 <a
-                  href="mailto:support@cacareeros.com"
+                  href="mailto:support@ezapply.work"
                   className="font-semibold text-[#0F172A] hover:text-[#1E3A8A] transition-colors no-underline"
                 >
-                  support@cacareeros.com
+                  support@ezapply.work
                 </a>
               </div>
             </div>

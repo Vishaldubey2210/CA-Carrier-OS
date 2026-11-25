@@ -64,7 +64,7 @@ export class AshbyConnector implements JobConnector {
           signal: controller.signal,
           headers: {
             'Accept': 'application/json',
-            'User-Agent': 'CACareerOS-JobAggregator/1.0 (+https://cacareeros.com)',
+            'User-Agent': 'EZapply-JobAggregator/2.0 (+https://ezapply.work)',
           },
         }).finally(() => clearTimeout(timeout));
 

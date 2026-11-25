@@ -376,7 +376,7 @@ export class JobsService {
       sourceProvider: 'DIRECT_EMPLOYER',
       canonicalUrl: input.canonicalUrl || input.sourceUrl || null,
       applicationUrl: input.applicationUrl || input.sourceUrl || null,
-      attribution: 'Direct Enterprise Mandate published via CA Career OS Employer Portal',
+      attribution: 'Direct Enterprise Mandate published via EZapply Employer Portal',
       originalPostedAt: now.toISOString(),
       firstSeenAt: now.toISOString(),
       lastSeenAt: now.toISOString(),

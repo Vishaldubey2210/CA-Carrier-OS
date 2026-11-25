@@ -209,8 +209,8 @@ export class JobAlertsService {
 
     const emailPayload: EmailPayload = {
       to: candidateEmail,
-      subject: `[CA Career OS] ${unalertedJobs.length} New CA Opportunities Match Your Preferences`,
-      bodyText: `Hello,\n\nWe found ${unalertedJobs.length} new verified CA openings matching your alert criteria:\n\n${jobListingsSummary}\n\nLogin to CA Career OS to review and tailor your application.`,
+      subject: `[EZapply] ${unalertedJobs.length} New Verified Opportunities Match Your Preferences`,
+      bodyText: `Hello,\n\nWe found ${unalertedJobs.length} new verified openings matching your alert criteria:\n\n${jobListingsSummary}\n\nLogin to EZapply to review and apply directly.`,
       metadata: {
         candidateId,
         jobIds: unalertedJobs.map((j) => j.id),

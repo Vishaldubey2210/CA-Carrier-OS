@@ -403,7 +403,7 @@ export default function SettingsPage() {
                 Permanent deletion purges all candidate resumes, applications, and workspace records in accordance with digital privacy laws.
               </p>
               <button
-                onClick={() => alert('To confirm account deletion, please email privacy@cacareeros.com with your registered email.')}
+                onClick={() => alert('To confirm account deletion, please email privacy@ezapply.work with your registered email.')}
                 className="btn btn-secondary"
                 style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)', padding: '0.5rem 1rem', fontSize: '0.8125rem' }}
               >

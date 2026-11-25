@@ -203,13 +203,18 @@ export function MassMailerSection() {
   const [linkedinUrl, setLinkedinUrl] = useState('https://linkedin.com/in/ca-rahul-sharma');
 
   // 3. Email Template State
-  const [selectedTemplateKey, setSelectedTemplateKey] = useState<'ARTICLESHIP' | 'INDUSTRIAL_TRAINING' | 'QUALIFIED_JOB'>('ARTICLESHIP');
-  const [subjectTemplate, setSubjectTemplate] = useState(GENERIC_TEMPLATES.ARTICLESHIP.subject);
-  const [bodyTemplate, setBodyTemplate] = useState(GENERIC_TEMPLATES.ARTICLESHIP.body);
+  type TemplateKey = 'TECH_ENGINEERING' | 'FINANCE_CONSULTING' | 'LEGAL_COMPLIANCE' | 'ARTICLESHIP' | 'INDUSTRIAL_TRAINING' | 'QUALIFIED_JOB';
+  const [selectedTemplateKey, setSelectedTemplateKey] = useState<TemplateKey>('TECH_ENGINEERING');
+  const [subjectTemplate, setSubjectTemplate] = useState(GENERIC_TEMPLATES.TECH_ENGINEERING.subject);
+  const [bodyTemplate, setBodyTemplate] = useState(GENERIC_TEMPLATES.TECH_ENGINEERING.body);
   const [activePreviewTab, setActivePreviewTab] = useState<'EDIT' | 'PREVIEW'>('EDIT');
   const [throttleDelaySec, setThrottleDelaySec] = useState<number>(1.5);
 
-  // 4. Target Selection State
+  // 4. Target Selection State (Directory OR Custom HR/Recruiter List for any domain)
+  const [recipientMode, setRecipientMode] = useState<'DIRECTORY' | 'CUSTOM'>('DIRECTORY');
+  const [customEmailsText, setCustomEmailsText] = useState(
+    'Razorpay Talent, careers@razorpay.com, Bengaluru\nCRED Hiring, talent@cred.club, Bengaluru\nGroww Engineering, hiring@groww.in, Bengaluru'
+  );
   const [targetFirms, setTargetFirms] = useState<MassMailingRecipient[]>([]);
   const [totalAvailableFirms, setTotalAvailableFirms] = useState(0);
   const [filterRegion, setFilterRegion] = useState('ALL');
@@ -219,6 +224,37 @@ export function MassMailerSection() {
   const [selectedBatchLimit, setSelectedBatchLimit] = useState<number>(50);
   const [isLoadingFirms, setIsLoadingFirms] = useState(false);
   const [showFirmsDrawer, setShowFirmsDrawer] = useState(false);
+
+  // Parse custom recipients whenever user types in CUSTOM mode
+  const customRecipients = useMemo<MassMailingRecipient[]>(() => {
+    const lines = customEmailsText
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const out: MassMailingRecipient[] = [];
+    for (const line of lines) {
+      const emailMatch = line.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+      if (!emailMatch) continue;
+      const email = emailMatch[0].toLowerCase();
+      const parts = line.split(',').map((p) => p.trim());
+      const domainName = email.split('@')[1]?.split('.')[0] || 'Hiring Team';
+      const firmName =
+        parts.length >= 2 && !parts[0].includes('@')
+          ? parts[0]
+          : domainName.charAt(0).toUpperCase() + domainName.slice(1);
+      const city = parts.length >= 3 ? parts[2] : candidateCity || 'India';
+      out.push({
+        firmName,
+        email,
+        primaryCity: city,
+        region: 'CUSTOM',
+        category: 'CUSTOM_OUTREACH',
+      });
+    }
+    return out;
+  }, [customEmailsText, candidateCity]);
+
+  const effectiveRecipients = recipientMode === 'CUSTOM' ? customRecipients : targetFirms;
 
   // 5. Campaign Execution & Live Logs State
   const [isSending, setIsSending] = useState(false);
@@ -243,7 +279,7 @@ export function MassMailerSection() {
   }, [filterRegion, filterCity, filterCategory, searchTarget, selectedBatchLimit]);
 
   // Handle template change
-  const handleTemplateSwitch = (key: 'ARTICLESHIP' | 'INDUSTRIAL_TRAINING' | 'QUALIFIED_JOB') => {
+  const handleTemplateSwitch = (key: TemplateKey) => {
     setSelectedTemplateKey(key);
     setSubjectTemplate(GENERIC_TEMPLATES[key].subject);
     setBodyTemplate(GENERIC_TEMPLATES[key].body);
@@ -338,10 +374,10 @@ export function MassMailerSection() {
 
   // Generate Personalized Preview for first recipient
   const previewData = useMemo(() => {
-    const firstFirm = targetFirms[0] || {
-      firmName: 'BSR & Co. LLP (KPMG Network)',
-      email: 'articleship@bsraffiliates.com',
-      primaryCity: 'Mumbai',
+    const firstFirm = effectiveRecipients[0] || {
+      firmName: 'Razorpay / BSR & Co. LLP',
+      email: 'talent@company.com',
+      primaryCity: candidateCity || 'Bengaluru',
     };
 
     const renderedSubject = subjectTemplate
@@ -362,7 +398,7 @@ export function MassMailerSection() {
       .replace(/{linkedin_url}/g, linkedinUrl);
 
     return { firm: firstFirm, subject: renderedSubject, body: renderedBody };
-  }, [targetFirms, subjectTemplate, bodyTemplate, candidateName, icaiRegNo, interStatus, candidateCity, phone, linkedinUrl]);
+  }, [effectiveRecipients, subjectTemplate, bodyTemplate, candidateName, icaiRegNo, interStatus, candidateCity, phone, linkedinUrl]);
 
   // Handle Start Campaign
   const handleStartCampaign = async () => {
@@ -374,13 +410,13 @@ export function MassMailerSection() {
       return;
     }
 
-    if (targetFirms.length === 0) {
-      alert('No CA firms selected. Please choose at least 1 firm recipient.');
+    if (effectiveRecipients.length === 0) {
+      alert('No recipients selected. Please select directory targets or paste at least 1 HR/recruiter email.');
       return;
     }
 
     const confirmStart = window.confirm(
-      `Ready to dispatch personalized applications to ${targetFirms.length} verified CA firms?\n\nDaily Safe Ceiling: 450 emails/day\nPacing delay: ${throttleDelaySec}s between emails to protect your Gmail reputation.`
+      `Ready to dispatch personalized applications to ${effectiveRecipients.length} recipients?\n\nDaily Safe Ceiling: 450 emails/day\nPacing delay: ${throttleDelaySec}s between emails to protect your Gmail reputation.`
     );
     if (!confirmStart) return;
 
@@ -398,7 +434,7 @@ export function MassMailerSection() {
         level: 'INFO',
         recipientEmail: 'SYSTEM',
         firmName: 'Campaign Initializing',
-        message: `Starting automated outreach to ${targetFirms.length} firms from ${savedConfig?.maskedEmail || smtpEmail} (Daily Safe Limit: 450 emails)...`,
+        message: `Starting automated outreach to ${effectiveRecipients.length} recipients from ${savedConfig?.maskedEmail || smtpEmail} (Daily Safe Limit: 450 emails)...`,
       },
     ]);
 
@@ -415,7 +451,7 @@ export function MassMailerSection() {
           : undefined,
         subject: subjectTemplate,
         bodyTemplate: bodyTemplate,
-        recipients: targetFirms,
+        recipients: effectiveRecipients,
         candidateDetails: {
           candidateName,
           icaiRegNo,
@@ -465,10 +501,10 @@ export function MassMailerSection() {
             </span>
           </div>
           <h2 className="text-[20px] sm:text-[22px] font-extrabold text-white tracking-tight m-0 mb-1.5">
-            1-Click CA Articleship &amp; Job Mass Outreach
+            EZapply 1-Click Cold Outreach Studio
           </h2>
           <p className="text-[13px] text-neutral-300 leading-relaxed m-0">
-            Send genuine, personalized cover letters directly from your own Gmail address to 5,000+ verified CA firms and recruiters. Automated rate limiting prevents spam flags and guarantees partner inbox delivery.
+            Send personalized cold pitches directly from your own Gmail address to hiring managers, tech recruiters, or 5,000+ verified firms. Automated rate limiting protects your sender reputation.
           </p>
         </div>
 
@@ -784,29 +820,47 @@ export function MassMailerSection() {
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 block mb-1">ICAI Registration No.</label>
+                <label className="font-semibold text-neutral-700 block mb-1">
+                  {selectedTemplateKey === 'TECH_ENGINEERING' || selectedTemplateKey === 'FINANCE_CONSULTING' || selectedTemplateKey === 'LEGAL_COMPLIANCE'
+                    ? 'Primary Domain / Registration ID'
+                    : 'ICAI Registration No.'}
+                </label>
                 <input
                   type="text"
                   value={icaiRegNo}
                   onChange={(e) => setIcaiRegNo(e.target.value)}
-                  placeholder="e.g. WRO0786542"
+                  placeholder={selectedTemplateKey === 'TECH_ENGINEERING' ? 'e.g. Full-Stack / Distributed Systems' : 'e.g. WRO0786542'}
                   className="w-full px-2.5 py-1.5 glass-input rounded text-black"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 block mb-1">CA Status / Clearance</label>
-                <select
-                  value={interStatus}
-                  onChange={(e) => setInterStatus(e.target.value)}
-                  className="w-full px-2.5 py-1.5 glass-input rounded text-black"
-                >
-                  <option value="Both Groups Cleared (1st Attempt)">Both Groups Cleared (1st Attempt)</option>
-                  <option value="Both Groups Cleared">Both Groups Cleared</option>
-                  <option value="Group 1 Cleared (Appearing G2)">Group 1 Cleared (Appearing G2)</option>
-                  <option value="Direct Entry Route Graduate">Direct Entry Route Graduate</option>
-                  <option value="CA Final Qualified">CA Final Qualified</option>
-                </select>
+                <label className="font-semibold text-neutral-700 block mb-1">
+                  {selectedTemplateKey === 'TECH_ENGINEERING' || selectedTemplateKey === 'FINANCE_CONSULTING' || selectedTemplateKey === 'LEGAL_COMPLIANCE'
+                    ? 'Experience / Credential'
+                    : 'CA Status / Clearance'}
+                </label>
+                {selectedTemplateKey === 'TECH_ENGINEERING' || selectedTemplateKey === 'FINANCE_CONSULTING' || selectedTemplateKey === 'LEGAL_COMPLIANCE' ? (
+                  <input
+                    type="text"
+                    value={interStatus}
+                    onChange={(e) => setInterStatus(e.target.value)}
+                    placeholder="e.g. 3+ Years Experience / B.Tech / MBA"
+                    className="w-full px-2.5 py-1.5 glass-input rounded text-black"
+                  />
+                ) : (
+                  <select
+                    value={interStatus}
+                    onChange={(e) => setInterStatus(e.target.value)}
+                    className="w-full px-2.5 py-1.5 glass-input rounded text-black"
+                  >
+                    <option value="Both Groups Cleared (1st Attempt)">Both Groups Cleared (1st Attempt)</option>
+                    <option value="Both Groups Cleared">Both Groups Cleared</option>
+                    <option value="Group 1 Cleared (Appearing G2)">Group 1 Cleared (Appearing G2)</option>
+                    <option value="Direct Entry Route Graduate">Direct Entry Route Graduate</option>
+                    <option value="CA Final Qualified">CA Final Qualified</option>
+                  </select>
+                )}
               </div>
 
               <div>
@@ -877,24 +931,36 @@ export function MassMailerSection() {
               </div>
             </div>
 
-            {/* Template Buttons */}
+            {/* Template Buttons (All Professions + CA) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
-              {(['ARTICLESHIP', 'INDUSTRIAL_TRAINING', 'QUALIFIED_JOB'] as const).map((key) => {
+              {(
+                [
+                  'TECH_ENGINEERING',
+                  'FINANCE_CONSULTING',
+                  'LEGAL_COMPLIANCE',
+                  'ARTICLESHIP',
+                  'INDUSTRIAL_TRAINING',
+                  'QUALIFIED_JOB',
+                ] as const
+              ).map((key) => {
                 const isSelected = selectedTemplateKey === key;
                 return (
                   <button
                     key={key}
                     type="button"
                     onClick={() => handleTemplateSwitch(key)}
-                    className={`p-2.5 text-left rounded-lg transition-all cursor-pointer text-[12px] leading-tight ${
+                    className={`p-2.5 text-left rounded-lg transition-all cursor-pointer text-[11.5px] leading-tight ${
                       isSelected
                         ? 'bg-black text-white font-bold shadow-xs'
                         : 'glass-pill hover:bg-white text-neutral-700'
                     }`}
                   >
-                    {key === 'ARTICLESHIP' && 'Articleship (Form 102/103)'}
-                    {key === 'INDUSTRIAL_TRAINING' && 'Industrial Training (Form 104)'}
-                    {key === 'QUALIFIED_JOB' && 'Qualified CA Job'}
+                    {key === 'TECH_ENGINEERING' && 'Tech & Software'}
+                    {key === 'FINANCE_CONSULTING' && 'Finance & Strategy'}
+                    {key === 'LEGAL_COMPLIANCE' && 'Legal & Compliance'}
+                    {key === 'ARTICLESHIP' && 'CA Articleship'}
+                    {key === 'INDUSTRIAL_TRAINING' && 'Industrial Training'}
+                    {key === 'QUALIFIED_JOB' && 'Qualified CA Role'}
                   </button>
                 );
               })}
@@ -944,97 +1010,142 @@ export function MassMailerSection() {
         <div className="lg:col-span-6 flex flex-col gap-5">
           {/* STEP 4: Target Selection & Daily Batch Limit */}
           <div className="glass-card rounded-xl p-5">
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
               <div>
                 <h3 className="text-[15px] font-bold text-black m-0 flex items-center gap-1.5">
                   <Building size={16} className="text-emerald-600" />
-                  <span>4. Filter Target CA Firms ({targetFirms.length} Selected)</span>
+                  <span>4. Select Target Recipients ({effectiveRecipients.length} Ready)</span>
                 </h3>
                 <span className="text-[12px] text-neutral-500">
-                  Sourced from 5,000+ verified CA firms database
+                  {recipientMode === 'DIRECTORY'
+                    ? 'Sourced from 5,000+ verified firms & hiring desks'
+                    : 'Custom recruiter / company email list (Any Domain)'}
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setShowFirmsDrawer(!showFirmsDrawer)}
-                className="text-[12px] font-semibold text-black hover:underline"
-              >
-                {showFirmsDrawer ? 'Hide List' : 'Preview List'}
-              </button>
-            </div>
-
-            {/* Filters Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-3 text-[12px]">
-              <div>
-                <label className="block text-neutral-600 mb-1 font-medium">Region</label>
-                <select
-                  value={filterRegion}
-                  onChange={(e) => setFilterRegion(e.target.value)}
-                  className="w-full p-1.5 glass-input rounded text-black"
+              <div className="inline-flex items-center gap-1 glass-pill p-1 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => setRecipientMode('DIRECTORY')}
+                  className={`px-2.5 py-1 rounded font-semibold cursor-pointer ${
+                    recipientMode === 'DIRECTORY' ? 'bg-black text-white' : 'text-neutral-700'
+                  }`}
                 >
-                  <option value="ALL">All Regions (5,000)</option>
-                  <option value="WIRC">WIRC (Mumbai, Pune, Guj)</option>
-                  <option value="NIRC">NIRC (Delhi NCR, Chd, Jai)</option>
-                  <option value="SIRC">SIRC (Blr, Chn, Hyd, Kochi)</option>
-                  <option value="EIRC">EIRC (Kolkata, Bhb, Patna)</option>
-                  <option value="CIRC">CIRC (Kanpur, Ind, Lko, Bhp)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-neutral-600 mb-1 font-medium">City</label>
-                <select
-                  value={filterCity}
-                  onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full p-1.5 glass-input rounded text-black"
+                  5,000+ Directory
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRecipientMode('CUSTOM')}
+                  className={`px-2.5 py-1 rounded font-semibold cursor-pointer ${
+                    recipientMode === 'CUSTOM' ? 'bg-black text-white' : 'text-neutral-700'
+                  }`}
                 >
-                  <option value="ALL">All Major Cities</option>
-                  <option value="Mumbai">Mumbai</option>
-                  <option value="New Delhi">New Delhi</option>
-                  <option value="Gurugram">Gurugram</option>
-                  <option value="Bengaluru">Bengaluru</option>
-                  <option value="Kolkata">Kolkata</option>
-                  <option value="Chennai">Chennai</option>
-                  <option value="Pune">Pune</option>
-                  <option value="Ahmedabad">Ahmedabad</option>
-                  <option value="Hyderabad">Hyderabad</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-neutral-600 mb-1 font-medium">Batch Size (450 Max)</label>
-                <select
-                  value={selectedBatchLimit}
-                  onChange={(e) => setSelectedBatchLimit(Number(e.target.value))}
-                  className="w-full p-1.5 glass-input rounded text-black font-semibold"
-                >
-                  <option value={25}>25 Firms (Quick Test)</option>
-                  <option value={50}>50 Firms (Recommended)</option>
-                  <option value={100}>100 Firms</option>
-                  <option value={250}>250 Firms</option>
-                  <option value={450}>450 Firms (Daily Maximum)</option>
-                </select>
+                  Custom Recruiter Emails
+                </button>
               </div>
             </div>
 
-            {/* Recipient Drawer */}
-            {showFirmsDrawer && (
-              <div className="max-h-[180px] overflow-y-auto glass-pill rounded-lg p-2 text-[11px] mb-3">
-                {isLoadingFirms ? (
-                  <div className="text-center py-4 text-neutral-500">Loading firms...</div>
-                ) : (
-                  targetFirms.map((f, i) => (
-                    <div
-                      key={i}
-                      className="flex justify-between py-1 border-b border-white/50 last:border-b-0"
+            {recipientMode === 'CUSTOM' ? (
+              <div className="space-y-2 mb-3">
+                <label className="text-[11px] font-semibold text-neutral-600 block">
+                  Paste HR / Recruiter / Founder emails (one per line: <code>Company, email@domain.com, City</code>)
+                </label>
+                <textarea
+                  rows={4}
+                  value={customEmailsText}
+                  onChange={(e) => setCustomEmailsText(e.target.value)}
+                  placeholder="Stripe Hiring, talent@stripe.com, Bengaluru&#10;Figma Recruiting, jobs@figma.com, Remote"
+                  className="w-full p-2.5 font-mono text-[12px] glass-input rounded-lg text-black"
+                />
+                <div className="text-[11px] text-emerald-700 font-semibold">
+                  Parsed {customRecipients.length} valid recipient email(s)
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-end mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowFirmsDrawer(!showFirmsDrawer)}
+                    className="text-[12px] font-semibold text-black hover:underline"
+                  >
+                    {showFirmsDrawer ? 'Hide List' : 'Preview List'}
+                  </button>
+                </div>
+
+                {/* Filters Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-3 text-[12px]">
+                  <div>
+                    <label className="block text-neutral-600 mb-1 font-medium">Region</label>
+                    <select
+                      value={filterRegion}
+                      onChange={(e) => setFilterRegion(e.target.value)}
+                      className="w-full p-1.5 glass-input rounded text-black"
                     >
-                      <div className="font-semibold text-black">{f.firmName} ({f.primaryCity || f.region})</div>
-                      <div className="font-mono text-neutral-600">{f.email}</div>
-                    </div>
-                  ))
+                      <option value="ALL">All Regions (5,000)</option>
+                      <option value="WIRC">WIRC (Mumbai, Pune, Guj)</option>
+                      <option value="NIRC">NIRC (Delhi NCR, Chd, Jai)</option>
+                      <option value="SIRC">SIRC (Blr, Chn, Hyd, Kochi)</option>
+                      <option value="EIRC">EIRC (Kolkata, Bhb, Patna)</option>
+                      <option value="CIRC">CIRC (Kanpur, Ind, Lko, Bhp)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-neutral-600 mb-1 font-medium">City</label>
+                    <select
+                      value={filterCity}
+                      onChange={(e) => setFilterCity(e.target.value)}
+                      className="w-full p-1.5 glass-input rounded text-black"
+                    >
+                      <option value="ALL">All Major Cities</option>
+                      <option value="Mumbai">Mumbai</option>
+                      <option value="New Delhi">New Delhi</option>
+                      <option value="Gurugram">Gurugram</option>
+                      <option value="Bengaluru">Bengaluru</option>
+                      <option value="Kolkata">Kolkata</option>
+                      <option value="Chennai">Chennai</option>
+                      <option value="Pune">Pune</option>
+                      <option value="Ahmedabad">Ahmedabad</option>
+                      <option value="Hyderabad">Hyderabad</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-neutral-600 mb-1 font-medium">Batch Size (450 Max)</label>
+                    <select
+                      value={selectedBatchLimit}
+                      onChange={(e) => setSelectedBatchLimit(Number(e.target.value))}
+                      className="w-full p-1.5 glass-input rounded text-black font-semibold"
+                    >
+                      <option value={25}>25 Recipients (Quick Test)</option>
+                      <option value={50}>50 Recipients (Recommended)</option>
+                      <option value={100}>100 Recipients</option>
+                      <option value={250}>250 Recipients</option>
+                      <option value={450}>450 Recipients (Daily Maximum)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Recipient Drawer */}
+                {showFirmsDrawer && (
+                  <div className="max-h-[180px] overflow-y-auto glass-pill rounded-lg p-2 text-[11px] mb-3">
+                    {isLoadingFirms ? (
+                      <div className="text-center py-4 text-neutral-500">Loading directory...</div>
+                    ) : (
+                      targetFirms.map((f, i) => (
+                        <div
+                          key={i}
+                          className="flex justify-between py-1 border-b border-white/50 last:border-b-0"
+                        >
+                          <div className="font-semibold text-black">{f.firmName} ({f.primaryCity || f.region})</div>
+                          <div className="font-mono text-neutral-600">{f.email}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 )}
-              </div>
+              </>
             )}
 
             {/* Delay Slider */}
@@ -1065,14 +1176,14 @@ export function MassMailerSection() {
                   Ready to Dispatch
                 </h3>
                 <div className="text-[12px] text-neutral-500 mt-0.5">
-                  Targeting <strong>{targetFirms.length}</strong> verified firms (Daily Quota: {DAILY_QUOTA_LIMIT})
+                  Targeting <strong>{effectiveRecipients.length}</strong> recipients (Daily Quota: {DAILY_QUOTA_LIMIT})
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={handleStartCampaign}
-                disabled={isSending || targetFirms.length === 0}
+                disabled={isSending || effectiveRecipients.length === 0}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-[#09090B] hover:bg-neutral-800 text-white font-bold text-[14px] flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSending ? (
@@ -1083,7 +1194,7 @@ export function MassMailerSection() {
                 ) : (
                   <>
                     <Send size={16} className="text-emerald-400" />
-                    <span>Start 1-Click Mass Mailing ({targetFirms.length})</span>
+                    <span>Start 1-Click Mass Mailing ({effectiveRecipients.length})</span>
                   </>
                 )}
               </button>
@@ -1093,7 +1204,7 @@ export function MassMailerSection() {
             <div className="grid grid-cols-3 gap-2.5">
               <div className="p-3 rounded-lg glass-pill text-center">
                 <div className="text-[10px] font-bold text-neutral-500 uppercase">Total Selected</div>
-                <div className="text-[20px] font-black text-black">{targetFirms.length}</div>
+                <div className="text-[20px] font-black text-black">{effectiveRecipients.length}</div>
               </div>
 
               <div className="p-3 rounded-lg glass-pill border-emerald-300/70 bg-emerald-50/80 text-center">
@@ -1119,7 +1230,7 @@ export function MassMailerSection() {
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                 </div>
                 <span className="text-[11px] text-neutral-400 font-semibold">
-                  outreach-terminal://ca-dispatcher (450 daily)
+                  ezapply://cold-mail-dispatcher (450 daily)
                 </span>
               </div>
 
