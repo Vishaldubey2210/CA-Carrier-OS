@@ -25,7 +25,33 @@ import {
 } from 'lucide-react';
 import { JobDetail, HIRING_SOURCES_CATALOG, HiringSourceCategory } from '@ca-career-os/shared';
 import { apiClient } from '@/lib/api-client';
-import { MassMailerSection } from '@/components/articleship/MassMailerSection';
+import dynamic from 'next/dynamic';
+
+const MassMailerSection = dynamic(
+  () => import('@/components/articleship/MassMailerSection').then((m) => m.MassMailerSection),
+  {
+    loading: () => (
+      <div
+        style={{
+          padding: '2.5rem 1.5rem',
+          background: 'var(--surface-primary)',
+          borderRadius: '12px',
+          border: '1px solid var(--border-subtle)',
+          margin: '1rem 0',
+        }}
+      >
+        <div className="skeleton-shimmer" style={{ width: '280px', height: '24px', marginBottom: '0.75rem' }} />
+        <div className="skeleton-shimmer" style={{ width: '460px', height: '14px', marginBottom: '2rem' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+          <div className="skeleton-shimmer" style={{ height: '140px', borderRadius: '8px' }} />
+          <div className="skeleton-shimmer" style={{ height: '140px', borderRadius: '8px' }} />
+          <div className="skeleton-shimmer" style={{ height: '140px', borderRadius: '8px' }} />
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 export default function ArticleshipPage() {
   const [jobs, setJobs] = useState<JobDetail[]>([]);
@@ -131,6 +157,17 @@ export default function ArticleshipPage() {
       return true;
     });
   }, [jobs, selectedType, selectedPathway, selectedCity, selectedSource, searchQuery]);
+
+  // Performance: Lazy render vacancies in batches to eliminate DOM bloat
+  const [visibleCount, setVisibleCount] = useState(25);
+
+  useEffect(() => {
+    setVisibleCount(25);
+  }, [selectedType, selectedPathway, selectedCity, selectedSource, searchQuery]);
+
+  const visibleJobs = useMemo(() => {
+    return filteredJobs.slice(0, visibleCount);
+  }, [filteredJobs, visibleCount]);
 
   const cities = useMemo(() => {
     const list = Array.from(new Set(jobs.map((j) => j.locationCity.split('/')[0].trim()))).filter(Boolean);
@@ -630,6 +667,7 @@ export default function ArticleshipPage() {
           </button>
         </div>
       ) : (
+        <>
         <div className="data-table-container">
           <table className="data-table">
             <thead>
@@ -642,7 +680,7 @@ export default function ArticleshipPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredJobs.map((job) => {
+              {visibleJobs.map((job) => {
                 const isSaved = savedIds.has(job.id);
                 const isIndustrial = job.opportunityType === 'INDUSTRIAL_TRAINING';
                 const targetUrl = job.applicationUrl || job.canonicalUrl || job.sourceUrl || '#';
@@ -780,6 +818,44 @@ export default function ArticleshipPage() {
             </tbody>
           </table>
         </div>
+
+        {filteredJobs.length > visibleCount && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '1.25rem 0 0.5rem',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setVisibleCount((prev) => Math.min(prev + 25, filteredJobs.length))}
+              className="btn btn-secondary"
+              style={{
+                fontSize: '0.8125rem',
+                padding: '0.5rem 1.25rem',
+                fontWeight: 600,
+              }}
+            >
+              Load More Openings ({visibleJobs.length} of {filteredJobs.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setVisibleCount(filteredJobs.length)}
+              className="btn btn-ghost"
+              style={{
+                fontSize: '0.75rem',
+                padding: '0.5rem 0.875rem',
+                color: 'var(--text-muted)',
+              }}
+            >
+              Show All ({filteredJobs.length})
+            </button>
+          </div>
+        )}
+        </>
       )}
       </>
       )}

@@ -200,6 +200,17 @@ export default function JobsPage() {
     });
   }, [jobs, savedJobIds, activeTab, searchQuery, selectedChannel, selectedOpportunityType, selectedPathway, selectedCity, selectedArrangement]);
 
+  // Performance: Lazy render jobs in batches of 24 to maintain 60fps scrolling
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [searchQuery, selectedChannel, selectedOpportunityType, selectedPathway, selectedCity, selectedArrangement, activeTab]);
+
+  const visibleJobs = useMemo(() => {
+    return filteredJobs.slice(0, visibleCount);
+  }, [filteredJobs, visibleCount]);
+
   const toggleSaveJob = async (jobId: string) => {
     const isCurrentlySaved = savedJobIds.has(jobId);
     setSavedJobIds((prev) => {
@@ -845,8 +856,9 @@ export default function JobsPage() {
               </div>
             </div>
           ) : (
+            <>
             <div className="job-directory-container">
-              {filteredJobs.map((job) => (
+              {visibleJobs.map((job) => (
                 <div
                   key={job.id}
                   className="job-directory-row"
@@ -1114,6 +1126,44 @@ export default function JobsPage() {
                 </div>
               ))}
             </div>
+
+            {filteredJobs.length > visibleCount && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '1.5rem 0 0.5rem',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((prev) => Math.min(prev + 24, filteredJobs.length))}
+                  className="btn btn-secondary"
+                  style={{
+                    fontSize: '0.8125rem',
+                    padding: '0.625rem 1.5rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  Load More Openings ({visibleJobs.length} of {filteredJobs.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount(filteredJobs.length)}
+                  className="btn btn-ghost"
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.625rem 1rem',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Show All ({filteredJobs.length})
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
       )}

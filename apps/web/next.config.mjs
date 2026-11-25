@@ -18,6 +18,11 @@ const apiOrigin = resolveApiOrigin();
 const nextConfig = {
   reactStrictMode: true,
   devIndicators: false,
+  compress: true,
+  poweredByHeader: false,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
   transpilePackages: ['@ca-career-os/shared'],
   async rewrites() {
     if (!apiOrigin) {
