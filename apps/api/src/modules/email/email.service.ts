@@ -125,7 +125,7 @@ export class EmailService {
    */
   async sendEmail(options: EmailOptions): Promise<{ success: boolean; messageId: string; simulated: boolean }> {
     const fromEmail = process.env.SMTP_FROM_EMAIL || 'noreply@cacareeros.com';
-    const fromName = process.env.SMTP_FROM_NAME || 'CA Career OS';
+    const fromName = process.env.SMTP_FROM_NAME || 'EZapply';
     const fromAddress = `"${fromName}" <${fromEmail}>`;
     const messageId = `<${randomUUID()}@cacareeros.com>`;
 
@@ -208,8 +208,8 @@ export class EmailService {
 <body>
   <div class="wrapper">
     <div class="header">
-      <span class="logo-badge">CA</span>
-      <span class="brand-name">CA Career OS &bull; Sovereign Career Platform</span>
+      <span class="logo-badge">EZ</span>
+      <span class="brand-name">EZapply &bull; Career Platform for All Professionals</span>
     </div>
     <div class="content">
       ${bodyContent}
@@ -219,7 +219,7 @@ export class EmailService {
       </div>
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} CA Career OS &bull; Built exclusively for Indian Chartered Accountants &bull; ICAI Code of Ethics Compliant<br>
+      &copy; ${new Date().getFullYear()} EZapply &bull; Career OS for Modern Professionals &bull; Zero-PII Protected<br>
       <a href="${appUrl}/help" style="color: #64748b; text-decoration: none;">Help Center</a> &bull; <a href="${appUrl}/privacy" style="color: #64748b; text-decoration: none;">Privacy Policy</a>
     </div>
   </div>
@@ -235,7 +235,7 @@ export class EmailService {
     const bodyHtml = `
       <h1>Your Verification Code</h1>
       <p>${greeting}</p>
-      <p>A sign-in attempt was initiated for your CA Career OS account. Use the single-use 6-digit verification code below to complete your authentication:</p>
+      <p>A sign-in attempt was initiated for your EZapply account. Use the single-use 6-digit verification code below to complete your authentication:</p>
       <div class="otp-box">
         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8;">Single-Use Security Code</div>
         <div class="otp-code">${otpCode}</div>
@@ -244,12 +244,12 @@ export class EmailService {
       <p style="font-size: 12px; color: #94a3b8;">This code can only be used once. For security reasons, maximum 5 verification attempts are allowed per code.</p>
     `;
 
-    const bodyText = `${greeting}\n\nYour CA Career OS sign-in verification code is: ${otpCode}\n\nThis code is valid for 5 minutes and expires automatically. Do not share this code with anyone.\n\nIf you did not request this code, please secure your account immediately.`;
+    const bodyText = `${greeting}\n\nYour EZapply sign-in verification code is: ${otpCode}\n\nThis code is valid for 5 minutes and expires automatically. Do not share this code with anyone.\n\nIf you did not request this code, please secure your account immediately.`;
 
-    const html = this.renderBaseTemplate('Sign-In Verification Code — CA Career OS', bodyHtml);
+    const html = this.renderBaseTemplate('Sign-In Verification Code — EZapply', bodyHtml);
     return await this.sendEmail({
       to,
-      subject: `[CA Career OS] ${otpCode} is your sign-in verification code`,
+      subject: `[EZapply] ${otpCode} is your sign-in verification code`,
       html,
       text: bodyText,
     });
@@ -261,22 +261,22 @@ export class EmailService {
   async sendEmailVerification(to: string, verificationLink: string, firstName?: string): Promise<{ success: boolean; messageId: string }> {
     const greeting = firstName ? `Welcome ${firstName},` : 'Welcome,';
     const bodyHtml = `
-      <h1>Verify Your CA Career OS Account</h1>
+      <h1>Verify Your EZapply Account</h1>
       <p>${greeting}</p>
-      <p>Thank you for registering on CA Career OS, the sovereign career operating system for Chartered Accountants. Please verify your email address to confirm your account credentials and activate your personal workspace.</p>
+      <p>Thank you for registering on EZapply, the universal career operating system for modern professionals. Please verify your email address to confirm your account credentials and activate your personal workspace.</p>
     `;
 
-    const bodyText = `${greeting}\n\nPlease verify your CA Career OS account by clicking the link below:\n${verificationLink}\n\nThis verification link is valid for 24 hours.`;
+    const bodyText = `${greeting}\n\nPlease verify your EZapply account by clicking the link below:\n${verificationLink}\n\nThis verification link is valid for 24 hours.`;
 
     const html = this.renderBaseTemplate(
-      'Verify Your Account — CA Career OS',
+      'Verify Your Account — EZapply',
       bodyHtml,
       { text: 'Verify Email Address', url: verificationLink }
     );
 
     return await this.sendEmail({
       to,
-      subject: '[CA Career OS] Verify your email address',
+      subject: '[EZapply] Verify your email address',
       html,
       text: bodyText,
     });
@@ -290,21 +290,21 @@ export class EmailService {
     const bodyHtml = `
       <h1>Reset Your Account Password</h1>
       <p>${greeting}</p>
-      <p>We received a request to reset the password for your CA Career OS account. Click the button below to choose a new password:</p>
+      <p>We received a request to reset the password for your EZapply account. Click the button below to choose a new password:</p>
       <p style="font-size: 12px; color: #94a3b8;">This password reset link will expire in <strong>15 minutes</strong> and can only be used once.</p>
     `;
 
-    const bodyText = `${greeting}\n\nWe received a request to reset your CA Career OS password.\nClick the link below to set a new password:\n${resetLink}\n\nThis link is valid for 15 minutes. If you did not request a password reset, you can safely ignore this email.`;
+    const bodyText = `${greeting}\n\nWe received a request to reset your EZapply password.\nClick the link below to set a new password:\n${resetLink}\n\nThis link is valid for 15 minutes. If you did not request a password reset, you can safely ignore this email.`;
 
     const html = this.renderBaseTemplate(
-      'Reset Your Password — CA Career OS',
+      'Reset Your Password — EZapply',
       bodyHtml,
       { text: 'Reset Password', url: resetLink }
     );
 
     return await this.sendEmail({
       to,
-      subject: '[CA Career OS] Reset your account password',
+      subject: '[EZapply] Reset your account password',
       html,
       text: bodyText,
     });
@@ -317,7 +317,7 @@ export class EmailService {
     const bodyHtml = `
       <h1>Support Enquiry Received</h1>
       <p>Dear ${name},</p>
-      <p>Thank you for contacting CA Career OS Support. We have received your inquiry regarding <strong>"${subject}"</strong>.</p>
+      <p>Thank you for contacting EZapply Support. We have received your inquiry regarding <strong>"${subject}"</strong>.</p>
       <div class="otp-box">
         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8;">Assigned Ticket Reference</div>
         <div style="font-size: 20px; font-weight: 700; color: #60a5fa; margin: 8px 0;">${ticketRef}</div>
@@ -326,12 +326,12 @@ export class EmailService {
       <p>Our executive team is reviewing your details and will follow up shortly.</p>
     `;
 
-    const bodyText = `Dear ${name},\n\nThank you for reaching out. We have logged your enquiry with reference ticket: ${ticketRef} regarding "${subject}".\n\nOur team will review your enquiry and respond within 24 business hours.\n\nCA Career OS Support Team`;
+    const bodyText = `Dear ${name},\n\nThank you for reaching out. We have logged your enquiry with reference ticket: ${ticketRef} regarding "${subject}".\n\nOur team will review your enquiry and respond within 24 business hours.\n\nEZapply Support Team`;
 
-    const html = this.renderBaseTemplate('Support Enquiry Received — CA Career OS', bodyHtml);
+    const html = this.renderBaseTemplate('Support Enquiry Received — EZapply', bodyHtml);
     return await this.sendEmail({
       to,
-      subject: `[CA Career OS] Support Request Received (${ticketRef})`,
+      subject: `[EZapply] Support Request Received (${ticketRef})`,
       html,
       text: bodyText,
     });
@@ -351,10 +351,10 @@ export class EmailService {
 
     const bodyText = `${greeting}\n\nSecurity Alert: ${eventTitle}\n\n${eventDetails}\n\nTimestamp: ${new Date().toUTCString()}\n\nIf this was not you, please contact security@cacareeros.com immediately.`;
 
-    const html = this.renderBaseTemplate(`Security Alert: ${eventTitle} — CA Career OS`, bodyHtml);
+    const html = this.renderBaseTemplate(`Security Alert: ${eventTitle} — EZapply`, bodyHtml);
     return await this.sendEmail({
       to,
-      subject: `[Security Alert] ${eventTitle} — CA Career OS`,
+      subject: `[Security Alert] ${eventTitle} — EZapply`,
       html,
       text: bodyText,
     });
@@ -484,31 +484,31 @@ export class EmailService {
       </div>
 
       <div style="font-size: 11px; color: #64748b; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px;">
-        Timestamp: ${timestampStr} | CA Career OS Autonomous Aggregator Daemon
+        Timestamp: ${timestampStr} | EZapply Autonomous Aggregator Daemon
       </div>
     `;
 
-    const bodyText = `[CharteredOS Scraper Alert] Real-time Ingestion Completed\n\n` +
+    const bodyText = `[EZapply Scraper Alert] Real-time Ingestion Completed\n\n` +
       `New Ingested: +${payload.totalIngested}\n` +
       `Duplicates: ${payload.totalDuplicates}\n` +
       `Duration: ${durationSeconds}s\n` +
       `Timestamp: ${timestampStr}\n\n` +
       `Sources:\n` +
       payload.sources.map(s => `- ${s.sourceName} (${s.providerType}): Status ${s.status}, Fetched ${s.fetchedCount}, New ${s.ingestedCount}`).join('\n') +
-      `\n\nAll anti-ban shields active. View live jobs on CharteredOS.`;
+      `\n\nAll anti-ban shields active. View live jobs on EZapply.`;
 
     const html = this.renderBaseTemplate(
-      `⚡ [Scraper Alert] +${payload.totalIngested} CA Jobs Ingested`,
+      `⚡ [Scraper Alert] +${payload.totalIngested} Jobs Ingested`,
       bodyHtml,
       {
         text: 'View Live Opportunity Board',
-        url: `${process.env.APP_URL || 'http://localhost:3000'}/articleship`,
+        url: `${process.env.APP_URL || 'http://localhost:3000'}/jobs`,
       }
     );
 
     const dispatchRes = await this.sendEmail({
       to: defaultRecipient,
-      subject: `⚡ [CharteredOS Scraper Alert] +${payload.totalIngested} New Opportunities Ingested (${new Date().toLocaleDateString('en-IN')})`,
+      subject: `⚡ [EZapply Scraper Alert] +${payload.totalIngested} New Opportunities Ingested (${new Date().toLocaleDateString('en-IN')})`,
       html,
       text: bodyText,
     });

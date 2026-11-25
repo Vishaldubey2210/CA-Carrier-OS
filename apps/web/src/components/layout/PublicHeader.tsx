@@ -16,8 +16,8 @@ export function PublicHeader() {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
-    { href: '/articleship', label: 'Articleship (₹99)' },
-    { href: '/jobs', label: 'CA Jobs (₹199)' },
+    { href: '/jobs', label: 'All Jobs' },
+    { href: '/articleship', label: 'Articleship & Internships' },
     { href: '/#pricing', label: 'Pricing' },
     { href: '/#faq', label: 'FAQ' },
   ];
@@ -82,17 +82,17 @@ export function PublicHeader() {
           <Link
             href="/"
             className="flex items-center gap-2.5 no-underline group focus-visible:ring-2 focus-visible:ring-black rounded-md outline-none"
-            aria-label="CharteredOS Home"
+            aria-label="EZapply Home"
           >
             <div className="w-8 h-8 rounded-md bg-[#09090B] flex items-center justify-center text-white font-black text-[13px] tracking-tight">
-              CO
+              EZ
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-[15px] text-[#09090B] tracking-tight leading-tight">
-                CharteredOS
+                EZapply
               </span>
               <span className="text-[10px] font-semibold text-neutral-500 tracking-wider uppercase">
-                Articleship &amp; CA Jobs
+                Career &amp; Application OS
               </span>
             </div>
           </Link>
@@ -194,9 +194,9 @@ export function PublicHeader() {
                   className="flex items-center gap-2 no-underline"
                 >
                   <div className="w-7 h-7 rounded-md bg-black flex items-center justify-center text-white font-bold text-xs">
-                    CO
+                    EZ
                   </div>
-                  <span className="font-bold text-black text-base">CharteredOS</span>
+                  <span className="font-bold text-black text-base">EZapply</span>
                 </Link>
                 <button
                   type="button"

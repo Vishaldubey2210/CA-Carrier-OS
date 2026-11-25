@@ -94,7 +94,7 @@ export default function HowItWorksPage() {
             marginBottom: '1rem',
           }}
         >
-          How CA Career OS Works
+          How EZapply Works
         </h1>
 
         <p style={{ fontSize: '1.0625rem', color: 'var(--text-secondary)', maxWidth: '720px', margin: '0 auto', lineHeight: 1.6 }}>

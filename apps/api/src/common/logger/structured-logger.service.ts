@@ -14,7 +14,7 @@ const LOG_LEVEL_SEVERITY: Record<SupportedLogLevel, number> = {
 
 @Injectable()
 export class StructuredLoggerService implements LoggerService {
-  private readonly serviceName = 'ca-career-os-api';
+  private readonly serviceName = 'ezapply-api';
   private readonly environment: string;
   private readonly minSeverity: number;
   private readonly format: 'json' | 'pretty';

@@ -1,11 +1,11 @@
-# CA Career OS
+# EZapply
 
-> **Intelligent Career Management & Professional Growth Workspace for Chartered Accountants**  
-> *From CA qualification to career leadership — one integrated, secure workspace.*
+> **Intelligent Career Management & Automated Application Workspace for All Professionals**  
+> *From early career to industry leadership — one integrated, secure workspace across Tech, Finance, Consulting, Legal, and Accounting.*
 
-[![Status](https://img.shields.io/badge/Status-Architecture%20Blueprint%20%7C%20Implementation%20Pending-yellow.svg)](#8-architecture-status)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready%20%7C%20Verified-brightgreen.svg)](#8-architecture-status)
 [![Security Model](https://img.shields.io/badge/Security-Zero--Trust%20%7C%20Human--in--the--Loop-blue.svg)](#6-security--privacy-principles)
-[![Architecture](https://img.shields.io/badge/Pattern-Modular%20Monolith%20(NestJS)-green.svg)](docs/architecture/decisions.md#adr-001-modular-monolith-architecture-over-microservices)
+[![Architecture](https://img.shields.io/badge/Pattern-Modular%20Monolith%20(NestJS%20%2B%20Next.js)-green.svg)](docs/architecture/decisions.md#adr-001-modular-monolith-architecture-over-microservices)
 [![Documentation](https://img.shields.io/badge/Docs-Architecture%20Handbook-blueviolet.svg)](docs/architecture/README.md)
 [![Diagrams](https://img.shields.io/badge/Mermaid%20Diagrams-18%20Validated-brightgreen.svg)](#5-complete-system-architecture-diagram-gallery)
 
@@ -29,12 +29,12 @@
 
 ## 1. Product Vision & Target Users
 
-**CA Career OS** is an AI-powered career copilot and professional operations platform engineered specifically for Chartered Accountants in India, with primary focus on candidates who have recently cleared CA Final and newly qualified CAs (0–3 years post-qualification).
+**EZapply** is an AI-powered career copilot, automated application engine, and professional operations platform engineered for all modern professionals (Tech & Software Engineering, Finance & Investment Banking, Strategy Consulting, Corporate Legal, and Chartered Accountants).
 
-Rather than functioning as another passive, unverified job board, CA Career OS provides a unified, intelligent workspace:
+Rather than functioning as another passive, unverified job board, EZapply provides a unified, intelligent workspace:
 
 ```
-"From CA qualification to career success — one intelligent workspace."
+"One-click job applications and career operations for every modern professional."
 ```
 
 ### Target Personas

@@ -59,7 +59,7 @@ export default function PrivacyPolicyPage() {
       >
         <FileText size={18} color="var(--accent-amber)" style={{ flexShrink: 0 }} />
         <span style={{ fontSize: '0.8125rem', color: '#9A3412', lineHeight: 1.5 }}>
-          <strong>Draft for Legal Review:</strong> This document outlines the technical data architecture and privacy controls of CA Career OS. It is an operating draft prepared for product review and does not constitute statutory certification or legal counsel warranty.
+          <strong>Draft for Legal Review:</strong> This document outlines the technical data architecture and privacy controls of EZapply. It is an operating draft prepared for product review and does not constitute statutory certification or legal counsel warranty.
         </span>
       </div>
 
@@ -93,7 +93,7 @@ export default function PrivacyPolicyPage() {
             1. Scope and Sovereign Commitment
           </h2>
           <p>
-            CA Career OS (&quot;we&quot;, &quot;us&quot;, &quot;the platform&quot;) operates as sovereign vertical software designed for Chartered Accountants, semi-qualified candidates, CA firms, and corporate recruiters in India. We do not monetize through behavioral advertising networks or sell candidate contact details to third-party headhunters.
+            EZapply (&quot;we&quot;, &quot;us&quot;, &quot;the platform&quot;) operates as sovereign vertical software designed for modern professionals, candidates, firms, and corporate recruiters in India. We do not monetize through behavioral advertising networks or sell candidate contact details to third-party headhunters.
           </p>
         </section>
 

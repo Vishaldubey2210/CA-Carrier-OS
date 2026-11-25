@@ -54,7 +54,7 @@ export default function AboutPage() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            CA Career OS
+            EZapply
           </span>
         </h1>
 
@@ -113,7 +113,7 @@ export default function AboutPage() {
             Four Principles We Never Compromise
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
-            Every algorithm, data schema, and workflow in CA Career OS is bound by these non-negotiable rules.
+            Every algorithm, data schema, and workflow in EZapply is bound by these non-negotiable rules.
           </p>
         </div>
 

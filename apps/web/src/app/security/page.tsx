@@ -49,7 +49,7 @@ export default function SecurityArchitecturePage() {
         </h1>
 
         <p style={{ fontSize: '1.0625rem', color: 'var(--text-secondary)', maxWidth: '720px', margin: '0 auto', lineHeight: 1.6 }}>
-          How CA Career OS protects confidential articleship records, client compliance portfolios, and candidate privacy through cryptographic and architectural guarantees.
+          How EZapply protects confidential records, user portfolios, and candidate privacy through cryptographic and architectural guarantees.
         </p>
 
         {/* Technical Architecture Review Notice */}

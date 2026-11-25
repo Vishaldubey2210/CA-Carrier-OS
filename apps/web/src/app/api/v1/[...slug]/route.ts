@@ -48,7 +48,7 @@ export async function GET(
           status: 'healthy',
           uptime: process.uptime(),
           timestamp: new Date().toISOString(),
-          service: 'ca-career-os-serverless',
+          service: 'ezapply-serverless',
           latencyMs: latency,
         },
         meta: { correlationId, timestamp: new Date().toISOString() },

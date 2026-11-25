@@ -72,7 +72,7 @@ export function getSmtpConfig() {
   const user = process.env.SMTP_USER?.replace(/^["']|["']$/g, '').trim() || '';
   const pass = process.env.SMTP_PASS?.replace(/^["']|["']$/g, '').trim() || '';
   const fromEmail = process.env.SMTP_FROM_EMAIL?.replace(/^["']|["']$/g, '').trim() || user;
-  const fromName = process.env.SMTP_FROM_NAME?.replace(/^["']|["']$/g, '').trim() || 'CharteredOS — CA Career OS';
+  const fromName = process.env.SMTP_FROM_NAME?.replace(/^["']|["']$/g, '').trim() || 'EZapply';
 
   return { host, port, secure, user, pass, fromEmail, fromName };
 }
@@ -109,10 +109,10 @@ export async function sendOtpViaSmtp(
     </head>
     <body>
       <div class="card">
-        <div class="logo">CharteredOS &bull; CA Career OS</div>
+        <div class="logo">EZapply &bull; Career Operating System</div>
         <h1>Your Security Verification Code</h1>
         <p>${greeting}</p>
-        <p>A sign-in request was initiated for your CA Career OS account. Enter the 6-digit verification code below to verify your email address and access your sovereign workspace:</p>
+        <p>A sign-in request was initiated for your EZapply account. Enter the 6-digit verification code below to verify your email address and access your workspace:</p>
         <div class="otp-container">
           <div class="otp-badge">Single-Use Verification Code</div>
           <div class="otp-code">${otpCode}</div>
@@ -120,7 +120,7 @@ export async function sendOtpViaSmtp(
         </div>
         <p>If you did not request this verification code, please ignore this email or review your account security settings.</p>
         <div class="footer">
-          CharteredOS &bull; Sovereign Career Operating System for Chartered Accountants<br>
+          EZapply &bull; Career Operating System for All Professionals<br>
           Automated system email &bull; Zero-PII protected &bull; Tenant-isolated
         </div>
       </div>
@@ -128,13 +128,13 @@ export async function sendOtpViaSmtp(
     </html>
   `;
 
-  const text = `${greeting}\n\nYour CA Career OS sign-in verification code is: ${otpCode}\n\nThis code is valid for 5 minutes and expires automatically. Do not share this code with anyone.\n\nIf you did not request this code, you can safely disregard this message.`;
+  const text = `${greeting}\n\nYour EZapply sign-in verification code is: ${otpCode}\n\nThis code is valid for 5 minutes and expires automatically. Do not share this code with anyone.\n\nIf you did not request this code, you can safely disregard this message.`;
 
   // 1. Direct HTTPS Resend API dispatch if RESEND_API_KEY is available (immune to datacenter SMTP blocks)
   if (resendApiKey) {
     try {
       logger.info('ResendAPI', `Dispatching OTP via Resend HTTPS API to ${maskEmail(to)}`, undefined, correlationId);
-      const resendFrom = process.env.RESEND_FROM || 'CharteredOS <onboarding@resend.dev>';
+      const resendFrom = process.env.RESEND_FROM || 'EZapply <onboarding@resend.dev>';
       const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -144,7 +144,7 @@ export async function sendOtpViaSmtp(
         body: JSON.stringify({
           from: resendFrom,
           to: [to],
-          subject: `[CA Career OS] ${otpCode} is your verification code`,
+          subject: `[EZapply] ${otpCode} is your verification code`,
           html,
           text,
         }),
@@ -190,7 +190,7 @@ export async function sendOtpViaSmtp(
     const sendPromise = transporter.sendMail({
       from: fromAddress,
       to,
-      subject: `[CA Career OS] ${otpCode} is your verification code`,
+      subject: `[EZapply] ${otpCode} is your verification code`,
       html,
       text,
     });
@@ -220,7 +220,7 @@ export async function sendOtpViaSmtp(
 
     // Provide immediate development/test console log so user is never locked out if provider policy triggers
     console.log(`\n========================================================================`);
-    console.log(`🔐 [CHARTERED-OS AUTH OTP] For ${to} -> Code: [ ${otpCode} ]`);
+    console.log(`🔐 [EZAPPLY AUTH OTP] For ${to} -> Code: [ ${otpCode} ]`);
     console.log(`⏱️  Valid for 5 minutes (SMTP note: ${err.message})`);
     console.log(`========================================================================\n`);
 

@@ -40,7 +40,7 @@ async function bootstrap() {
   process.once('SIGINT', () => handleShutdown('SIGINT'));
 
   await app.listen(env.PORT, '0.0.0.0');
-  logger.log(`🚀 CA Career OS API running on http://localhost:${env.PORT}`);
+  logger.log(`🚀 EZapply API running on http://localhost:${env.PORT}`);
   logger.log(`Health check: http://localhost:${env.PORT}/api/v1/health`);
   logger.log(`Readiness check: http://localhost:${env.PORT}/api/v1/health/ready`);
 }

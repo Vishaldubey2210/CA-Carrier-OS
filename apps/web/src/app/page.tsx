@@ -12,11 +12,11 @@ export default function RootHomePage() {
   const organizationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'CharteredOS',
-    url: 'https://cacareeros.com',
-    logo: 'https://cacareeros.com/logo.png',
+    name: 'EZapply',
+    url: 'https://ezapply.work',
+    logo: 'https://ezapply.work/logo.png',
     description:
-      'Verified CA Articleship vacancies (Form 102/103), Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.',
+      'Verified job openings, automated cold email outreach, and career copilot for every professional across Tech, Finance, Consulting, Legal, and CA Articleships.',
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'IN',

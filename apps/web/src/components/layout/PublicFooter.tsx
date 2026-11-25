@@ -19,23 +19,23 @@ export function PublicFooter() {
             <Link
               href="/"
               className="inline-flex items-center gap-2 no-underline"
-              aria-label="CharteredOS Home"
+              aria-label="EZapply Home"
             >
               <div className="w-8 h-8 rounded-lg bg-[#09090B] flex items-center justify-center text-white font-bold text-sm shadow-xs">
-                CO
+                EZ
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-black text-base tracking-tight leading-tight">
-                  CharteredOS
+                  EZapply
                 </span>
                 <span className="text-[10px] font-medium text-neutral-500 uppercase tracking-wider">
-                  Articleship &amp; CA Jobs
+                  Career &amp; Application OS
                 </span>
               </div>
             </Link>
 
             <p className="text-[13px] text-neutral-600 leading-relaxed max-w-[300px] m-0">
-              The simplest, easiest-to-use platform for verified CA Articleship vacancies and Qualified Chartered Accountant jobs in India.
+              The smart, one-click application platform and career copilot for every professional across Tech, Finance, Consulting, Legal, and Accounting.
             </p>
           </div>
 
@@ -46,6 +46,11 @@ export function PublicFooter() {
             </h4>
             <ul className="list-none p-0 m-0 flex flex-col gap-2 text-[13px]">
               <li>
+                <Link href="/jobs" className="text-neutral-600 hover:text-black transition-colors no-underline">
+                  All Verified Jobs (Tech, Finance, Legal)
+                </Link>
+              </li>
+              <li>
                 <Link href="/articleship" className="text-neutral-600 hover:text-black transition-colors no-underline">
                   Articleship Hub (Form 102/103)
                 </Link>
@@ -53,11 +58,6 @@ export function PublicFooter() {
               <li>
                 <Link href="/articleship" className="text-neutral-600 hover:text-black transition-colors no-underline">
                   Industrial Training (Form 104)
-                </Link>
-              </li>
-              <li>
-                <Link href="/jobs" className="text-neutral-600 hover:text-black transition-colors no-underline">
-                  CA Jobs &amp; Opportunities
                 </Link>
               </li>
               <li>
@@ -115,7 +115,7 @@ export function PublicFooter() {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-white/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-neutral-500">
           <p className="m-0">
-            © {new Date().getFullYear()} CharteredOS. Simple, verified CA Articleship &amp; Job discovery.
+            © {new Date().getFullYear()} EZapply. Smart, verified applications &amp; career copilot for all professionals.
           </p>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="text-neutral-500 hover:text-black transition-colors no-underline">

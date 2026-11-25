@@ -1,5 +1,5 @@
 /**
- * CA Career OS — Centralized Typed API Client
+ * EZapply — Centralized Typed API Client
  * Standardized network communication with canonical /api/v1 routing,
  * cookie credentials, typed response envelopes, correlation ID extraction,
  * timeout controls, safe idempotent retries, and offline detection.

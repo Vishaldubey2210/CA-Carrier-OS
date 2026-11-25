@@ -49,7 +49,7 @@ export function PurposeGovernance() {
             Governance &amp; fiduciary trust
           </h2>
           <p className="text-[15px] text-[#57534E] leading-relaxed">
-            Every database schema, background worker, and matching pipeline in CharteredOS is bound by professional compliance and member privacy.
+            Every database schema, background worker, and matching pipeline in EZapply is bound by professional compliance and member privacy.
           </p>
         </div>
 

@@ -44,7 +44,7 @@ const FAQ_DATA: FaqItem[] = [
   {
     category: 'Privacy & Security',
     q: 'Do you share candidate data with third-party advertising brokers?',
-    a: 'Never. CA Career OS operates strictly as sovereign software. We do not sell candidate resumes, personal emails, or mobile numbers to third-party ad networks or recruitment headhunters.',
+    a: 'Never. EZapply operates strictly as sovereign software. We do not sell candidate resumes, personal emails, or mobile numbers to third-party ad networks or recruitment headhunters.',
   },
   {
     category: 'Privacy & Security',
@@ -72,8 +72,8 @@ const FAQ_DATA: FaqItem[] = [
   },
   {
     category: 'CA Practice OS',
-    q: 'Does CA Career OS comply with ICAI non-solicitation ethics?',
-    a: 'Yes. CA Career OS strictly conforms to Clauses 6 and 7 of Part I of the First Schedule of the Chartered Accountants Act, 1949. We do not solicit professional work or permit commercial touting between practitioners.',
+    q: 'Does EZapply comply with professional non-solicitation ethics?',
+    a: 'Yes. EZapply strictly conforms to professional ethics standards and Clauses 6 and 7 of Part I of the First Schedule of the Chartered Accountants Act, 1949. We do not solicit professional work or permit commercial touting between practitioners.',
   },
 
   // 5. Billing & Invoicing

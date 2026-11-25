@@ -90,10 +90,10 @@ function ResetPasswordContent() {
                 fontSize: '1rem',
               }}
             >
-              CA
+              EZ
             </div>
             <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              CA Career OS
+              EZapply
             </span>
           </Link>
 

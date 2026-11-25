@@ -34,8 +34,76 @@ import {
 } from '@ca-career-os/shared';
 
 export const GENERIC_TEMPLATES = {
+  TECH_ENGINEERING: {
+    name: '1. Tech & Software Engineering Application',
+    subject: 'Application for Software Engineering Role | {candidate_name} | {city}',
+    body: `Dear Engineering Hiring Team at {firm_name},
+
+I am writing to express my strong interest in Software Engineering / Developer opportunities with {firm_name} in {city}.
+
+My Professional Background & Technical Stack:
+• Candidate Name: {candidate_name}
+• Primary Stack: React, Next.js, Node.js, TypeScript, PostgreSQL, Distributed Systems
+• Location: {candidate_city}
+• Contact: {phone}
+• GitHub / Portfolio: {linkedin_url}
+
+I have hands-on experience designing robust backend services, scalable RESTful & GraphQL APIs, and responsive, accessible web applications. I admire {firm_name}'s high-growth engineering standards and would love to contribute to your core product roadmap.
+
+My updated resume is attached for your review. Thank you for your time and consideration.
+
+Best regards,
+{candidate_name}
+Mobile: {phone}
+{linkedin_url}`,
+  },
+  FINANCE_CONSULTING: {
+    name: '2. Finance Analyst & Strategy Consultant Application',
+    subject: 'Application for Finance / Strategy Associate | {candidate_name} | {city}',
+    body: `Dear Hiring Team at {firm_name},
+
+I am writing to formally submit my candidacy for Corporate Finance, Investment Banking, FP&A, or Strategy Consulting roles at {firm_name} in {city}.
+
+Profile Overview:
+• Candidate Name: {candidate_name}
+• Domain: Corporate FP&A, Financial Modeling (DCF/LBO), Due Diligence, Strategy
+• Qualification: {inter_status}
+• Base City: {candidate_city}
+• Phone: {phone}
+
+With a strong analytical grounding in financial statement analysis, operational modeling, and business problem solving, I am eager to drive measurable business outcomes at {firm_name}.
+
+My CV and key project highlights are attached for your consideration.
+
+Warm regards,
+{candidate_name}
+Mobile: {phone}
+{linkedin_url}`,
+  },
+  LEGAL_COMPLIANCE: {
+    name: '3. Legal Associate & Corporate Compliance Application',
+    subject: 'Application for Legal & Compliance Associate | {candidate_name} | {city}',
+    body: `Respected Legal Recruitment Team at {firm_name},
+
+I am writing to submit my application for Legal Associate and Corporate Compliance positions at {firm_name} in {city}.
+
+Summary of Credentials:
+• Name: {candidate_name}
+• Key Focus: Corporate M&A, Contract Negotiation, Regulatory Compliance, Risk Advisory
+• Location: {candidate_city}
+• Contact: {phone}
+
+I bring rigorous attention to contractual precision, statutory adherence, and corporate risk mitigation. I am keen to support {firm_name}'s legal advisory mandates.
+
+My complete Curriculum Vitae is enclosed. Thank you for your review.
+
+Sincerely,
+{candidate_name}
+Phone: {phone}
+{linkedin_url}`,
+  },
   ARTICLESHIP: {
-    name: '1. CA Articleship (Form 102/103 2-Year Scheme)',
+    name: '4. CA Articleship (Form 102/103 2-Year Scheme)',
     subject: 'Application for Articleship | {candidate_name} | {inter_status} | ICAI Reg: {cro_number} | {city}',
     body: `Respected HR & Recruitment Team at {firm_name},
 
@@ -62,7 +130,7 @@ Mobile: {phone}
 {linkedin_url}`,
   },
   INDUSTRIAL_TRAINING: {
-    name: '2. CA Industrial Training (Form 104 - MNCs & Corporates)',
+    name: '5. CA Industrial Training (Form 104 - MNCs & Corporates)',
     subject: 'Application for CA Industrial Training (Form 104) | {candidate_name} | ICAI: {cro_number} | {city}',
     body: `Respected Campus & Finance Hiring Team at {firm_name},
 
@@ -86,7 +154,7 @@ Mobile: {phone}
 {linkedin_url}`,
   },
   QUALIFIED_JOB: {
-    name: '3. Qualified & Semi-Qualified CA Job Application',
+    name: '6. Qualified & Semi-Qualified CA Job Application',
     subject: 'Application for Chartered Accountant Role | {candidate_name} | CA Qualified | {city}',
     body: `Dear Hiring Team at {firm_name},
 
@@ -467,7 +535,7 @@ export function MassMailerSection() {
         {showGuide && (
           <div className="space-y-4 pt-2 border-t border-white/60">
             <p className="text-[13px] text-neutral-600 m-0">
-              Google requires a 16-character <strong>App Password</strong> instead of your normal Gmail password. This allows CharteredOS to securely dispatch your applications directly from your email without ever exposing your main Google Account password.
+              Google requires a 16-character <strong>App Password</strong> instead of your normal Gmail password. This allows EZapply to securely dispatch your applications directly from your email without ever exposing your main Google Account password.
             </p>
 
             {/* 5 Visual Steps */}
@@ -526,7 +594,7 @@ export function MassMailerSection() {
                 </div>
                 <div className="text-[12px] font-bold text-black">Name the App</div>
                 <div className="text-[11px] text-neutral-600 leading-snug">
-                  Type <code>CharteredOS</code> or <code>Articleship Mailer</code> and click <strong>Create</strong>.
+                  Type <code>EZapply</code> or <code>Cold Mailer</code> and click <strong>Create</strong>.
                 </div>
               </div>
 

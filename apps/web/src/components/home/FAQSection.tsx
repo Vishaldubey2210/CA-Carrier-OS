@@ -6,28 +6,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const FAQS = [
   {
-    q: 'What is included in the ₹99 Articleship Pass?',
-    a: 'The ₹99 Articleship Pass gives CA students 3 months of unlimited access to verified articleship vacancies under Form 102/103 (2-year scheme) and Corporate Industrial Training (Form 104) at Big 4, Top 20 firms, and leading MNCs, with direct partner contact details and stipend transparency.',
+    q: 'What is EZapply?',
+    a: 'EZapply is an all-in-one AI career operating system and application suite built for modern professionals across Tech, Finance, Consulting, Legal, and Accounting. It combines verified job discovery, automated cold outreach via personal Gmail SMTP, and smart application tracking.',
   },
   {
-    q: 'What is included in the ₹199 CA Career Pro Pass?',
-    a: 'The ₹199 CA Career Pro Pass includes everything in the Articleship Pass plus full 6-month access to all Qualified and Semi-Qualified CA job postings across Audit, Tax, FP&A, Due Diligence, and Corporate Finance, along with genuine salary benchmarks and direct recruiter connections.',
+    q: 'What is included in the ₹99 Intern & Trainee Pass?',
+    a: 'The ₹99 Pass gives students, graduates, and articleship trainees 3 months of access to verified internships, CA articleship vacancies (Form 102/103), Corporate Industrial Training (Form 104), and our 1-click cold email outreach tool with 5,000+ verified hiring desk contacts.',
   },
   {
-    q: 'Are the articleship and job postings verified?',
-    a: 'Yes. Every vacancy listed on CharteredOS is directly verified from authorized firm career portals, official partner circulars, or confirmed recruiter postings to ensure you never waste time applying to expired or fake listings.',
+    q: 'What is included in the ₹199 Professional Pro Pass?',
+    a: 'The ₹199 Pro Pass provides 6 months of comprehensive access to all verified jobs across Tech, Finance, Consulting, Legal, and Qualified CA roles, along with our 450/day Gmail cold mailer, salary benchmarks, and direct recruiter contacts.',
+  },
+  {
+    q: 'Are the job and articleship postings verified?',
+    a: 'Yes. Every vacancy listed on EZapply is directly verified from authorized employer career portals (Greenhouse, Lever, Workday), official partner circulars, or confirmed recruiter announcements to ensure zero expired or fake listings.',
   },
   {
     q: 'Is there any recurring subscription or auto-debit?',
-    a: 'No. Both the ₹99 Articleship Pass and ₹199 CA Career Pro Pass are strictly one-time payments with zero hidden fees, auto-renewals, or surprise charges.',
+    a: 'No. Both the ₹99 Intern Pass and ₹199 Professional Pro Pass are strictly one-time payments with zero hidden fees, zero auto-renewals, and zero surprise charges.',
   },
   {
-    q: 'How do I apply for the listed vacancies?',
-    a: 'Each listing provides direct outbound links to the official employer career portal, Google Form, or direct HR/Partner email, allowing you to submit your application directly to the decision makers.',
-  },
-  {
-    q: 'Is CharteredOS affiliated with ICAI?',
-    a: 'No. CharteredOS is an independent career platform built specifically to help Indian Chartered Accountants and CA students easily find genuine articleships and jobs.',
+    q: 'Can non-finance professionals (like software developers or consultants) use EZapply?',
+    a: 'Yes, absolutely! EZapply is built for every ambitious professional. Whether you are a software engineer, data scientist, management consultant, corporate lawyer, finance analyst, or CA student, EZapply helps you discover verified opportunities and apply directly.',
   },
 ];
 

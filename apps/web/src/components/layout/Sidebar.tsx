@@ -27,8 +27,8 @@ import { WorkspaceType } from '@ca-career-os/shared';
 const CANDIDATE_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard?tab=outreach', label: 'Mass Outreach (450/Day)', icon: Mail },
-  { href: '/articleship', label: 'Articleship', icon: GraduationCap },
-  { href: '/jobs', label: 'Jobs', icon: Briefcase },
+  { href: '/jobs', label: 'Jobs (All Roles)', icon: Briefcase },
+  { href: '/articleship', label: 'Articleship & Internships', icon: GraduationCap },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -57,14 +57,14 @@ export function Sidebar() {
               fontSize: '0.9375rem',
             }}
           >
-            CO
+            EZ
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
-              CharteredOS
+              EZapply
             </div>
             <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.04em', fontWeight: 500 }}>
-              ARTICLES & JOBS
+              CAREER &amp; JOBS OS
             </div>
           </div>
         </Link>
@@ -127,7 +127,7 @@ export function Sidebar() {
           color: 'var(--text-muted)',
         }}
       >
-        <span style={{ fontWeight: 500 }}>CharteredOS</span>
+        <span style={{ fontWeight: 500 }}>EZapply</span>
         <Link href="/help" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>
           Support
         </Link>

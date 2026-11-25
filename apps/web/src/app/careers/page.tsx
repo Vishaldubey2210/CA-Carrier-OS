@@ -43,7 +43,7 @@ export default function CareersPage() {
             marginBottom: '1rem',
           }}
         >
-          Work at CA Career OS
+          Work at EZapply
         </h1>
 
         <p style={{ fontSize: '1.0625rem', color: 'var(--text-secondary)', maxWidth: '680px', margin: '0 auto', lineHeight: 1.6 }}>

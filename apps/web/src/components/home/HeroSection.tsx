@@ -22,7 +22,7 @@ interface SampleJob {
   id: string;
   firm: string;
   role: string;
-  category: 'ARTICLESHIP' | 'QUALIFIED' | 'INDUSTRIAL_TRAINING';
+  category: 'TECH' | 'FINANCE' | 'CONSULTING' | 'ARTICLESHIP' | 'QUALIFIED' | 'INDUSTRIAL_TRAINING';
   typeLabel: string;
   location: string;
   compensation: string;
@@ -32,58 +32,80 @@ interface SampleJob {
 
 const FEATURED_OPPORTUNITIES: SampleJob[] = [
   {
-    id: 'gt-audit-01',
+    id: 'google-swe-01',
+    firm: 'Google India',
+    role: 'Senior Software Engineer (Distributed Systems & Cloud Core)',
+    category: 'TECH',
+    typeLabel: 'Tech & Engineering',
+    location: 'Bengaluru (Hybrid)',
+    compensation: '₹45L – ₹65L / yr',
+    exposure: 'Distributed Infrastructure, High-Throughput APIs, Kubernetes, Go',
+    url: 'https://careers.google.com',
+  },
+  {
+    id: 'gs-quant-02',
+    firm: 'Goldman Sachs India',
+    role: 'Financial Analyst & Investment Banking Associate',
+    category: 'FINANCE',
+    typeLabel: 'Finance & Banking',
+    location: 'Bengaluru (Hybrid)',
+    compensation: '₹28L – ₹38L / yr',
+    exposure: 'LBO Modeling, M&A Valuation, Financial Risk Engineering',
+    url: 'https://www.goldmansachs.com/careers',
+  },
+  {
+    id: 'mckinsey-strat-03',
+    firm: 'McKinsey & Company',
+    role: 'Management Consultant — Corporate Strategy & Operations',
+    category: 'CONSULTING',
+    typeLabel: 'Consulting & Strategy',
+    location: 'Mumbai / Delhi (Hybrid)',
+    compensation: '₹32L – ₹42L / yr',
+    exposure: 'Digital Transformation, Growth Strategy, Private Equity Diligence',
+    url: 'https://www.mckinsey.com/careers',
+  },
+  {
+    id: 'gt-audit-04',
     firm: 'Grant Thornton Bharat LLP',
     role: 'Senior Associate — Statutory Audit & Assurance',
     category: 'QUALIFIED',
-    typeLabel: 'Qualified CA',
+    typeLabel: 'Chartered Accountant',
     location: 'Mumbai (Hybrid)',
     compensation: '₹14L – ₹18L / yr',
-    exposure: 'CARO 2020, Ind AS 115, Listed Audits',
+    exposure: 'CARO 2020, Ind AS 115, Listed Entity Audits',
     url: 'https://gtbharat.com/careers',
   },
   {
-    id: 'singhi-art-02',
+    id: 'singhi-art-05',
     firm: 'Singhi & Co Chartered Accountants',
-    role: 'CA Article Assistant (2-Year Scheme)',
+    role: 'CA Article Assistant (2-Year Practical Scheme)',
     category: 'ARTICLESHIP',
     typeLabel: 'Articleship (Form 102/103)',
     location: 'Delhi NCR (Onsite)',
     compensation: '₹18,000 – ₹25,000 / mo',
-    exposure: 'Tax Audit (Form 3CD), Statutory Audit, GST Filings',
+    exposure: 'Tax Audit (Form 3CD), Statutory Audit, GST Direct Filings',
     url: 'https://singhico.com/careers',
   },
   {
-    id: 'deloitte-ind-03',
+    id: 'deloitte-ind-06',
     firm: 'Deloitte India Advisory',
-    role: 'CA Industrial Trainee — Financial Reporting',
+    role: 'CA Industrial Trainee — Corporate Finance & Ind AS',
     category: 'INDUSTRIAL_TRAINING',
     typeLabel: 'Industrial Training (Form 104)',
     location: 'Bengaluru (Hybrid)',
     compensation: '₹45,000 – ₹55,000 / mo',
-    exposure: 'Ind AS 116 Leases, Internal Financial Controls',
+    exposure: 'Ind AS 116 Leases, Internal Financial Controls (IFC), SAP S/4HANA',
     url: 'https://www2.deloitte.com/in/en/careers',
   },
   {
-    id: 'bdo-fdd-04',
-    firm: 'BDO India LLP',
-    role: 'Manager — Financial Due Diligence & M&A',
-    category: 'QUALIFIED',
-    typeLabel: 'Qualified CA',
-    location: 'Bengaluru (Onsite)',
-    compensation: '₹22L – ₹28L / yr',
-    exposure: 'Quality of Earnings (QoE), Working Capital Pacing',
-    url: 'https://bdo.in/careers',
-  },
-  {
-    id: 'razorpay-fpa-05',
+    id: 'razorpay-eng-07',
     firm: 'Razorpay Software',
-    role: 'Senior Manager — Corporate FP&A',
-    category: 'QUALIFIED',
-    typeLabel: 'Qualified CA',
+    role: 'Staff Platform Engineer — Payments & Fintech Infrastructure',
+    category: 'TECH',
+    typeLabel: 'Tech & Engineering',
     location: 'Bengaluru (Hybrid)',
-    compensation: '₹26L – ₹34L / yr',
-    exposure: '3-Statement Financial Modeling, SaaS Unit Economics',
+    compensation: '₹40L – ₹52L / yr',
+    exposure: 'Payment Gateways, High-Availability Systems, Node.js & Go',
     url: 'https://boards.greenhouse.io/razorpay',
   },
 ];
@@ -92,12 +114,14 @@ export function HeroSection() {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'ARTICLESHIP' | 'QUALIFIED'>('ALL');
+  const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'TECH' | 'FINANCE' | 'CONSULTING' | 'ARTICLESHIP'>('ALL');
 
   const filteredList = useMemo(() => {
     return FEATURED_OPPORTUNITIES.filter((item) => {
-      if (selectedFilter === 'ARTICLESHIP' && item.category === 'QUALIFIED') return false;
-      if (selectedFilter === 'QUALIFIED' && item.category !== 'QUALIFIED') return false;
+      if (selectedFilter === 'TECH' && item.category !== 'TECH') return false;
+      if (selectedFilter === 'FINANCE' && item.category !== 'FINANCE' && item.category !== 'QUALIFIED') return false;
+      if (selectedFilter === 'CONSULTING' && item.category !== 'CONSULTING') return false;
+      if (selectedFilter === 'ARTICLESHIP' && item.category !== 'ARTICLESHIP' && item.category !== 'INDUSTRIAL_TRAINING') return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -105,7 +129,8 @@ export function HeroSection() {
           item.firm.toLowerCase().includes(q) ||
           item.role.toLowerCase().includes(q) ||
           item.exposure.toLowerCase().includes(q) ||
-          item.location.toLowerCase().includes(q)
+          item.location.toLowerCase().includes(q) ||
+          item.typeLabel.toLowerCase().includes(q)
         );
       }
       return true;
@@ -119,55 +144,67 @@ export function HeroSection() {
         {/* Frosted Glass Status Pill */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-pill text-[12px] font-medium text-neutral-800 mb-5">
           <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-          <span className="font-semibold text-neutral-900">5,000+ Verified CA Firms</span>
+          <span className="font-semibold text-neutral-900">EZapply</span>
           <span className="text-neutral-400">•</span>
-          <span className="text-neutral-600">Form 102/103 &amp; Qualified Openings</span>
+          <span className="text-neutral-600">The Career Operating System for All Professionals</span>
         </div>
 
         <h1 className="text-[clamp(2.1rem,3.6vw,3.25rem)] font-extrabold text-[#09090B] tracking-tight leading-[1.16] mb-4">
-          Verified CA Articleship &amp; Placement Network
+          Smart Applications &amp; Career OS for Every Professional
         </h1>
 
-        <p className="text-[clamp(1rem,1.15vw,1.125rem)] text-neutral-600 leading-relaxed max-w-[620px] mx-auto mb-6 font-normal">
-          The simplest and easiest way to search verified Articleship openings (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.
+        <p className="text-[clamp(1rem,1.15vw,1.125rem)] text-neutral-600 leading-relaxed max-w-[660px] mx-auto mb-6 font-normal">
+          Whether you&apos;re in Tech, Finance, Consulting, Legal, or CA Articleship—discover verified opportunities, dispatch cold emails, and track applications with EZapply.
         </p>
 
         {/* Frosted Glass Feature Badges */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-8 text-[12px] text-neutral-700">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill">
             <CheckCircle2 size={13} className="text-emerald-600" />
-            <span>Form 102/103 2-Yr Scheme</span>
+            <span>Tech &amp; Software Roles</span>
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill">
             <CheckCircle2 size={13} className="text-emerald-600" />
-            <span>Form 104 Industrial Training</span>
+            <span>Finance &amp; Banking</span>
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill">
             <CheckCircle2 size={13} className="text-emerald-600" />
-            <span>1-Click Mass Outreach</span>
+            <span>Consulting &amp; Strategy</span>
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill">
             <CheckCircle2 size={13} className="text-emerald-600" />
-            <span>₹99 / ₹199 Transparent Pricing</span>
+            <span>CA Articleship &amp; Jobs</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>1-Click Cold Mailer</span>
           </span>
         </div>
 
         {/* Primary Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/articleship"
+            href="/jobs"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#09090B] hover:bg-neutral-800 text-white text-[14px] font-semibold transition-all shadow-md no-underline"
           >
-            <GraduationCap size={16} />
-            <span>Articleship Hub (₹99)</span>
+            <Briefcase size={16} />
+            <span>Explore All Jobs</span>
           </Link>
 
           <Link
-            href="/jobs"
+            href="/articleship"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-pill text-[#09090B] hover:bg-white text-[14px] font-semibold transition-all no-underline"
           >
-            <Briefcase size={15} />
-            <span>CA Jobs (₹199)</span>
+            <GraduationCap size={15} />
+            <span>Articleship &amp; Internships</span>
+          </Link>
+
+          <Link
+            href="/dashboard?tab=outreach"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg glass-pill text-neutral-700 hover:text-black text-[13px] font-semibold transition-all no-underline"
+          >
+            <Mail size={14} />
+            <span>Cold Mailer</span>
           </Link>
 
           <Link
@@ -191,14 +228,14 @@ export function HeroSection() {
             />
             <input
               type="text"
-              placeholder="Search by firm, discipline, or city..."
+              placeholder="Search by role, company, skills, or city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-[13px] text-black glass-input rounded-lg placeholder:text-neutral-400"
             />
           </div>
 
-          <div className="inline-flex items-center gap-1 bg-black/5 backdrop-blur-md p-1 rounded-lg border border-white/50 self-start sm:self-auto text-[12px]">
+          <div className="inline-flex items-center gap-1 bg-black/5 backdrop-blur-md p-1 rounded-lg border border-white/50 self-start sm:self-auto text-[12px] flex-wrap">
             <button
               type="button"
               onClick={() => setSelectedFilter('ALL')}
@@ -208,7 +245,40 @@ export function HeroSection() {
                   : 'text-neutral-700 hover:text-black'
               }`}
             >
-              All Openings
+              All Roles
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedFilter('TECH')}
+              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
+                selectedFilter === 'TECH'
+                  ? 'bg-black text-white shadow-xs'
+                  : 'text-neutral-700 hover:text-black'
+              }`}
+            >
+              Tech &amp; Engineering
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedFilter('FINANCE')}
+              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
+                selectedFilter === 'FINANCE'
+                  ? 'bg-black text-white shadow-xs'
+                  : 'text-neutral-700 hover:text-black'
+              }`}
+            >
+              Finance &amp; Banking
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedFilter('CONSULTING')}
+              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
+                selectedFilter === 'CONSULTING'
+                  ? 'bg-black text-white shadow-xs'
+                  : 'text-neutral-700 hover:text-black'
+              }`}
+            >
+              Consulting
             </button>
             <button
               type="button"
@@ -220,17 +290,6 @@ export function HeroSection() {
               }`}
             >
               Articleship &amp; Trainees
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedFilter('QUALIFIED')}
-              className={`px-3 py-1 rounded-md transition-all cursor-pointer font-medium ${
-                selectedFilter === 'QUALIFIED'
-                  ? 'bg-black text-white shadow-xs'
-                  : 'text-neutral-700 hover:text-black'
-              }`}
-            >
-              Qualified CAs
             </button>
           </div>
         </div>

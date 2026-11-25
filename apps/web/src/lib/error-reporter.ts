@@ -1,5 +1,5 @@
 /**
- * CA Career OS — Frontend Observability & Error Reporter
+ * EZapply — Frontend Observability & Error Reporter
  * Captures runtime UI/client exceptions with privacy sanitization
  * (redacting passwords, OTPs, auth tokens, financial records, and resume text).
  */

@@ -115,7 +115,7 @@ export default function ContactPage() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            CA Career OS Team
+            EZapply Team
           </span>
         </h1>
 

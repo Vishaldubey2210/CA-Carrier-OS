@@ -13,35 +13,35 @@ export function FinalCTA() {
         </div>
 
         <h2 className="text-[clamp(1.75rem,2.5vw,2.25rem)] font-extrabold text-[#09090B] tracking-tight leading-snug m-0 max-w-[580px]">
-          Ready to Find Your Articleship or Next CA Role?
+          Ready to Land Your Dream Role with EZapply?
         </h2>
 
         <p className="text-[15px] text-neutral-600 max-w-[540px] m-0 leading-relaxed">
-          Access verified articleship vacancies, corporate industrial training, and qualified CA job postings across top firms in India.
+          Access verified openings across Tech, Finance, Consulting, Legal, and Accounting with direct application portals and 1-click cold outreach.
         </p>
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Link
-            href="/articleship"
+            href="/jobs"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#09090B] hover:bg-neutral-800 text-white text-[14px] font-semibold transition-all shadow-md no-underline"
           >
-            <GraduationCap size={16} />
-            <span>Browse Articleship (₹99)</span>
+            <Briefcase size={16} />
+            <span>Explore All Jobs</span>
           </Link>
 
           <Link
-            href="/jobs"
+            href="/articleship"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass-pill text-[#09090B] hover:bg-white text-[14px] font-semibold transition-all no-underline"
           >
-            <Briefcase size={15} />
-            <span>Explore CA Jobs (₹199)</span>
+            <GraduationCap size={15} />
+            <span>Articleship &amp; Internships (₹99)</span>
           </Link>
         </div>
 
         <span className="text-[12px] text-neutral-500 pt-1 flex items-center gap-1.5">
           <CheckCircle2 size={13} className="text-emerald-600" />
-          <span>Direct applications • Zero agency middleman • 5,000+ verified firm listings</span>
+          <span>Direct applications • Zero agency middleman • Built for every modern professional</span>
         </span>
       </div>
     </section>

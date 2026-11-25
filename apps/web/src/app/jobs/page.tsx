@@ -123,7 +123,7 @@ export default function JobsPage() {
         setJobs(jobsRes.data);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Failed to communicate with CA Career OS API.');
+      setErrorMsg(err.message || 'Failed to communicate with EZapply API.');
     }
 
     // 2. Fetch candidate pipeline applications & saved listings (safe for demo / guest)
@@ -178,7 +178,20 @@ export default function JobsPage() {
       if (selectedChannel === 'ARTICLESHIP' && j.opportunityType !== 'ARTICLESHIP' && j.opportunityType !== 'INDUSTRIAL_TRAINING') return false;
 
       // Opportunity type filter
-      if (selectedOpportunityType !== 'ALL' && j.opportunityType !== selectedOpportunityType) return false;
+      if (selectedOpportunityType !== 'ALL') {
+        if (selectedOpportunityType === 'TECH_ROLES') {
+          const isTech = j.title.toLowerCase().match(/(developer|engineer|software|frontend|backend|fullstack|data|devops|architect)/i);
+          if (!isTech) return false;
+        } else if (selectedOpportunityType === 'CONSULTING_ROLES') {
+          const isConsulting = j.caPathway === 'CONSULTING' || j.title.toLowerCase().match(/(consult|strategy|advisory|analyst)/i);
+          if (!isConsulting) return false;
+        } else if (selectedOpportunityType === 'FINANCE_EXECUTIVE') {
+          const isFin = j.caPathway === 'FPA' || j.caPathway === 'IB' || j.caPathway === 'CORP_FIN' || j.opportunityType === 'FINANCE_EXECUTIVE' || j.title.toLowerCase().match(/(finance|fp&a|banking|treasury|equity|investment)/i);
+          if (!isFin) return false;
+        } else if (j.opportunityType !== selectedOpportunityType) {
+          return false;
+        }
+      }
 
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -227,7 +240,7 @@ export default function JobsPage() {
       if (isCurrentlySaved) {
         await apiClient.delete(`/jobs/${jobId}/save`);
       } else {
-        await apiClient.post(`/jobs/${jobId}/save`, { notes: 'Saved from CA Career OS Job Board' });
+        await apiClient.post(`/jobs/${jobId}/save`, { notes: 'Saved from EZapply Job Board' });
       }
     } catch {
       // Retain optimistic state
@@ -626,7 +639,7 @@ export default function JobsPage() {
                 />
                 <input
                   type="text"
-                  placeholder="Search by role title, firm, or technical skills (e.g. Ind AS 115, Transfer Pricing, FP&A)..."
+                  placeholder="Search by role, company, or skills (e.g. Software, Finance, Consulting, React, Audit)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
@@ -710,14 +723,15 @@ export default function JobsPage() {
 
             {/* Role Level & Opportunity Type */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.625rem' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Level:</span>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', marginRight: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Discipline:</span>
               {[
-                { id: 'ALL', label: 'All Levels' },
-                { id: 'ARTICLESHIP', label: 'Articleship' },
+                { id: 'ALL', label: 'All Roles' },
+                { id: 'TECH_ROLES', label: 'Tech & Engineering' },
+                { id: 'FINANCE_EXECUTIVE', label: 'Finance & Banking' },
+                { id: 'CONSULTING_ROLES', label: 'Consulting' },
+                { id: 'ARTICLESHIP', label: 'Articleship (Form 102/103)' },
                 { id: 'INDUSTRIAL_TRAINING', label: 'Industrial Training' },
-                { id: 'CA_FRESHER', label: 'CA Fresher' },
-                { id: 'QUALIFIED_CA', label: 'Qualified CA' },
-                { id: 'FINANCE_EXECUTIVE', label: 'FP&A / Finance' },
+                { id: 'QUALIFIED_CA', label: 'Chartered Accountant' },
               ].map((ot) => (
                 <button
                   key={ot.id}
@@ -1603,7 +1617,7 @@ export default function JobsPage() {
                 <CheckCircle2 size={36} style={{ margin: '0 auto 0.75rem' }} />
                 <h4 style={{ fontWeight: 700 }}>Report Submitted</h4>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                  Thank you for keeping CA Career OS clean and genuine. Our moderation queue has flagged this vacancy for provenance revalidation.
+                  Thank you for keeping EZapply clean and genuine. Our moderation queue has flagged this vacancy for provenance revalidation.
                 </p>
               </div>
             ) : (

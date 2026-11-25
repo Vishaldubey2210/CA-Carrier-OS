@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
             1. Acceptance of Terms
           </h2>
           <p>
-            By creating an account or accessing CA Career OS (&quot;the Platform&quot;), you agree to be legally bound by these Terms of Service. If you are entering into these terms on behalf of a partnership firm, corporate entity, or recruitment agency, you represent that you hold the legal authority to bind that organization.
+            By creating an account or accessing EZapply (&quot;the Platform&quot;), you agree to be legally bound by these Terms of Service. If you are entering into these terms on behalf of a partnership firm, corporate entity, or recruitment agency, you represent that you hold the legal authority to bind that organization.
           </p>
         </section>
 
@@ -91,7 +91,7 @@ export default function TermsOfServicePage() {
             3. ICAI Code of Ethics Alignment
           </h2>
           <p>
-            CA Career OS is strictly aligned with the Code of Ethics established by the Institute of Chartered Accountants of India (ICAI). In particular:
+            EZapply is strictly aligned with professional ethics and the Code of Ethics established by regulatory bodies in India. In particular:
           </p>
           <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li>Users shall not solicit professional clients in violation of Clauses 6 and 7 of Part I of the First Schedule of the Chartered Accountants Act, 1949.</li>
@@ -126,7 +126,7 @@ export default function TermsOfServicePage() {
             6. Statutory Disclaimer & Limitation of Liability
           </h2>
           <p>
-            CA Career OS is an independent vertical SaaS provider. We are not an official organ of the Institute of Chartered Accountants of India (ICAI) and do not guarantee statutory examination results or campus placement hiring offers. To the maximum extent permitted by Indian law, CA Career OS is provided &quot;as is&quot; without warranties of any kind.
+            EZapply is an independent professional SaaS provider. We do not guarantee statutory examination results or campus placement hiring offers. To the maximum extent permitted by Indian law, EZapply is provided &quot;as is&quot; without warranties of any kind.
           </p>
         </section>
 

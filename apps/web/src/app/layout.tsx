@@ -4,39 +4,46 @@ import { AppShell } from '../components/layout/AppShell';
 import { AuthProvider } from '../context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'CharteredOS — Verified CA Articleship & Job Board',
+  title: 'EZapply — Smart Job Applications & Career OS for All Professionals',
   description:
-    'The simplest platform for verified CA Articleship vacancies (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.',
+    'The simplest, smartest career platform for verified job openings, cold email outreach, and one-click applications across Tech, Finance, Consulting, Legal, and CA Articleships.',
   keywords: [
+    'EZapply',
+    'Job Application',
+    'Career OS',
+    'Tech Jobs',
+    'Software Engineer Jobs',
+    'Finance Jobs',
+    'Investment Banking',
+    'Management Consulting',
+    'Legal Associate Jobs',
     'Chartered Accountant',
-    'CharteredOS',
     'CA Articleship',
     'Articleship Vacancies',
     'Form 102',
     'Form 103',
     'Form 104 Industrial Training',
-    'CA Jobs India',
-    'Big 4 Articleship',
+    'Cold Mail Outreach',
   ],
-  authors: [{ name: 'CharteredOS' }],
-  metadataBase: new URL('https://cacareeros.com'),
+  authors: [{ name: 'EZapply' }],
+  metadataBase: new URL('https://ezapply.work'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'CharteredOS — Verified CA Articleship & Job Board',
+    title: 'EZapply — Smart Job Applications & Career OS for All Professionals',
     description:
-      'Verified CA Articleship vacancies (Form 102/103), Corporate Industrial Training (Form 104), and Qualified Chartered Accountant jobs in India.',
-    url: 'https://cacareeros.com',
-    siteName: 'CharteredOS',
+      'Verified job openings, cold email outreach, and one-click applications across Tech, Finance, Consulting, Legal, and CA Articleships.',
+    url: 'https://ezapply.work',
+    siteName: 'EZapply',
     locale: 'en_IN',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CharteredOS — Verified CA Articleship & Job Board',
+    title: 'EZapply — Smart Job Applications & Career OS for All Professionals',
     description:
-      'Verified CA Articleship vacancies and Qualified Chartered Accountant jobs in India.',
+      'Verified job openings and automated outreach across Tech, Finance, Consulting, Legal, and CA Articleships.',
   },
   robots: {
     index: true,

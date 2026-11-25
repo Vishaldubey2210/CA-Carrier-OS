@@ -275,7 +275,7 @@ export default function SettingsPage() {
             Email & In-App Alerts
           </h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-            Configure how and when CA Career OS sends you critical career updates.
+            Configure how and when EZapply sends you critical career updates.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '640px' }}>

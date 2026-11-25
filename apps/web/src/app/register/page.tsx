@@ -243,7 +243,7 @@ export default function RegisterPage() {
               boxShadow: '0 2px 4px rgba(2, 132, 199, 0.2)',
             }}
           >
-            CA
+            EZ
           </div>
           <h1
             style={{
@@ -254,11 +254,11 @@ export default function RegisterPage() {
               marginBottom: '0.25rem',
             }}
           >
-            {step === 'FORM' ? 'Create your account' : 'Check your email'}
+            {step === 'FORM' ? 'Create your EZapply account' : 'Check your email'}
           </h1>
           <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
             {step === 'FORM'
-              ? 'Sovereign career platform for Chartered Accountants'
+              ? 'Career operating system for all professionals'
               : `We sent a 6-digit verification code to ${maskedEmail}`}
           </p>
         </div>

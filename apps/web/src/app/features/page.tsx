@@ -206,7 +206,7 @@ export default function FeaturesPage() {
         </h1>
 
         <p style={{ fontSize: '1.0625rem', color: 'var(--text-secondary)', maxWidth: '750px', margin: '0 auto 2rem', lineHeight: 1.6 }}>
-          Explore the 9 core modules of CA Career OS. Every capability is mapped to real backend domain services, persistent data models, and verified test suites.
+          Explore the core modules of EZapply. Every capability is mapped to real backend domain services, persistent data models, and verified test suites.
         </p>
 
         {/* Filter Pills */}

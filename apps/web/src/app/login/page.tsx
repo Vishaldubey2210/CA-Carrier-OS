@@ -233,7 +233,7 @@ export default function LoginPage() {
               boxShadow: 'var(--shadow-sm)',
             }}
           >
-            CA
+            EZ
           </div>
 
           <h1
@@ -245,11 +245,11 @@ export default function LoginPage() {
               marginBottom: '0.375rem',
             }}
           >
-            {step === 'CREDENTIALS' ? 'Sign in to CA Career OS' : 'Verify Your Identity'}
+            {step === 'CREDENTIALS' ? 'Sign in to EZapply' : 'Verify Your Identity'}
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
             {step === 'CREDENTIALS'
-              ? 'Multi-Tenant Chartered Accountant Career Platform'
+              ? 'Career Operating System for All Professionals'
               : `Security code dispatched to ${maskedEmail}`}
           </p>
         </div>

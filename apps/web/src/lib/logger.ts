@@ -1,5 +1,5 @@
 /**
- * CA Career OS — Production-Grade Universal Structured Logger
+ * EZapply — Production-Grade Universal Structured Logger
  * Operates across Next.js Client Components, Server Components, and Serverless API Routes.
  * Automatic privacy redaction, correlation tracking, and JSON serialization in production.
  */

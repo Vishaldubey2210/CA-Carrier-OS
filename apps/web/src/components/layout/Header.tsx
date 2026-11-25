@@ -402,7 +402,7 @@ export function Header() {
 
             <button
               onClick={handleLogout}
-              title="Sign out of CharteredOS"
+              title="Sign out of EZapply"
               style={{
                 background: 'var(--danger-surface)',
                 border: '1px solid var(--danger-border)',
@@ -467,14 +467,14 @@ export function Header() {
                     fontSize: '0.875rem',
                   }}
                 >
-                  CO
+                  EZ
                 </div>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
-                    CharteredOS
+                    EZapply
                   </div>
                   <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    CAREER PLATFORM
+                    CAREER OS
                   </div>
                 </div>
               </Link>

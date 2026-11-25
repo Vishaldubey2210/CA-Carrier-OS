@@ -80,7 +80,7 @@ export default function CookiePolicyPage() {
               Zero Third-Party Advertising Trackers
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
-              CA Career OS does not deploy behavioral advertising trackers, third-party remarketing pixels, or commercial data-broker cookies. We only set strictly necessary first-party cookies essential for secure session management.
+              EZapply does not deploy behavioral advertising trackers, third-party remarketing pixels, or commercial data-broker cookies. We only set strictly necessary first-party cookies essential for secure session management.
             </p>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function CookiePolicyPage() {
             1. What Cookies We Set and Why
           </h2>
           <p style={{ marginBottom: '1.25rem' }}>
-            Below is the exhaustive list of cookies set by CA Career OS:
+            Below is the exhaustive list of cookies set by EZapply:
           </p>
 
           <div className="glass-panel" style={{ overflowX: 'auto', padding: '0.5rem' }}>
