@@ -83,7 +83,7 @@ export default function ArticleshipPage() {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      const res = await apiClient.get<JobDetail[]>('/jobs?limit=100');
+      const res = await apiClient.get<JobDetail[]>('/jobs?limit=500');
       if (res.success && Array.isArray(res.data)) {
         const articleshipList = res.data.filter(
           (j) =>
@@ -91,7 +91,9 @@ export default function ArticleshipPage() {
             j.opportunityType === 'INDUSTRIAL_TRAINING' ||
             j.title.toLowerCase().includes('article') ||
             j.title.toLowerCase().includes('trainee') ||
-            j.title.toLowerCase().includes('intern')
+            j.title.toLowerCase().includes('form 102') ||
+            j.title.toLowerCase().includes('form 103') ||
+            j.title.toLowerCase().includes('form 104')
         );
         setJobs(articleshipList.length > 0 ? articleshipList : res.data);
       }
@@ -117,8 +119,15 @@ export default function ArticleshipPage() {
   };
 
   const handleDirectApply = (url?: string | null) => {
-    const targetUrl = url || 'https://cajobs.icai.org/';
-    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    if (!url || url === '#' || url.includes('placeholder')) {
+      window.open('https://cajobs.icai.org/', '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (url.startsWith('mailto:')) {
+      window.location.href = url;
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const filteredJobs = useMemo(() => {
@@ -731,8 +740,26 @@ export default function ArticleshipPage() {
                           {firmInitials}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.8125rem', lineHeight: 1.3 }}>
-                            {job.title}
+                          <div>
+                            <a
+                              href={targetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              style={{
+                                fontWeight: 600,
+                                color: 'var(--text-primary)',
+                                fontSize: '0.8125rem',
+                                lineHeight: 1.3,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                              }}
+                            >
+                              <span>{job.title}</span>
+                              <ExternalLink size={11} style={{ opacity: 0.6 }} />
+                            </a>
                           </div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.125rem', flexWrap: 'wrap' }}>
                             <span>{job.companyName}</span>
@@ -804,9 +831,12 @@ export default function ArticleshipPage() {
                           {isSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                         </button>
                         <button
-                          onClick={() => handleDirectApply(targetUrl)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDirectApply(targetUrl);
+                          }}
                           className="btn btn-secondary"
-                          style={{ fontSize: '0.75rem', padding: '0.3125rem 0.625rem', fontWeight: 600 }}
+                          style={{ fontSize: '0.75rem', padding: '0.3125rem 0.625rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                         >
                           Apply ↗
                         </button>

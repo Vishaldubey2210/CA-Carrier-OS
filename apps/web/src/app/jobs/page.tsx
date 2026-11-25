@@ -118,7 +118,7 @@ export default function JobsPage() {
 
     // 1. Fetch public verified jobs catalog (non-blocking)
     try {
-      const jobsRes = await apiClient.get<JobDetail[]>('/jobs');
+      const jobsRes = await apiClient.get<JobDetail[]>('/jobs?limit=500');
       if (jobsRes.success && Array.isArray(jobsRes.data)) {
         setJobs(jobsRes.data);
       }

@@ -59,7 +59,7 @@ export async function GET(
 
   // 2. Verified Jobs search & filter: /api/v1/jobs
   if (path === 'jobs') {
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
+    const limit = parseInt(searchParams.get('limit') || '500', 10);
     const search = searchParams.get('search')?.toLowerCase() || searchParams.get('query')?.toLowerCase() || '';
     const opportunityType = searchParams.get('opportunityType') || 'ALL';
     const pathway = searchParams.get('pathway') || searchParams.get('caPathway') || 'ALL';

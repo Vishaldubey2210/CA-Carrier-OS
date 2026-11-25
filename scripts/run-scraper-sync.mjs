@@ -117,8 +117,20 @@ async function runScraperSync() {
     if (j?.id) jobMap.set(j.id, j);
   }
 
+  // Filter out any non-CA or fake test fixture jobs
+  const bannedKeywords = ['software', 'engineer', 'developer', 'full stack', 'product manager', 'ai agent', 'machine learning', 'data science', 'sales', 'customer support', 'marketing', 'mobile', 'react', 'frontend', 'backend', 'gh-10', 'lev-20', 'example.com', 'placeholder'];
+  const bannedCompanies = ['binance', 'gitlab', 'canonical', 'reddit', 'twilio', 'stripe', 'clickup', 'dandy', 'phantom', 'liftoff', 'juniper square', 'zip', 'samsara', 'proper ai', 'certik', 'reedsy', 'serve robotics', 'thumbtack', 'kalshi', 'bjak', 'cloudbeds', 'hims & hers'];
+
   let newCount = 0;
   for (const nj of allScrapedJobs) {
+    const title = (nj.title || '').toLowerCase();
+    const company = (nj.companyName || '').toLowerCase();
+    const url = (nj.applicationUrl || nj.canonicalUrl || '').toLowerCase();
+    if (bannedKeywords.some((b) => title.includes(b) || url.includes(b))) continue;
+    if (bannedCompanies.some((b) => company.includes(b))) continue;
+    if (url.includes('jobicy') && nj.opportunityType === 'ARTICLESHIP') continue;
+    if (url.includes('yubhub')) continue;
+
     if (!jobMap.has(nj.id)) {
       jobMap.set(nj.id, nj);
       newCount++;
