@@ -40,6 +40,7 @@ export default function LoginPage() {
   const [challengeId, setChallengeId] = useState<string>('');
   const [maskedEmail, setMaskedEmail] = useState<string>('');
   const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
+  const [previewCode, setPreviewCode] = useState<string | null>(null);
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
@@ -90,6 +91,12 @@ export default function LoginPage() {
       setMaskedEmail(res.maskedEmail || email);
       setResendCooldown(res.resendCooldownSeconds || 60);
       setDeliveryNote(res.deliveryNote || null);
+      if (res.previewCode) {
+        setPreviewCode(res.previewCode);
+        setOtpDigits(res.previewCode.split('').slice(0, 6));
+      } else {
+        setPreviewCode(null);
+      }
       setStep('OTP');
       setError(null);
     } else {
@@ -161,7 +168,13 @@ export default function LoginPage() {
       setResendCooldown(60);
       setResendSuccess(res.message || 'A fresh verification code has been dispatched.');
       setDeliveryNote(res.deliveryNote || null);
-      setOtpDigits(['', '', '', '', '', '']);
+      if (res.previewCode) {
+        setPreviewCode(res.previewCode);
+        setOtpDigits(res.previewCode.split('').slice(0, 6));
+      } else {
+        setPreviewCode(null);
+        setOtpDigits(['', '', '', '', '', '']);
+      }
       digitRefs[0]?.current?.focus();
     } else {
       setError(res.error || 'Failed to resend code. Please try again later.');
@@ -172,6 +185,8 @@ export default function LoginPage() {
     setStep('CREDENTIALS');
     setError(null);
     setResendSuccess(null);
+    setDeliveryNote(null);
+    setPreviewCode(null);
     setOtpDigits(['', '', '', '', '', '']);
   };
 
@@ -430,6 +445,46 @@ export default function LoginPage() {
               >
                 <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>{deliveryNote}</span>
+              </div>
+            )}
+
+            {previewCode && (
+              <div
+                style={{
+                  padding: '0.625rem 0.875rem',
+                  borderRadius: '8px',
+                  background: 'rgba(2, 132, 199, 0.08)',
+                  border: '1px solid rgba(2, 132, 199, 0.25)',
+                  color: 'var(--brand-primary, #0284c7)',
+                  fontSize: '0.8125rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '0.5rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShieldCheck size={16} style={{ flexShrink: 0 }} />
+                  <span>
+                    Auto-filled Code: <strong style={{ fontFamily: 'monospace', letterSpacing: '0.1em' }}>{previewCode}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOtpDigits(previewCode.split('').slice(0, 6))}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--brand-primary, #0284c7)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: '0.2rem 0.4rem',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Fill
+                </button>
               </div>
             )}
 

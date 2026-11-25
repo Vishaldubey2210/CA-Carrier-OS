@@ -83,6 +83,7 @@ export async function sendOtpViaSmtp(
   firstName?: string,
   correlationId?: string
 ): Promise<{ success: boolean; messageId: string; simulated?: boolean; note?: string }> {
+  const resendApiKey = process.env.RESEND_API_KEY?.trim();
   const smtp = getSmtpConfig();
   const greeting = firstName ? `Hello ${firstName},` : 'Hello,';
   const fromAddress = `"${smtp.fromName}" <${smtp.fromEmail}>`;
@@ -128,6 +129,39 @@ export async function sendOtpViaSmtp(
   `;
 
   const text = `${greeting}\n\nYour CA Career OS sign-in verification code is: ${otpCode}\n\nThis code is valid for 5 minutes and expires automatically. Do not share this code with anyone.\n\nIf you did not request this code, you can safely disregard this message.`;
+
+  // 1. Direct HTTPS Resend API dispatch if RESEND_API_KEY is available (immune to datacenter SMTP blocks)
+  if (resendApiKey) {
+    try {
+      logger.info('ResendAPI', `Dispatching OTP via Resend HTTPS API to ${maskEmail(to)}`, undefined, correlationId);
+      const resendFrom = process.env.RESEND_FROM || 'CharteredOS <onboarding@resend.dev>';
+      const resendRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: resendFrom,
+          to: [to],
+          subject: `[CA Career OS] ${otpCode} is your verification code`,
+          html,
+          text,
+        }),
+      });
+
+      if (resendRes.ok) {
+        const resendData = await resendRes.json();
+        logger.info('ResendAPI', `OTP email dispatched successfully via Resend to ${maskEmail(to)}`, { id: resendData.id }, correlationId);
+        return { success: true, messageId: resendData.id, simulated: false };
+      } else {
+        const errPayload = await resendRes.text();
+        logger.warn('ResendAPI', `Resend API returned non-200: ${errPayload}`, undefined, correlationId);
+      }
+    } catch (resendErr: any) {
+      logger.warn('ResendAPI', `Resend API error: ${resendErr.message}`, undefined, correlationId);
+    }
+  }
 
   logger.info(
     'SMTP',
@@ -265,7 +299,7 @@ export async function createOtpChallenge(
     expiresInSeconds,
     resendCooldownSeconds,
     deliveryNote: dispatch.note || undefined,
-    previewCode: process.env.NODE_ENV === 'test' ? otpCode : undefined,
+    previewCode: (dispatch.simulated || process.env.NODE_ENV === 'test') ? otpCode : undefined,
   };
 }
 
@@ -313,7 +347,7 @@ export async function resendOtpChallenge(
     expiresInSeconds: 300,
     resendCooldownSeconds: 60,
     deliveryNote: dispatch.note || undefined,
-    previewCode: process.env.NODE_ENV === 'test' ? otpCode : undefined,
+    previewCode: (dispatch.simulated || process.env.NODE_ENV === 'test') ? otpCode : undefined,
   };
 }
 
