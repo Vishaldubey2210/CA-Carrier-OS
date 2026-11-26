@@ -66349,5 +66349,48 @@
         "verifiedAt": "2026-11-25T17:51:21.892Z"
       }
     ]
+  },
+  {
+    "externalJobId": "eirc-art-2026-kol-01",
+    "title": "Article Assistant — Statutory Audit & Bank Audit Exposure",
+    "companyName": "L. B. Jha & Co. (EIRC Reg: 301088E)",
+    "locationCity": "Kolkata",
+    "workArrangement": "ONSITE",
+    "caPathway": "AUDIT",
+    "opportunityType": "ARTICLESHIP",
+    "channel": "EXTERNAL",
+    "sourceProvider": "EIRC_ICAI",
+    "sourceUrl": "https://eirc-icai.org/public/vacancy/details/articleship-learning",
+    "canonicalUrl": "https://eirc-icai.org/public/vacancy/details/articleship-learning",
+    "applicationUrl": "https://eirc-icai.org/public/vacancy/details/articleship-learning",
+    "attribution": "Official EIRC ICAI Article Placement Portal (Live Notice Board)",
+    "salaryDisclosed": true,
+    "salaryMin": 96000,
+    "salaryMax": 144000,
+    "experienceMin": 0,
+    "experienceMax": 0,
+    "rawDescription": "EIRC approved vacancy for CA Intermediate (Both Groups / Single Group) passed candidates. Hands-on practical training in statutory audit, concurrent audit of scheduled commercial banks, and MCA ROC filing compliances under Form 102/103.",
+    "mandatorySkills": [
+      "CA Intermediate Pass",
+      "ICITSS (ITT & Orientation)"
+    ],
+    "preferredSkills": [
+      "TallyPrime",
+      "MS Excel (VLOOKUP, Pivot)",
+      "Audit Standards"
+    ],
+    "requiredQualification": "SEMI_QUALIFIED",
+    "minArticleshipMonths": 0,
+    "preferredFirmTiers": [
+      "MID_SIZE",
+      "REGIONAL_REPUTED"
+    ],
+    "keyResponsibilities": [
+      "Conduct vouching, verification, and ledger scrutiny.",
+      "Assist senior audit partners in compiling Form 3CD Tax Audit reports.",
+      "Draft audit observations and walk-through test workpapers."
+    ],
+    "originalPostedAt": "2026-11-26T01:13:09.388Z",
+    "verificationStatus": "SOURCE_ACTIVE"
   }
 ]
